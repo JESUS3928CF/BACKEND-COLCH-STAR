@@ -6,7 +6,7 @@ const consultar = async (req, res) => {
 
     res.status(200).json(clientes);
     } catch (error) {
-        res.status(500).json({error: "No se pudo haser la consulta a la tabla clientes"}); 
+        res.status(500).json({error: "No se pudo hacer la consulta a la tabla clientes"}); 
     }
     
 }
