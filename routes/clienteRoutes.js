@@ -1,10 +1,8 @@
 const express = require("express");
+const {consultar} = require('../controllers/clienteController');
 const router = express.Router();
 
 /// peticiones para clientes
-router.get("/", (req, res) => {
-    res.status(200).send("Desde Clientes ...");
-    console.log("Porque no puedo llegar aquí");
-});
+router.get("/", consultar );
 
 module.exports = router;
