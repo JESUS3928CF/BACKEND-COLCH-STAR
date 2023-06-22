@@ -1,6 +1,7 @@
 const express = require("express");
 const db = require("./config/db");
 const clienteRoutes = require('./routes/clienteRoutes');
+const proveedorRoutes = require('./routes/proveedorRoutes');
 const dotenv = require('dotenv/config');
 const routerApi = require("./routes/index");
 
