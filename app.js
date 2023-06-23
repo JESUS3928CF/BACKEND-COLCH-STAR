@@ -5,11 +5,13 @@ const db = require("./config/db");
 const cors = require('cors');
 const dotenv = require('dotenv/config');
 const routerApi = require("./routes/index");
+const bodyParser = require("body-parser");
 
 
 const app = express();
 
-
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 
 db.authenticate()

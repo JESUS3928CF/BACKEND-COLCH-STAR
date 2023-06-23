@@ -7,7 +7,7 @@ const ClienteModels = db.define(
     {
         id_cliente: {
             type: Sequelize.INTEGER,
-            primaryKey: true, 
+            primaryKey: true,
             autoIncrement: true,
         },
         nombre: {
@@ -27,12 +27,14 @@ const ClienteModels = db.define(
         },
         estado: {
             type: Sequelize.BOOLEAN,
+            defaultValue: true, //! Establece el valor por defecto del estado como true
         },
     },
     {
         tableName: 'cliente', 
     }
 );
+
 
 /// Consultas personalizadas para clientes
 

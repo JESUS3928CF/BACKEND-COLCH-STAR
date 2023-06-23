@@ -11,9 +11,36 @@ const consultar = async (req, res) => {
 
         
     } catch (error) {
-        console.error('Error al consultar la tabla cliente:', error);
+        console.log('Error al consultar la tabla cliente:', error);
         res.status(500).json({ error: 'Error al consultar la tabla cliente' });
     }
 };
 
-module.exports = { consultar };
+
+const agregar = async (req,res) => {
+
+     try {
+         const { nombre, apellido, telefono, email, direccion } = req.body;
+
+
+        //!  Insertar un nuevo cliente en la base de datos
+         const nuevoCliente = await ClienteModels.create({
+             nombre,
+             apellido,
+             telefono,
+             email,
+             direccion,
+         });
+
+         /// Mensaje de respuesta
+         res.json({
+             message: 'Cliente agregado exitosamente',
+         });
+
+     } catch (error) {
+         // Envía una respuesta al cliente indicando el error
+         res.status(500).json({ message: 'Error al agregar el cliente' });
+     }
+}
+
+module.exports = { consultar, agregar };
