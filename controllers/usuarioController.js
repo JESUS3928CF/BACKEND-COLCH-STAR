@@ -12,7 +12,7 @@ const consultar = async (req, res) => {
         
     } catch (error) {
         console.log('Error al consultar la tabla usuarios:', error);
-        res.status(500).json({ error: 'Error al consultar la tabla usuarios' });
+        res.status(500).json({ error: 'Error al consultar la tabla usuarios ' });
     }
 };
 
