@@ -1,5 +1,5 @@
 const express = require("express");
-const {consultar, agregar, actualizar} = require('../controllers/usuarioController');
+const {consultar, agregar, actualizar, cambiarEstado} = require('../controllers/usuarioController');
 const router = express.Router();
 
 /// peticiones para clientes
@@ -13,6 +13,9 @@ router.post("/", agregar );
 
 router.patch('/:id', actualizar);
 
+
+//* Cambiar estado
+router.patch('/estado/:id', cambiarEstado);
 
 
 module.exports = router;
