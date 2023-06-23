@@ -94,7 +94,7 @@ const cambiarEstado = async (req, res) => {
         // Actualizar los valores del registro
         usuario.estado = !estado;
 
-        cliente.save();
+        usuario.save();
 
         res.json({ message: 'Cambio de estado' });
     } catch (error) {
