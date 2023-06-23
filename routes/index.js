@@ -6,7 +6,7 @@ function routerApi(app){
     const router = express.Router();
     app.use("/api", router)
     router.use('/clientes', routerCliente);
-    router.use('/proveedor',routerProveedor)
+    router.use('/proveedor', routerProveedor)
 
 }
 
