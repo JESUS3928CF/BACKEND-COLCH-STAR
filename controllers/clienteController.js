@@ -16,6 +16,7 @@ const consultar = async (req, res) => {
     }
 };
 
+//! Agregar un cliente
 
 const agregar = async (req,res) => {
 
@@ -24,7 +25,7 @@ const agregar = async (req,res) => {
 
 
         //!  Insertar un nuevo cliente en la base de datos
-         const nuevoCliente = await ClienteModels.create({
+         await ClienteModels.create({
              nombre,
              apellido,
              telefono,
@@ -43,4 +44,33 @@ const agregar = async (req,res) => {
      }
 }
 
-module.exports = { consultar, agregar };
+//! Actualizar un cliente
+
+const actualizar = async (req, res) => {    
+    try {
+
+        const { nombre, apellido, telefono, email, direccion } = req.body;
+
+        console.log('actualizar esto');
+        const id = req.params.id;
+        console.log(id);
+
+        const cliente = await ClienteModels.findOne({
+            where: { id_cliente: id },
+        });
+        // Actualizar los valores del registro
+        cliente.nombre = nombre;
+        cliente.apellido = apellido;
+        cliente.telefono = telefono;
+        cliente.email = email;
+        cliente.direccion = direccion
+
+        cliente.save();
+
+        res.json({ message: 'Actualización exitosa' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error al actualizar el cliente' });
+    }
+}
+
+module.exports = { consultar, agregar, actualizar };
