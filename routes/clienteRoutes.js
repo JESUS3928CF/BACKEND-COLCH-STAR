@@ -1,5 +1,5 @@
 const express = require("express");
-const {consultar, agregar, actualizar} = require('../controllers/clienteController');
+const {consultar, agregar, actualizar, cambiarEstado} = require('../controllers/clienteController');
 const router = express.Router();
 
 /// peticiones para clientes
@@ -10,8 +10,12 @@ router.get("/", consultar );
 //* Insert One
 router.post("/", agregar );
 
-
+//* Uddate
 router.patch('/:id', actualizar);
+
+//* Cambiar estado
+router.patch('/estado/:id', cambiarEstado);
+
 
 
 

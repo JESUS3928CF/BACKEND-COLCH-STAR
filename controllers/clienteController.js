@@ -51,7 +51,7 @@ const actualizar = async (req, res) => {
 
         const { nombre, apellido, telefono, email, direccion } = req.body;
 
-        console.log('actualizar esto');
+        // console.log('actualizar esto');
         const id = req.params.id;
         console.log(id);
 
@@ -73,4 +73,30 @@ const actualizar = async (req, res) => {
     }
 }
 
-module.exports = { consultar, agregar, actualizar };
+//! Actualizar un cliente
+
+const cambiarEstado = async (req, res) => {    
+    try {
+
+        console.log("Se hiso una estado");
+        const { estado } = req.body;
+
+        console.log('actualizar esto');
+        const id = req.params.id;
+        console.log(id);
+
+        const cliente = await ClienteModels.findOne({
+            where: { id_cliente: id },
+        });
+        // Actualizar los valores del registro
+        cliente.estado = !estado;
+
+        cliente.save();
+
+        res.json({ message: 'Cambio de estado' });
+    } catch (error) {
+        res.status(500).json({ message: 'no se cambio el estado' });
+    }
+}
+
+module.exports = { consultar, agregar, actualizar, cambiarEstado };
