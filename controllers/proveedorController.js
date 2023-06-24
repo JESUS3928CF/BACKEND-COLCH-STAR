@@ -24,7 +24,7 @@ const agregar = async (req,res) => {
 
 
        //!  Insertar un nuevo cliente en la base de datos
-        await ClienteModels.create({
+        await ProveedorModels.create({
             nombre,
             telefono,
             direccion,
@@ -42,60 +42,34 @@ const agregar = async (req,res) => {
     }
 }
 
-// //! Actualizar un cliente
+// ! Actualizar un proveedor
 
-// const actualizar = async (req, res) => {    
-//     try {
+const actualizar = async (req, res) => {    
+    try {
 
-//         const { nombre, apellido, telefono, email, direccion } = req.body;
+        const { nombre,  telefono,  direccion, contacto } = req.body;
 
-//         // console.log('actualizar esto');
-//         const id = req.params.id;
-//         console.log(id);
+        console.log('actualizar esto');
+        const id = req.params.id;
+        console.log(id);
 
-//         const cliente = await ClienteModels.findOne({
-//             where: { id_cliente: id },
-//         });
-//         // Actualizar los valores del registro
-//         cliente.nombre = nombre;
-//         cliente.apellido = apellido;
-//         cliente.telefono = telefono;
-//         cliente.email = email;
-//         cliente.direccion = direccion
+        const proveedor = await ProveedorModels.findOne({
+            where: { id_proveedor: id },
+        });
+        // Actualizar los valores del registro
+        proveedor.nombre = nombre;
+        proveedor.telefono = telefono;
+        proveedor.direccion = direccion;
+        proveedor.contacto = contacto;
 
-//         cliente.save();
+        cliente.save();
 
-//         res.json({ message: 'Actualización exitosa' });
-//     } catch (error) {
-//         res.status(500).json({ message: 'Error al actualizar el cliente' });
-//     }
-// }
+        res.json({ message: 'Actualización exitosa' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error al actualizar el proveedor' });
+    }
+}
 
-// //! Actualizar un cliente
 
-// const cambiarEstado = async (req, res) => {    
-//     try {
-
-//         console.log("Se hiso una estado");
-//         const { estado } = req.body;
-
-//         console.log('actualizar esto');
-//         const id = req.params.id;
-//         console.log(id);
-
-//         const cliente = await ClienteModels.findOne({
-//             where: { id_cliente: id },
-//         });
-//         // Actualizar los valores del registro
-//         cliente.estado = !estado;
-
-//         cliente.save();
-
-//         res.json({ message: 'Cambio de estado' });
-//     } catch (error) {
-//         res.status(500).json({ message: 'no se cambio el estado' });
-//     }
-// }
-
-module.exports = {consu,agregar};
+module.exports = {consu,agregar,actualizar};
 

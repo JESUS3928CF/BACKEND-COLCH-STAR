@@ -1,5 +1,5 @@
 const express = require("express");
-const {consu, agregar, actualizar} = require('../controllers/proveedorController');
+const {consu, agregar,actualizar} = require('../controllers/proveedorController');
 
 const router = express.Router();
 
@@ -10,8 +10,8 @@ router.get("/", consu );
 //* Insert One
 router.post("/", agregar );
 
-// //* Uddate
-// router.patch('/:id', actualizar);
+//* Uddate
+router.patch('/:id', actualizar);
 
 // //* Cambiar estado
 // router.patch('/estado/:id', cambiarEstado);
