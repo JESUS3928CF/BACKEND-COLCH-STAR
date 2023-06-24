@@ -5,9 +5,9 @@ const { ProveedorModels } = require("../models/ProveedorModel");
 const consu = async (req, res) => {
     try {
         //por el meto findAll se buscna todos los registros
-        const resultado = await ProveedorModels.findAll();
+        const proveedores = await ProveedorModels.findAll();
         
-    res.status(200).json(resultado)
+    res.status(200).json(proveedores)
     } catch (e) {
         console.e("error en la busqueda de la tabla ",e);
         res.status(500).json({e:"no se consulto la tabla"});
@@ -60,9 +60,9 @@ const actualizar = async (req, res) => {
         proveedor.nombre = nombre;
         proveedor.telefono = telefono;
         proveedor.direccion = direccion;
-        proveedor.contacto = contacto;
+        proveedor.contacto = contacto
 
-        cliente.save();
+        proveedor.save();
 
         res.json({ message: 'Actualización exitosa' });
     } catch (error) {

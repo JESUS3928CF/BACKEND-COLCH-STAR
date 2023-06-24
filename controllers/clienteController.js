@@ -1,15 +1,15 @@
-const  { ClienteModels} = require('../models/ClienteModel');
+const { ClienteModels } = require('../models/ClienteModel');
 
 const consultar = async (req, res) => {
     try {
 
         /// Consultando todos los registros
         const clientes = await ClienteModels.findAll();
-        
+
         //- Forma de inviar un JSON
         res.status(200).json(clientes);
 
-        
+
     } catch (error) {
         console.log('Error al consultar la tabla cliente:', error);
         res.status(500).json({ error: 'Error al consultar la tabla cliente' });
@@ -18,35 +18,35 @@ const consultar = async (req, res) => {
 
 //! Agregar un cliente
 
-const agregar = async (req,res) => {
+const agregar = async (req, res) => {
 
-     try {
-         const { nombre, apellido, telefono, email, direccion } = req.body;
+    try {
+        const { nombre, apellido, telefono, email, direccion } = req.body;
 
 
         //!  Insertar un nuevo cliente en la base de datos
-         await ClienteModels.create({
-             nombre,
-             apellido,
-             telefono,
-             email,
-             direccion,
-         });
+        await ClienteModels.create({
+            nombre,
+            apellido,
+            telefono,
+            email,
+            direccion,
+        });
 
-         /// Mensaje de respuesta
-         res.json({
-             message: 'Cliente agregado exitosamente',
-         });
+        /// Mensaje de respuesta
+        res.json({
+            message: 'Cliente agregado exitosamente',
+        });
 
-     } catch (error) {
-         // Envía una respuesta al cliente indicando el error
-         res.status(500).json({ message: 'Error al agregar el cliente' });
-     }
+    } catch (error) {
+        // Envía una respuesta al cliente indicando el error
+        res.status(500).json({ message: 'Error al agregar el cliente' });
+    }
 }
 
 //! Actualizar un cliente
 
-const actualizar = async (req, res) => {    
+const actualizar = async (req, res) => {
     try {
 
         const { nombre, apellido, telefono, email, direccion } = req.body;
@@ -75,7 +75,7 @@ const actualizar = async (req, res) => {
 
 //! Actualizar un cliente
 
-const cambiarEstado = async (req, res) => {    
+const cambiarEstado = async (req, res) => {
     try {
 
         console.log("Se hiso una estado");
