@@ -22,11 +22,14 @@ const ProveedorModels = db.define(
         contacto: {
             type: Sequelize.STRING,
         },
+        estado: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: true, //! Establece el valor por defecto del estado como true
+        },
     },
     {
         tableName: 'proveedor', 
     }
 );
-
 
 module.exports = { ProveedorModels };
