@@ -25,7 +25,7 @@ const agregar = async (req,res) => {
 
 
         //!  Insertar un nuevo cliente en la base de datos
-         const user = await UsuarioModels.create({
+        await UsuarioModels.create({
              nombre,
              apellido,
              telefono,
@@ -36,7 +36,7 @@ const agregar = async (req,res) => {
 
          /// Mensaje de respuesta
          res.json({
-             message: 'Usuario agregado exitosamente',user
+             message: 'Usuario agregado exitosamente',
          });
 
      } catch (error) {
@@ -65,7 +65,7 @@ const actualizar = async (req, res) => {
         usuario.telefono = telefono;
         usuario.email = email;
         usuario.contrasena = contrasena;
-        usuario.fk_rol = fk_rol;
+        usuario.fk_rol = fk_rol
 
         usuario.save();
 
