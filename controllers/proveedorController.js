@@ -1,7 +1,6 @@
 const { ProveedorModels } = require("../models/ProveedorModel");
 
 
-
 const consu = async (req, res) => {
     try {
         //por el meto findAll se buscna todos los registros
@@ -97,5 +96,5 @@ const cambiarEstado = async (req, res) => {
 }
 
 
-module.exports = {consu,agregar,actualizar, cambiarEstado };
+module.exports = { consu, agregar,actualizar, cambiarEstado };
 

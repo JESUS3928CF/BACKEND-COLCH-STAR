@@ -7,7 +7,7 @@ const ProveedorModels = db.define(
     {
         id_proveedor: {
             type: Sequelize.INTEGER,
-            primaryKey: true, 
+            primaryKey: true,
             autoIncrement: true,
         },
         nombre: {
@@ -28,8 +28,25 @@ const ProveedorModels = db.define(
         },
     },
     {
-        tableName: 'proveedor', 
+        tableName: 'proveedor',
     }
 );
 
-module.exports = { ProveedorModels };
+
+// Consultas personalizadas para clientes
+
+const findOneProveedor = async (id) => {
+    try {
+
+        const consulta = `SELECT * FROM proveedor where id_proveedor = ${id}`;
+        const resultado = await db.query(consulta, {
+            type: Sequelize.QueryTypes.SELECT,
+        });
+
+        return resultado;
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+module.exports = { ProveedorModels, findOneProveedor };
