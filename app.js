@@ -15,8 +15,8 @@ app.use(bodyParser.json());
 
 
 db.authenticate()
-    .then( () => { console.log("Base de datos conectada") })
-        .catch( error => { console.log(error)});
+    .then(() => { console.log("Base de datos conectada") })
+    .catch(error => { console.log(error)});
 
 
 port = process.env.PORT || 4000;
