@@ -18,6 +18,3 @@ router.patch('/estado/:id', cambiarEstado);
 
 module.exports = router;
 
-
-
-
