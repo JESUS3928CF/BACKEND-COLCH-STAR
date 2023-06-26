@@ -1,13 +1,25 @@
 const  { UsuarioModels} = require('../models/UsuariosModel');
+const { RolModels } = require('../models/RolModels');
+
 
 const consultar = async (req, res) => {
     try {
 
         /// Consultando todos los registros
-        const usuario = await UsuarioModels.findAll();
+        // const usuario = await UsuarioModels.findAll();
+
+         const usuarios = await UsuarioModels.findAll({
+             include: [
+                 {
+                     model: RolModels,
+                     attributes: ['nombre'], // Incluye solo el campo "nombre" del modelo Rol
+                 },
+             ]
+         });
+
         
         //- Forma de inviar un JSON
-        res.status(200).json(usuario);
+        res.status(200).json(usuarios);
 
         
     } catch (error) {

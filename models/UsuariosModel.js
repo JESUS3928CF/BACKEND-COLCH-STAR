@@ -1,6 +1,7 @@
 //! Necesitamos importar esto
 const Sequelize = require('sequelize');
 const db = require('../config/db');
+const { RolModels } = require('./RolModels');
 
 const UsuarioModels = db.define(
     'usuario',
@@ -30,12 +31,17 @@ const UsuarioModels = db.define(
             defaultValue: true, //! Establece el valor por defecto del estado como true
         },
         fk_rol: {
-            type: Sequelize.INTEGER,
+            type: Sequelize.INTEGER(5),
+            allowNull: false,
+            field: 'fk_rol', // Nombre correcto de la columna en la tabla usuario
         },
     },
     {
-        tableName: 'usuario', 
+        tableName: 'usuario',
     }
 );
+
+UsuarioModels.belongsTo(RolModels, { foreignKey: 'fk_rol' });
+// UsuarioModels.belongsTo(RolModels);
 
 module.exports = { UsuarioModels };
