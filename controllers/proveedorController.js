@@ -3,26 +3,29 @@ const { ProveedorModels } = require("../models/ProveedorModel");
 
 const consu = async (req, res) => {
     try {
-        //por el meto findAll se buscna todos los registros
+
+        /// Consultando todos los registros
         const proveedores = await ProveedorModels.findAll();
-        
-    res.status(200).json(proveedores)
-    } catch (e) {
-        console.e("error en la busqueda de la tabla ",e);
-        res.status(500).json({e:"no se consulto la tabla"});
-    } 
-      
-}
+
+        //- Forma de inviar un JSON
+        res.status(200).json(proveedores);
+
+
+    } catch (error) {
+        console.log('Error al consultar la tabla proveedor:', error);
+        res.status(500).json({ error: 'Error al consultar la tabla proveedor' });
+    }
+};
 
 //! Agregar proveedor
 
-const agregar = async (req,res) => {
+const agregar = async (req, res) => {
 
     try {
-        const { nombre,  telefono,  direccion, contacto } = req.body;
+        const { nombre, telefono,  direccion, contacto } = req.body;
 
 
-       //!  Insertar un nuevo cliente en la base de datos
+        //!  Insertar un nuevo cliente en la base de datos
         await ProveedorModels.create({
             nombre,
             telefono,
@@ -43,12 +46,12 @@ const agregar = async (req,res) => {
 
 // ! Actualizar un proveedor
 
-const actualizar = async (req, res) => {    
+const actualizar = async (req, res) => {
     try {
 
-        const { nombre,  telefono,  direccion, contacto } = req.body;
+        const { nombre, telefono, direccion, contacto } = req.body;
 
-        console.log('actualizar esto');
+        // console.log('actualizar esto');
         const id = req.params.id;
         console.log(id);
 
@@ -65,13 +68,12 @@ const actualizar = async (req, res) => {
 
         res.json({ message: 'Actualización exitosa' });
     } catch (error) {
-        res.status(500).json({ message: 'Error al actualizar el proveedor' });
+        res.status(500).json({ message: 'Error al actualizar el proveedor ' });
     }
 }
-
 //! Actualizar un cliente
 
-const cambiarEstado = async (req, res) => {    
+const cambiarEstado = async (req, res) => {
     try {
 
         console.log("Se hiso una estado");
