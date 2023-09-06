@@ -37,11 +37,10 @@ const UsuarioModels = db.define(
         },
     },
     {
-        tableName: 'usuario',
+        tableName: 'usuario', //- para definir el nombre de la tabla tiene que ser el mismo de la db para evitar errores
     }
 );
 
-UsuarioModels.belongsTo(RolModels, { foreignKey: 'fk_rol' });
-// UsuarioModels.belongsTo(RolModels);
+UsuarioModels.belongsTo(RolModels, { foreignKey: 'fk_rol' }); /// Establecer la relación
 
 module.exports = { UsuarioModels };

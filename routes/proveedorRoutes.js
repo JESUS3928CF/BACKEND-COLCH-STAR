@@ -1,10 +1,10 @@
 const express = require("express");
-const {consu, agregar, actualizar, cambiarEstado} = require('../controllers/proveedorController');
+const {consultar, agregar, actualizar, cambiarEstado} = require('../controllers/proveedorController');
 const router = express.Router();
 
 
 //* Find all
-router.get("/", consu );
+router.get("/", consultar );
 
 //* Insert One
 router.post("/", agregar );

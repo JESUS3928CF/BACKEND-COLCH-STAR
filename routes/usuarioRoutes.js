@@ -13,7 +13,7 @@ router.get("/", consultar );
 //* Insert One
 router.post("/", agregar );
 
-
+//* actualizar
 router.patch('/:id', actualizar);
 
 

@@ -7,7 +7,7 @@ const RolModels = db.define(
     {
         id_rol: {
             type: Sequelize.INTEGER(5),
-            allowNull: false,
+            allowNull: false, //- No puede tener valores nulos
             primaryKey: true,
             autoIncrement: true,
         },

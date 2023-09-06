@@ -1,7 +1,7 @@
 const { ProveedorModels } = require("../models/ProveedorModel");
 
 
-const consu = async (req, res) => {
+const consultar = async (req, res) => {
     try {
 
         /// Consultando todos los registros
@@ -51,7 +51,6 @@ const actualizar = async (req, res) => {
 
         const { nombre, telefono, direccion, contacto } = req.body;
 
-        // console.log('actualizar esto');
         const id = req.params.id;
         console.log(id);
 
@@ -76,7 +75,6 @@ const actualizar = async (req, res) => {
 const cambiarEstado = async (req, res) => {
     try {
 
-        console.log("Se hiso una estado");
         const { estado } = req.body;
 
         console.log('actualizar esto');
@@ -98,5 +96,5 @@ const cambiarEstado = async (req, res) => {
 }
 
 
-module.exports = { consu, agregar,actualizar, cambiarEstado };
+module.exports = { consultar, agregar,actualizar, cambiarEstado };
 

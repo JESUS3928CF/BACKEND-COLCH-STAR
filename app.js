@@ -24,7 +24,6 @@ port = process.env.PORT || 4000;
 ///Middlewares
 app.use(cors());
 
-// app.use("/api/clientes", clienteRoutes);
 routerApi(app);
 
 app.get("/api", (req, res) => {
@@ -35,12 +34,6 @@ app.use('/*', (req, res) => {
     res.status(404).send('Paso algo inesperado');
 });
 
-
-
 app.listen(port, () => {
     console.log(`Servidor funcionando en http://localhost:${port}`);
 });
-
-
-
-

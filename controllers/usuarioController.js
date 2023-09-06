@@ -1,12 +1,13 @@
 const  { UsuarioModels} = require('../models/UsuariosModel');
 const { RolModels } = require('../models/RolModels');
 
+//! Consultar un registro relacionado con Sequelize
 const consultarRegistro = async (req, res) => {
     try {
-        // Obtener el ID del registro a consultar desde los parámetros de la solicitud
+        /// Obtener el ID del registro a consultar desde los parámetros de la solicitud
         const { id } = req.params;
 
-        // Consultar el registro usando el modelo correspondiente y la relación con RolModels
+        /// Consultar el registro usando el modelo correspondiente y la relación con RolModels
         const usuario = await UsuarioModels.findByPk(id, {
             include: [
                 {
@@ -16,12 +17,12 @@ const consultarRegistro = async (req, res) => {
             ],
         });
 
-        // Verificar si se encontró el registro
+        /// Verificar si se encontró el registro
         if (usuario) {
-            // Si se encontró, enviar el registro como respuesta
+            //- Si se encontró, enviar el registro como respuesta
             res.status(200).json(usuario);
         } else {
-            // Si no se encontró, enviar una respuesta indicando que el registro no existe
+            //- Si no se encontró, enviar una respuesta indicando que el registro no existe
             res.status(404).json({ error: 'Registro no encontrado' });
         }
     } catch (error) {

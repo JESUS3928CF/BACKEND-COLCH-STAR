@@ -10,7 +10,7 @@ router.get("/", consultar );
 //* Insert One
 router.post("/", agregar );
 
-//* Uddate
+//* Update
 router.patch('/:id', actualizar);
 
 //* Cambiar estado
