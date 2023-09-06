@@ -89,7 +89,7 @@ const agregar = async (req,res) => {
      }
 }
 
-//! Actualizar un cliente
+//! Actualizar un usuario
 
 const actualizar = async (req, res) => {    
     try {
