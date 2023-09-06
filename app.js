@@ -1,7 +1,5 @@
 const express = require("express");
 const db = require("./config/db");
-// const clienteRoutes = require('./routes/clienteRoutes');
-// const proveedorRoutes = require('./routes/proveedorRoutes');
 const cors = require('cors');
 const dotenv = require('dotenv/config');
 const routerApi = require("./routes/index");
@@ -19,7 +17,7 @@ db.authenticate()
     .catch(error => { console.log(error)});
 
 
-port = process.env.PORT || 4000;
+const port = process.env.PORT || 4000;
 
 ///Middlewares
 app.use(cors());
