@@ -1,3 +1,4 @@
+const emailClienteRegistrado = require('../helpers/emailClienteRegistrado');
 const { ClienteModels } = require('../models/ClienteModel');
 
 const consultar = async (req, res) => {
@@ -24,6 +25,12 @@ const agregar = async (req, res) => {
         const { nombre, apellido, telefono, email, direccion } = req.body;
 
 
+         emailClienteRegistrado({ email, nombre });
+         /// Mensaje de respuesta
+         res.json({
+             message: 'Cliente agregado exitosamente',
+         });
+
         //!  Insertar un nuevo cliente en la base de datos
         await ClienteModels.create({
             nombre,
@@ -33,11 +40,7 @@ const agregar = async (req, res) => {
             direccion,
         });
 
-        /// Mensaje de respuesta
-        res.json({
-            message: 'Cliente agregado exitosamente',
-        });
-
+       
     } catch (error) {
         // Envía una respuesta al cliente indicando el error
         res.status(500).json({ message: 'Error al agregar el cliente' });

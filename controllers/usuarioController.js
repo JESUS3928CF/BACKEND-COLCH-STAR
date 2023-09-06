@@ -1,6 +1,9 @@
 const  { UsuarioModels} = require('../models/UsuariosModel');
 const { RolModels } = require('../models/RolModels');
 
+//! Importamos la dependencia
+// const bcrypt = require('bcrypt');
+
 //! Consultar un registro relacionado con Sequelize
 const consultarRegistro = async (req, res) => {
     try {
@@ -67,8 +70,12 @@ const agregar = async (req,res) => {
      try {
          const { nombre, apellido, telefono, email, contrasena, fk_rol } = req.body;
 
+         //! Hashing la contraseña
+        //  const hash = bcrypt.hash(contrasena, 10);
+        //  contrasena = hash;
 
-        //!  Insertar un nuevo cliente en la base de datos
+        console.log(nombre, apellido, telefono, email, contrasena, fk_rol);
+
          const user = await UsuarioModels.create({
              nombre,
              apellido,
