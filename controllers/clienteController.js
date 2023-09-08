@@ -25,11 +25,11 @@ const agregar = async (req, res) => {
         const { nombre, apellido, telefono, email, direccion } = req.body;
 
 
-         emailClienteRegistrado({ email, nombre });
          /// Mensaje de respuesta
          res.json({
              message: 'Cliente agregado exitosamente',
          });
+
 
         //!  Insertar un nuevo cliente en la base de datos
         await ClienteModels.create({
@@ -39,6 +39,9 @@ const agregar = async (req, res) => {
             email,
             direccion,
         });
+
+         emailClienteRegistrado({ email, nombre });
+
 
        
     } catch (error) {

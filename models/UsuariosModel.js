@@ -19,9 +19,11 @@ const UsuarioModels = db.define(
         },
         telefono: {
             type: Sequelize.STRING,
+            unique: true
         },
         email: {
             type: Sequelize.STRING,
+            unique: true
         },
         contrasena: {
             type: Sequelize.STRING,
@@ -32,7 +34,6 @@ const UsuarioModels = db.define(
         },
         fk_rol: {
             type: Sequelize.INTEGER(5),
-            allowNull: false,
             field: 'fk_rol', // Nombre correcto de la columna en la tabla usuario
         },
     },

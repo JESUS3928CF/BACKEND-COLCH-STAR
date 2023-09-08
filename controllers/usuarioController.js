@@ -1,5 +1,6 @@
-const  { UsuarioModels} = require('../models/UsuariosModel');
+const { UsuarioModels } = require('../models/UsuariosModel');
 const { RolModels } = require('../models/RolModels');
+const e = require('cors');
 
 //! Importamos la dependencia
 // const bcrypt = require('bcrypt');
@@ -36,27 +37,22 @@ const consultarRegistro = async (req, res) => {
     }
 };
 
-
 const consultar = async (req, res) => {
     try {
-
         /// Consultando todos los registros
         // const usuario = await UsuarioModels.findAll();
 
-         const usuarios = await UsuarioModels.findAll({
-             include: [
-                 {
-                     model: RolModels,
-                     attributes: ['nombre'], // Incluye solo el campo "nombre" del modelo Rol
-                 },
-             ]
-         });
+        const usuarios = await UsuarioModels.findAll({
+            include: [
+                {
+                    model: RolModels,
+                    attributes: ['nombre'], // Incluye solo el campo "nombre" del modelo Rol
+                },
+            ],
+        });
 
-        
         //- Forma de inviar un JSON
         res.status(200).json(usuarios);
-
-        
     } catch (error) {
         console.log('Error al consultar la tabla usuarios:', error);
         res.status(500).json({ error: 'Error al consultar la tabla usuarios' });
@@ -65,43 +61,64 @@ const consultar = async (req, res) => {
 
 //! Agregar un cliente
 
-const agregar = async (req,res) => {
-
-     try {
-         const { nombre, apellido, telefono, email, contrasena, fk_rol } = req.body;
-
-         //! Hashing la contraseña
+const agregar = async (req, res) => {
+    try {
+        const { nombre, apellido, telefono, email, contrasena, fk_rol } =
+            req.body;
+        //! Hashing la contraseña
         //  const hash = bcrypt.hash(contrasena, 10);
         //  contrasena = hash;
 
-        console.log(nombre, apellido, telefono, email, contrasena, fk_rol);
+        /// validar que el número no exista
 
-         const user = await UsuarioModels.create({
-             nombre,
-             apellido,
-             telefono,
-             email,
-             contrasena,
-             fk_rol,
-         });
+        const telOcupado = await UsuarioModels.findOne({
+            where: { telefono: telefono },
+        });
 
-         /// Mensaje de respuesta
-         res.json({
-             message: 'Usuario agregado exitosamente',user
-         });
+        const correoOcupado = await UsuarioModels.findOne({
+            where: { email: email },
+        });
 
-     } catch (error) {
-         // Envía una respuesta al cliente indicando el error
-         res.status(500).json({ message: 'Error al agregar el usuario' });
-     }
-}
+        if (telOcupado) {
+            return res.json({
+                message: 'Teléfono en uso',
+                telOcupado,
+            });
+        }
+
+        if (correoOcupado) {
+            return res.json({
+                message: 'Correo en uso',
+                correoOcupado,
+            });
+        }
+
+        await UsuarioModels.create({
+            nombre,
+            apellido,
+            telefono,
+            email,
+            contrasena,
+            fk_rol,
+        });
+
+
+        /// Mensaje de respuesta
+        res.json({
+            message: 'Usuario agregado exitosamente'
+        });
+    } catch (error) {
+        // Envía una respuesta al cliente indicando el error
+        res.status(500).json({ message: 'Error al agregar el usuario' });
+    }
+};
 
 //! Actualizar un usuario
 
-const actualizar = async (req, res) => {    
+const actualizar = async (req, res) => {
     try {
-
-        const { nombre, apellido, telefono, email, contrasena, fk_rol } = req.body;
+        const { nombre, apellido, telefono, email, contrasena, fk_rol } =
+            req.body;
 
         console.log('actualizar esto');
         const id = req.params.id;
@@ -124,15 +141,13 @@ const actualizar = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Error al actualizar el usuario' });
     }
-}
-
+};
 
 //! Actualizar un cliente
 
-const cambiarEstado = async (req, res) => {    
+const cambiarEstado = async (req, res) => {
     try {
-
-        console.log("Se hizo unn estado");
+        console.log('Se hizo unn estado');
         const { estado } = req.body;
 
         console.log('actualizar esto');
@@ -151,7 +166,7 @@ const cambiarEstado = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'no se cambio el estado' });
     }
-}
+};
 
 module.exports = {
     consultar,
