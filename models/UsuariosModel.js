@@ -3,6 +3,7 @@ const Sequelize = require('sequelize');
 const db = require('../config/db');
 const { RolModels } = require('./RolModels');
 
+
 const UsuarioModels = db.define(
     'usuario',
     {

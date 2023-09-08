@@ -1,18 +1,17 @@
 const { UsuarioModels } = require('../models/UsuariosModel');
 const { RolModels } = require('../models/RolModels');
-const e = require('cors');
 
 //! Importamos la dependencia
-// const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 
 //! Consultar un registro relacionado con Sequelize
-const consultarRegistro = async (req, res) => {
-    try {
-        /// Obtener el ID del registro a consultar desde los parámetros de la solicitud
-        const { id } = req.params;
+const login = async (req, res) => {
+    const { email, contrasena } = req.body;
 
-        /// Consultar el registro usando el modelo correspondiente y la relación con RolModels
-        const usuario = await UsuarioModels.findByPk(id, {
+    try {
+        /// Consultar el registro
+        const usuario = await UsuarioModels.findOne({
+            where: { email: email },
             include: [
                 {
                     model: RolModels,
@@ -21,14 +20,21 @@ const consultarRegistro = async (req, res) => {
             ],
         });
 
-        /// Verificar si se encontró el registro
-        if (usuario) {
-            //- Si se encontró, enviar el registro como respuesta
-            res.status(200).json(usuario);
-        } else {
-            //- Si no se encontró, enviar una respuesta indicando que el registro no existe
-            res.status(404).json({ error: 'Registro no encontrado' });
+        if (!usuario) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
         }
+        /// Verificar si se encontró el registro
+
+        const contrasenaValida = await bcrypt.compare(
+            contrasena,
+            usuario.contrasena
+        );
+        if (!contrasenaValida) {
+            return res.status(401).json({ message: 'Contraseña incorrecta' });
+        }
+
+        res.json(usuario);
+
     } catch (error) {
         console.log('Error al consultar el registro del usuario:', error);
         res.status(500).json({
@@ -65,11 +71,9 @@ const agregar = async (req, res) => {
     try {
         const { nombre, apellido, telefono, email, contrasena, fk_rol } =
             req.body;
-        //! Hashing la contraseña
-        //  const hash = bcrypt.hash(contrasena, 10);
-        //  contrasena = hash;
 
-        /// validar que el número no exista
+        //! Cifra la contraseña utilizando bcrypt
+        const hashedContrasena = await bcrypt.hash(contrasena, 10); //- El segundo argumento es el número de rondas de hashing
 
         const telOcupado = await UsuarioModels.findOne({
             where: { telefono: telefono },
@@ -98,14 +102,14 @@ const agregar = async (req, res) => {
             apellido,
             telefono,
             email,
-            contrasena,
+            contrasena: hashedContrasena, /// Guarda la contraseña cifrada en la base de datos
             fk_rol,
         });
 
-
         /// Mensaje de respuesta
         res.json({
-            message: 'Usuario agregado exitosamente'
+            message: 'Usuario agregado exitosamente',
+            hashedContrasena,
         });
     } catch (error) {
         // Envía una respuesta al cliente indicando el error
@@ -117,8 +121,15 @@ const agregar = async (req, res) => {
 
 const actualizar = async (req, res) => {
     try {
-        const { nombre, apellido, telefono, email, contrasena, fk_rol } =
-            req.body;
+        const {
+            nombre,
+            apellido,
+            telefono,
+            email,
+            contrasenaActual,
+            contrasenaNueva,
+            fk_rol,
+        } = req.body;
 
         console.log('actualizar esto');
         const id = req.params.id;
@@ -127,12 +138,28 @@ const actualizar = async (req, res) => {
         const usuario = await UsuarioModels.findOne({
             where: { id_usuario: id },
         });
+
+        // Compara la contraseña proporcionada con la contraseña almacenada
+        const contrasenaValida = await bcrypt.compare(
+            contrasenaActual,
+            usuario.contrasena
+        );
+
+        if (!contrasenaValida) {
+            return res
+                .status(401)
+                .json({ message: 'Contraseña actual incorrecta' });
+        }
+
+        // Cifra la contraseña utilizando bcrypt
+        const hashedContrasena = await bcrypt.hash(contrasenaNueva, 10);
+
         // Actualizar los valores del registro
         usuario.nombre = nombre;
         usuario.apellido = apellido;
         usuario.telefono = telefono;
         usuario.email = email;
-        usuario.contrasena = contrasena;
+        usuario.contrasena = hashedContrasena;
         usuario.fk_rol = fk_rol;
 
         usuario.save();
@@ -173,5 +200,5 @@ module.exports = {
     agregar,
     actualizar,
     cambiarEstado,
-    consultarRegistro,
+    login,
 };

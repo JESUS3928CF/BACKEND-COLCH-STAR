@@ -1,11 +1,11 @@
 const express = require("express");
-const {consultar, agregar, actualizar, cambiarEstado, consultarRegistro} = require('../controllers/usuarioController');
+const {consultar, agregar, actualizar, cambiarEstado, login} = require('../controllers/usuarioController');
 const router = express.Router();
 
 /// peticiones para clientes
 
 //* Find one
-router.get("/findOne/:id", consultarRegistro );
+router.post("/login", login );
 
 //* Find all
 router.get("/", consultar );

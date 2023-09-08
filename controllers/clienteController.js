@@ -57,7 +57,6 @@ const actualizar = async (req, res) => {
 
         const { nombre, apellido, telefono, email, direccion } = req.body;
 
-        // console.log('actualizar esto');
         const id = req.params.id;
         console.log(id);
 
