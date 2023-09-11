@@ -32,7 +32,6 @@ const login = async (req, res) => {
         if (!contrasenaValida) {
             return res.json({ message: 'Contraseña incorrecta' });
         }
-
         res.json(usuario);
     } catch (error) {
         console.log('Error al consultar el registro del usuario:', error);
@@ -129,8 +128,8 @@ const actualizar = async (req, res) => {
             where: { id_usuario: id },
         });
 
-        if(usuario == null)
-            return res.json({message: "Usuario no encontrado"});
+        if (usuario == null)
+            return res.json({ message: 'Usuario no encontrado' });
         // Actualizar los valores del registro
         usuario.nombre = nombre;
         usuario.apellido = apellido;
@@ -163,7 +162,6 @@ const actualizarContrasena = async (req, res) => {
             contrasenaActual,
             usuario.contrasena
         );
-
 
         if (!contrasenaValida) {
             return res.json({ message: 'Contraseña actual incorrecta' });
