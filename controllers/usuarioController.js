@@ -21,7 +21,7 @@ const login = async (req, res) => {
         });
 
         if (!usuario) {
-            return res.status(404).json({ message: 'Usuario no encontrado' });
+            return res.json({ message: 'Usuario no encontrado' });
         }
         /// Verificar si se encontró el registro
 
@@ -30,11 +30,10 @@ const login = async (req, res) => {
             usuario.contrasena
         );
         if (!contrasenaValida) {
-            return res.status(401).json({ message: 'Contraseña incorrecta' });
+            return res.json({ message: 'Contraseña incorrecta' });
         }
 
         res.json(usuario);
-
     } catch (error) {
         console.log('Error al consultar el registro del usuario:', error);
         res.status(500).json({
@@ -121,15 +120,35 @@ const agregar = async (req, res) => {
 
 const actualizar = async (req, res) => {
     try {
-        const {
-            nombre,
-            apellido,
-            telefono,
-            email,
-            contrasenaActual,
-            contrasenaNueva,
-            fk_rol,
-        } = req.body;
+        const { nombre, apellido, telefono, email, fk_rol } = req.body;
+
+        const id = req.params.id;
+        console.log(id);
+
+        const usuario = await UsuarioModels.findOne({
+            where: { id_usuario: id },
+        });
+
+        if(usuario == null)
+            return res.json({message: "Usuario no encontrado"});
+        // Actualizar los valores del registro
+        usuario.nombre = nombre;
+        usuario.apellido = apellido;
+        usuario.telefono = telefono;
+        usuario.email = email;
+        usuario.fk_rol = fk_rol;
+
+        usuario.save();
+
+        res.json({ message: 'Actualización exitosa' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error al actualizar el usuario' });
+    }
+};
+
+const actualizarContrasena = async (req, res) => {
+    try {
+        const { contrasenaActual, contrasenaNueva } = req.body;
 
         console.log('actualizar esto');
         const id = req.params.id;
@@ -145,28 +164,21 @@ const actualizar = async (req, res) => {
             usuario.contrasena
         );
 
+
         if (!contrasenaValida) {
-            return res
-                .status(401)
-                .json({ message: 'Contraseña actual incorrecta' });
+            return res.json({ message: 'Contraseña actual incorrecta' });
         }
 
         // Cifra la contraseña utilizando bcrypt
         const hashedContrasena = await bcrypt.hash(contrasenaNueva, 10);
 
-        // Actualizar los valores del registro
-        usuario.nombre = nombre;
-        usuario.apellido = apellido;
-        usuario.telefono = telefono;
-        usuario.email = email;
         usuario.contrasena = hashedContrasena;
-        usuario.fk_rol = fk_rol;
 
         usuario.save();
 
-        res.json({ message: 'Actualización exitosa' });
+        res.json({ message: 'Contraseña actualizada con éxito' });
     } catch (error) {
-        res.status(500).json({ message: 'Error al actualizar el usuario' });
+        res.status(500).json({ message: 'Error al actualizar la contraseña' });
     }
 };
 
@@ -201,4 +213,5 @@ module.exports = {
     actualizar,
     cambiarEstado,
     login,
+    actualizarContrasena,
 };
