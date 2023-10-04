@@ -19,7 +19,10 @@ const ProveedorModels = db.define(
         direccion: {
             type: Sequelize.STRING,
         },
-        contacto: {
+        cedula: {
+            type: Sequelize.STRING,
+        },
+        nit: {
             type: Sequelize.STRING,
         },
         estado: {
@@ -33,20 +36,4 @@ const ProveedorModels = db.define(
 );
 
 
-// Consultas personalizadas para clientes
-
-const findOneProveedor = async (id) => {
-    try {
-
-        const consulta = `SELECT * FROM proveedor where id_proveedor = ${id}`;
-        const resultado = await db.query(consulta, {
-            type: Sequelize.QueryTypes.SELECT,
-        });
-
-        return resultado;
-
-    } catch (error) {
-        console.log(error);
-    }
-}
-module.exports = { ProveedorModels, findOneProveedor };
+module.exports = { ProveedorModels };
