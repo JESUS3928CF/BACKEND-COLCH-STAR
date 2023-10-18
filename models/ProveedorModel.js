@@ -19,10 +19,7 @@ const ProveedorModels = db.define(
         direccion: {
             type: Sequelize.STRING,
         },
-        cedula: {
-            type: Sequelize.STRING,
-        },
-        nit: {
+        identificador: {
             type: Sequelize.STRING,
         },
         estado: {

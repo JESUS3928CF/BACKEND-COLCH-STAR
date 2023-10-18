@@ -22,7 +22,7 @@ const consultar = async (req, res) => {
 const agregar = async (req, res) => {
 
     try {
-        const { nombre, telefono,  direccion, cedula, nit } = req.body;
+        const { nombre, telefono,  direccion,  identificador } = req.body;
 
 
         //!  Insertar un nuevo cliente en la base de datos
@@ -30,8 +30,7 @@ const agregar = async (req, res) => {
             nombre,
             telefono,
             direccion,
-            cedula,
-            nit
+            identificador
         });
 
         /// Mensaje de respuesta
@@ -50,7 +49,7 @@ const agregar = async (req, res) => {
 const actualizar = async (req, res) => {
     try {
 
-        const { nombre, telefono, direccion, cedula, nit  } = req.body;
+        const { nombre, telefono, direccion,  identificador  } = req.body;
 
         const id = req.params.id;
         console.log(id);
@@ -62,8 +61,7 @@ const actualizar = async (req, res) => {
         proveedor.nombre = nombre;
         proveedor.telefono = telefono;
         proveedor.direccion = direccion;
-        proveedor.cedula = cedula
-        proveedor.nit = nit
+        proveedor.identificador = identificador
 
         proveedor.save();
 
