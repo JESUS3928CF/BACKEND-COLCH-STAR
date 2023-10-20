@@ -21,7 +21,7 @@ const consultar = async (req, res) => {
 const agregar = async (req,res) => {
 
      try {
-         const { nombre, apellido, telefono, email, direccion } = req.body;
+         const { nombre, apellido, telefono, email, direccion,cedula } = req.body;
 
 
         //!  Insertar un nuevo cliente en la base de datos
@@ -31,6 +31,7 @@ const agregar = async (req,res) => {
              telefono,
              email,
              direccion,
+             cedula,
          });
 
          /// Mensaje de respuesta
@@ -49,7 +50,7 @@ const agregar = async (req,res) => {
 const actualizar = async (req, res) => {    
     try {
 
-        const { nombre, apellido, telefono, email, direccion } = req.body;
+        const { nombre, apellido, telefono, email, direccion,cedula } = req.body;
 
         // console.log('actualizar esto');
         const id = req.params.id;
@@ -64,6 +65,7 @@ const actualizar = async (req, res) => {
         cliente.telefono = telefono;
         cliente.email = email;
         cliente.direccion = direccion
+        cliente.cedula = cedula
 
         cliente.save();
 

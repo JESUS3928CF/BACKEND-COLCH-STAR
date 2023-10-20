@@ -25,6 +25,9 @@ const ClienteModels = db.define(
         direccion: {
             type: Sequelize.STRING,
         },
+        cedula: {
+            type: Sequelize.STRING,
+        },
         estado: {
             type: Sequelize.BOOLEAN,
             defaultValue: true, //! Establece el valor por defecto del estado como true
