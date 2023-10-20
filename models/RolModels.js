@@ -3,7 +3,7 @@ const Sequelize = require('sequelize');
 const db = require('../config/db');
 
 const RolModels = db.define(
-    'roles',
+    'rol',
     {
         id_rol: {
             type: Sequelize.INTEGER(5),
@@ -26,7 +26,7 @@ const RolModels = db.define(
         },
     },
     {
-        tableName: 'roles', // Nombre de la tabla en la base de datos
+        tableName: 'rol', // Nombre de la tabla en la base de datos
     }
 );
 
