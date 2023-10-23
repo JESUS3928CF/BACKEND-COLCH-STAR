@@ -25,6 +25,9 @@ const ClienteModels = db.define(
         direccion: {
             type: Sequelize.STRING,
         },
+        cedula: {
+            type: Sequelize.STRING,
+        },
         estado: {
             type: Sequelize.BOOLEAN,
             allowNull: false,
@@ -37,23 +40,6 @@ const ClienteModels = db.define(
 );
 
 
-/// Consultas personalizadas para clientes
 
-const findOneCliente = async (id) => {
-    try {
-
-        const consulta = `SELECT * FROM cliente where id_cliente = ${id}`;
-        const resultado = await db.query(consulta, {
-            type: Sequelize.QueryTypes.SELECT,
-        });
-
-        return resultado;
-        
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-
-module.exports = { ClienteModels, findOneCliente };
+module.exports = { ClienteModels };
 

@@ -15,7 +15,7 @@ const VentaModels = db.define('ventas', {
         type: Sequelize.INTEGER,
     },
     monto_total: {
-        type: Sequelize.DECIMAL,
+        type: Sequelize.DOUBLE,
     },
     fecha_entrega: {
         type: Sequelize.DATE,

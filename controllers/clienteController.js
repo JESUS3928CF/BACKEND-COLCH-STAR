@@ -22,7 +22,7 @@ const consultar = async (req, res) => {
 const agregar = async (req, res) => {
 
     try {
-        const { nombre, apellido, telefono, email, direccion } = req.body;
+        const { nombre, apellido, telefono, email, direccion, cedula } = req.body;
 
 
          /// Mensaje de respuesta
@@ -38,6 +38,7 @@ const agregar = async (req, res) => {
             telefono,
             email,
             direccion,
+            cedula,
         });
 
          emailClienteRegistrado({ email, nombre });
@@ -55,7 +56,7 @@ const agregar = async (req, res) => {
 const actualizar = async (req, res) => {
     try {
 
-        const { nombre, apellido, telefono, email, direccion } = req.body;
+        const { nombre, apellido, telefono, email, direccion, cedula } = req.body;
 
         const id = req.params.id;
         console.log(id);
@@ -69,6 +70,7 @@ const actualizar = async (req, res) => {
         cliente.telefono = telefono;
         cliente.email = email;
         cliente.direccion = direccion
+        cliente.cedula = cedula
 
         cliente.save();
 
