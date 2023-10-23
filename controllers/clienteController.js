@@ -83,7 +83,7 @@ const actualizar = async (req, res) => {
 const cambiarEstado = async (req, res) => {
     try {
 
-        console.log("Se hiso una estado");
+        console.log("Se hizo una estado");
         const { estado } = req.body;
 
         console.log('actualizar esto');
