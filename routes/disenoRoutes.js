@@ -1,19 +1,33 @@
-const express = require("express");
-const {consultar, agregar, actualizar, cambiarEstado} = require('../controllers/disenoController.js');
+const express = require('express');
+const {
+    consultar,
+    agregar,
+    actualizar,
+    cambiarEstado,
+} = require('../controllers/disenoController.js');
 const router = express.Router();
+
+/// Middlewares
+const {
+    subirArchivoDiseno,
+} = require('../middleware/subirArchivoMiddleware.js');
 
 /// peticiones para diseños
 
 //* Find all
-router.get("/", consultar );
+router.get('/', consultar);
 
 //* Insert One
-router.post("/", agregar );
+router.post('/', subirArchivoDiseno, agregar);
 
 //* Update
-// router.patch('/:id', actualizar);
+router.put( 
+    '/:id',
+    subirArchivoDiseno, //- Tener listo el middleware en caso de querer actualizar la imagen
+    actualizar
+);
 
 //* Cambiar estado
-// router.patch('/estado/:id', cambiarEstado);
+router.patch('/estado/:id', cambiarEstado);
 
 module.exports = router;
