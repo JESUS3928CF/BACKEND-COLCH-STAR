@@ -5,7 +5,7 @@ const router = express.Router();
 /// peticiones para diseños
 
 //* Find all
-// router.get("/", consultar );
+router.get("/", consultar );
 
 //* Insert One
 router.post("/", agregar );

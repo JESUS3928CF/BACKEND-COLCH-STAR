@@ -5,6 +5,9 @@ const routerUsuario = require('./usuarioRoutes');
 const routerVenta = require('./ventaRoutes');
 const routerDiseno = require('./disenoRoutes');
 
+/// Middlewares
+const { subirArchivoDiseno } = require("../middleware/subirArchivoMiddleware.js")
+
 function routerApi(app){
     const router = express.Router();
     app.use("/api", router)
@@ -12,7 +15,7 @@ function routerApi(app){
     router.use('/proveedores', routerProveedor);
     router.use('/usuarios', routerUsuario);
     router.use('/ventas', routerVenta);
-    router.use('/disenos', routerDiseno);
+    router.use('/disenos',subirArchivoDiseno, routerDiseno);
 }
 
 
