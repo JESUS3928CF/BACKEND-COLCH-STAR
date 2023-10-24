@@ -16,7 +16,4 @@ router.patch('/:id', actualizar);
 //* Cambiar estado
 router.patch('/estado/:id', cambiarEstado);
 
-
-
-
 module.exports = router;
