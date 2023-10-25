@@ -1,4 +1,6 @@
-const {PrendasModels} = require('../models/PrendasModel');
+const {PrendasModels}= require('../models/PrendasModel.js')
+
+
 
 const consultar = async (req,res)=>{
     try{
@@ -18,13 +20,18 @@ const consultar = async (req,res)=>{
 
 const agregar = async(req,res)=>{
     try{
-        const{nombre,cantidad,precio,tipo_tela,imagen,genero}=req.body;
 
-        await PrendasModels.create(
-            {nombre,cantidad,precio,tipo_tela,imagen,genero});
+
+        const{nombre,cantidad,precio,tipo_de_tela,imagen,genero}= req.body
+        console.log(req.body)
+        const prendas = await PrendasModels.create(
+            {nombre:nombre,cantidad,precio,tipo_de_tela,imagen,genero});
+            
         res.status(200).json({menssage:'Prenda agregada exitosamente'})
+        console.log(prendas)
     } catch(error){
         res.status(500).json({message: 'Error al agregar prenda'})
+        console.log(error)
     }
 
 };
@@ -32,10 +39,10 @@ const agregar = async(req,res)=>{
 
 const update= async(req,res)=>{
     try{
-        const{nombre,cantidad,precio,tipo_tela,imagen,genero}=req.body
+        const{nombre,cantidad,precio,tipo_de_tela,imagen,genero}=req.body
         const id = req.params.id
 
-        const prenda = await PrendasModels.finOne({
+        const prenda = await PrendasModels.findOne({
             where:{id_prenda:id},
         });
 
@@ -43,7 +50,7 @@ const update= async(req,res)=>{
         prenda.nombre= nombre;
         prenda.cantidad=cantidad;
         prenda.precio=precio;
-        prenda.tipo_tela=tipo_tela;
+        prenda.tipo_de_tela=tipo_de_tela;
         prenda.imagen=imagen;
         prenda.genero=genero;
 
@@ -55,6 +62,7 @@ const update= async(req,res)=>{
 
     } catch (error){
         res.status(500).json({massge: 'Error al actualizar la prendas'})
+        console.log(error)
     }
 }
 
@@ -65,7 +73,8 @@ const cambiarEstado= async(req, res)=>{
 
         const {estado}= req.body;
         const id = req.params.id
-        const prenda= await PrendasModels.finOne({where: { id_prenda:id} }); 
+        const prenda= await PrendasModels.findOne(
+            {where: { id_prenda:id} }); 
         prenda.estado=!estado;
         prenda.save()
 

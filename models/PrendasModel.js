@@ -1,38 +1,43 @@
-const sequelize = require('sequelize')
+const Sequelize = require('sequelize')
 const db = require('../config/db');
 
 const PrendasModels = db.define(
     'prenda',
     {
         id_prenda:{
-            type: sequelize.Sequelize.INTEGER,
+            type: Sequelize.INTEGER,
             primaryKey:true,
             autoIncrement:true,
         },
 
         nombre: {
-            type:sequelize.STRING,
+            type:Sequelize.STRING,
         },
         cantidad:{
-            type: sequelize.INTEGER,
+            type: Sequelize.INTEGER,
         },
         precio:{
-            type: sequelize.DOUBLE,
+            type: Sequelize.DOUBLE,
         },
         tipo_de_tela:{
-            type:sequelize.STRING,
+            type:Sequelize.STRING,
         },
         imagen:{
-            type:sequelize.STRING,
+            type:Sequelize.STRING,
         },
         genero: {
-            type: sequelize.STRING,
+            type: Sequelize.STRING,
         },
         publicado:{
-            type:sequelize.BOOLEAN,
+            type: Sequelize.BOOLEAN,
+            allowNull: false,
+            defaultValue: false,
+            
         },
         estado:{
-            type: sequelize.BOOLEAN,
+            type: Sequelize.BOOLEAN,
+            allowNull: false,
+            defaultValue: false,            
         },
     },{
         tableName: 'prenda'

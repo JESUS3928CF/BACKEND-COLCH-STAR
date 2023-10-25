@@ -12,6 +12,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
+
 db.authenticate()
     .then(() => { console.log("Base de datos conectada") })
     .catch(error => { console.log(error)});
@@ -33,6 +34,7 @@ app.get("/api", (req, res) => {
 
 app.use('/*', (req, res) => {
     res.status(404).send('Paso algo inesperado');
+ 
 });
 
 app.listen(port, () => {
