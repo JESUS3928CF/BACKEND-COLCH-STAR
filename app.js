@@ -8,8 +8,8 @@ const bodyParser = require("body-parser");
 
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 
 db.authenticate()
@@ -23,6 +23,9 @@ const port = process.env.PORT || 4000;
 app.use(cors());
 
 routerApi(app);
+
+/// Carpeta publica de los diseños
+app.use(express.static('uploads/disenos'));
 
 app.get("/api", (req, res) => {
     res.status(200).send('API DE COLCH STAR');
