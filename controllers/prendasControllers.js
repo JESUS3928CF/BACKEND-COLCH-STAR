@@ -1,4 +1,6 @@
 const {PrendasModels}= require('../models/PrendasModel.js')
+const fs = require('fs')
+
 
 
 
@@ -22,17 +24,25 @@ const agregar = async(req,res)=>{
     try{
 
 
-        const{nombre,cantidad,precio,tipo_de_tela,imagen,genero}= req.body
+        const{nombre,cantidad,precio,tipo_de_tela,genero} = req.body
         console.log(req.body)
+
+        // if(!req.file){
+        //     return res.json({message:`Error la imagen es obligatoria`})
+        // }
+
+
+        
         const prendas = await PrendasModels.create(
-            {nombre:nombre,cantidad,precio,tipo_de_tela,imagen,genero});
+            {nombre:'Tomas',cantidad,precio,tipo_de_tela,imagen:req.file.filenaem,genero});
             
         res.status(200).json({menssage:'Prenda agregada exitosamente'})
         console.log(prendas)
     } catch(error){
         res.status(500).json({message: 'Error al agregar prenda'})
-        console.log(error)
+
     }
+
 
 };
 

@@ -9,6 +9,7 @@ const routerDiseno = require('./disenoRoutes');
 
 
 function routerApi(app){
+    const router = express.Router();
     app.use("/api", router)
     router.use('/clientes', routerCliente);
     router.use('/proveedores', routerProveedor);
