@@ -22,10 +22,17 @@ const agregar = async(req,res)=>{
     try{
 
 
-        const{nombre,cantidad,precio,tipo_de_tela,imagen,genero}= req.body
+        const{nombre,cantidad,precio,tipo_de_tela,genero}= req.body
+
+        console.log('Datos que se enviaran a la db', req.body)
+        console.log('img',req.file)
+
+        if(!req.file){
+            return res.json({message: `Error la imajen de la prenda es obligatoria`})
+        }
         console.log(req.body)
         const prendas = await PrendasModels.create(
-            {nombre:nombre,cantidad,precio,tipo_de_tela,imagen,genero});
+            {nombre,cantidad,precio,tipo_de_tela,imagen:req.file.filename,genero});
             
         res.status(200).json({menssage:'Prenda agregada exitosamente'})
         console.log(prendas)
