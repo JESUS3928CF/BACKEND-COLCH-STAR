@@ -111,14 +111,14 @@ const cambiarEstado = async (req, res) => {
 //! cambiar el estado de publicación de un diseño
 const cambiarPublicacion = async (req, res) => {
     try {
-        const { publicado } = req.body;
+        const { estado } = req.body;
         const id = req.params.id;
 
         const diseno = await DisenoModels.findOne({
             where: { id_diseno: id },
         });
         // Actualizar el estado contrario al que se le envía 
-        diseno.publicado = !publicado;
+        diseno.publicado = !estado;
 
         diseno.save();
 
