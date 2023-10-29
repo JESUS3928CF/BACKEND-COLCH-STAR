@@ -1,4 +1,10 @@
 {
-    "cSpell.words": ["contrasena", "diseno", "disenos", "Publicacion"],
+    "cSpell.words": [
+        "contrasena",
+        "diseno",
+        "disenos",
+        "Publicacion",
+        "tamano"
+    ],
     "DockerRun.DisableDockerrc": true
 }
