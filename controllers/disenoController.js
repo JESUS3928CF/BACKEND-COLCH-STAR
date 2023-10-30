@@ -108,5 +108,25 @@ const cambiarEstado = async (req, res) => {
     }
 }
 
+//! cambiar el estado de publicación de un diseño
+const cambiarPublicacion = async (req, res) => {
+    try {
+        const { estado } = req.body;
+        const id = req.params.id;
 
-module.exports = { agregar, consultar, actualizar, cambiarEstado };
+        const diseno = await DisenoModels.findOne({
+            where: { id_diseno: id },
+        });
+        // Actualizar el estado contrario al que se le envía 
+        diseno.publicado = !estado;
+
+        diseno.save();
+
+        res.json({ message: 'Se cambio el estado de publicación' });
+    } catch (error) {
+        res.status(500).json({ message: 'No se cambio el estado de publicación' });
+    }
+}
+
+
+module.exports = { agregar, consultar, actualizar, cambiarEstado, cambiarPublicacion };
