@@ -84,6 +84,7 @@ const actualizar = async (req, res) => {
         res.json({ message: 'Actualización exitosa' });
     } catch (error) {
         res.status(500).json({ message: 'Error al actualizar el diseño' });
+        console.log(error)
     }
 }
 
