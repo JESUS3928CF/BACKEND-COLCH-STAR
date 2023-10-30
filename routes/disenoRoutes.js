@@ -4,6 +4,7 @@ const {
     agregar,
     actualizar,
     cambiarEstado,
+    cambiarPublicacion,
 } = require('../controllers/disenoController.js');
 const router = express.Router();
 
@@ -29,5 +30,8 @@ router.put(
 
 //* Cambiar estado
 router.patch('/estado/:id', cambiarEstado);
+
+//* Cambiar estado
+router.patch('/publicado/:id', cambiarPublicacion);
 
 module.exports = router;
