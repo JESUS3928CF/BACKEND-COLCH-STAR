@@ -20,7 +20,7 @@ const subirArchivoDiseno = (req, res, next) => {
 
 //* Función para subir un archivo a la carpeta 'prendas'
 const subirArchivoPrenda = (req, res, next) => {
-    const upload = multer(configurarMulter("prendas")).single('imagen');
+    const upload = multer(configurarMulter('prenda')).single('imagen');
     upload(req, res, function (error) {
         if (error) {
             res.json({ mensaje: error });

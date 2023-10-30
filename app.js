@@ -12,6 +12,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
+
 db.authenticate()
     .then(() => { console.log("Base de datos conectada") })
     .catch(error => { console.log(error)});
@@ -26,6 +27,7 @@ routerApi(app);
 
 /// Carpeta publica de los diseños
 app.use(express.static('uploads/disenos'));
+app.use(express.static('uploads/prenda'))
 
 app.get("/api", (req, res) => {
     res.status(200).send('API DE COLCH STAR');
@@ -33,6 +35,7 @@ app.get("/api", (req, res) => {
 
 app.use('/*', (req, res) => {
     res.status(404).send('Paso algo inesperado');
+ 
 });
 
 app.listen(port, () => {
