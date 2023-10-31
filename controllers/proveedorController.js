@@ -32,7 +32,7 @@ const agregar = async (req, res) => {
 
         if (identificadorRepetido) {
             return res.status(400).json({
-                message: 'Ya exite esta identificacion',
+                message: 'Ya Existe esta Identificación',
                 identificadorRepetido,
             });
         }
