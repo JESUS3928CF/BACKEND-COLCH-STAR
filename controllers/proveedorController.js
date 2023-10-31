@@ -26,6 +26,16 @@ const agregar = async (req, res) => {
 
 
 
+        const identificadorRepetido  = await ProveedorModels.findOne({
+            where: { identificador: identificador },
+        });
+
+        if (identificadorRepetido) {
+            return res.status(400).json({
+                message: 'Ya exite esta identificacion',
+                identificadorRepetido,
+            });
+        }
 
 
         //!  Insertar un nuevo cliente en la base de datos
