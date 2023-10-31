@@ -25,10 +25,17 @@ const agregar = async (req, res) => {
         const { nombre, apellido, telefono, email, direccion, cedula } = req.body;
 
 
-         /// Mensaje de respuesta
-         res.json({
-             message: 'Cliente agregado exitosamente',
-         });
+        const cedulaRepetido  = await ClienteModels.findOne({
+            where: { cedula: cedula },
+        });
+
+        if (cedulaRepetido) {
+            return res.status(400).json({
+                message: 'Ya exite esta cédula',
+                cedulaRepetido,
+            });
+        }
+         
 
 
         //!  Insertar un nuevo cliente en la base de datos
@@ -39,6 +46,11 @@ const agregar = async (req, res) => {
             email,
             direccion,
             cedula,
+        });
+
+        /// Mensaje de respuesta
+        res.json({
+            message: 'Cliente agregado exitosamente',
         });
 
          emailClienteRegistrado({ email, nombre });
