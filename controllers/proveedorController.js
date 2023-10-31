@@ -24,13 +24,8 @@ const agregar = async (req, res) => {
     try {
         const { nombre, telefono,  direccion,  identificador } = req.body;
 
-        //validacion para no permitir repetir la identificacion
-        
-        // const proveedorExistente = await ProveedorModels.findOne({ identificador });
 
-        // if (proveedorExistente) {
-        //     return res.status(400).json({ message: 'Ya existe un proveedor con la misma identificación' });
-        // }
+
 
 
         //!  Insertar un nuevo cliente en la base de datos
