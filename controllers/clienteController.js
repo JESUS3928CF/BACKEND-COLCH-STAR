@@ -22,7 +22,7 @@ const consultar = async (req, res) => {
 const agregar = async (req, res) => {
 
     try {
-        const { nombre, apellido, telefono, email, direccion, identificacion } = req.body;
+        const { nombre, apellido, telefono, email, direccion, identificacion, tipoIdentificacion} = req.body;
 
 
         const identificacionRepetida  = await ClienteModels.findOne({
@@ -46,6 +46,7 @@ const agregar = async (req, res) => {
             email,
             direccion,
             identificacion,
+            tipoIdentificacion,
         });
 
         /// Mensaje de respuesta
@@ -68,7 +69,7 @@ const agregar = async (req, res) => {
 const actualizar = async (req, res) => {
     try {
 
-        const { nombre, apellido, telefono, email, direccion, identificacion } = req.body;
+        const { nombre, apellido, telefono, email, direccion, identificacion, tipoIdentificacion } = req.body;
 
         const id = req.params.id;
         console.log(id);
@@ -99,7 +100,7 @@ const actualizar = async (req, res) => {
         cliente.email = email;
         cliente.direccion = direccion
         cliente.identificacion = identificacion
-
+        cliente.tipoIdentificacion = tipoIdentificacion
         cliente.save();
 
         res.json({ message: 'Actualización exitosa' });

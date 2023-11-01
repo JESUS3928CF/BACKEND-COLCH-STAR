@@ -28,6 +28,10 @@ const ClienteModels = db.define(
         identificacion: {
             type: Sequelize.STRING,
         },
+        tipoIdentificacion: {
+            type: Sequelize.STRING,
+
+        },
         estado: {
             type: Sequelize.BOOLEAN,
             allowNull: false,
