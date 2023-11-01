@@ -25,7 +25,7 @@ const ClienteModels = db.define(
         direccion: {
             type: Sequelize.STRING,
         },
-        cedula: {
+        identificacion: {
             type: Sequelize.STRING,
         },
         estado: {

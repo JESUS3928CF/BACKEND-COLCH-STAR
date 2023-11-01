@@ -22,17 +22,17 @@ const consultar = async (req, res) => {
 const agregar = async (req, res) => {
 
     try {
-        const { nombre, apellido, telefono, email, direccion, cedula } = req.body;
+        const { nombre, apellido, telefono, email, direccion, identificacion } = req.body;
 
 
-        const cedulaRepetido  = await ClienteModels.findOne({
-            where: { cedula: cedula },
+        const identificacionRepetida  = await ClienteModels.findOne({
+            where: { identificacion: identificacion },
         });
 
-        if (cedulaRepetido) {
+        if (identificacionRepetida) {
             return res.status(400).json({
-                message: 'Ya exite esta cédula',
-                cedulaRepetido,
+                message: 'Ya exite esta identidicación',
+                identificacionRepetida,
             });
         }
          
@@ -45,7 +45,7 @@ const agregar = async (req, res) => {
             telefono,
             email,
             direccion,
-            cedula,
+            identificacion,
         });
 
         /// Mensaje de respuesta
@@ -68,7 +68,7 @@ const agregar = async (req, res) => {
 const actualizar = async (req, res) => {
     try {
 
-        const { nombre, apellido, telefono, email, direccion, cedula } = req.body;
+        const { nombre, apellido, telefono, email, direccion, identificacion } = req.body;
 
         const id = req.params.id;
         console.log(id);
@@ -78,15 +78,15 @@ const actualizar = async (req, res) => {
         });
 
         
-        if (cedula !== cliente.cedula) {
-            const cedulaRepetido = await ClienteModels.findOne({
-                where: { cedula: cedula },
+        if (identificacion !== cliente.identificacion) {
+            const identificacionRepetida = await ClienteModels.findOne({
+                where: { identificacion: identificacion },
             });
 
-            if (cedulaRepetido) {
+            if (identificacionRepetida) {
                 return res.status(400).json({
-                    message: 'Ya Existe esta Cédula',
-                    cedulaRepetido,
+                    message: 'Ya Existe esta Identificación',
+                    identificacionRepetida,
                 });
             }
         }
@@ -98,7 +98,7 @@ const actualizar = async (req, res) => {
         cliente.telefono = telefono;
         cliente.email = email;
         cliente.direccion = direccion
-        cliente.cedula = cedula
+        cliente.identificacion = identificacion
 
         cliente.save();
 
