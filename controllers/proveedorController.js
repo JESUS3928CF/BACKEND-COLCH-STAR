@@ -27,7 +27,10 @@ const agregar = async (req, res) => {
         
 
         const identificadorRepetido  = await ProveedorModels.findOne({
-            where: { identificador: identificador  } && { tipoIdentificacion: tipoIdentificacion}
+            where: {
+                identificador: identificador,
+                tipoIdentificacion: tipoIdentificacion
+              }
         });
 
 
