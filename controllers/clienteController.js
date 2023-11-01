@@ -76,6 +76,18 @@ const actualizar = async (req, res) => {
         const cliente = await ClienteModels.findOne({
             where: { id_cliente: id },
         });
+
+        const cedulaRepetido  = await ClienteModels.findOne({
+            where: { cedula: cedula },
+        });
+
+        if (cedulaRepetido) {
+            return res.status(400).json({
+                message: 'Ya Existe esta Cédula',
+                cedulaRepetido,
+            });
+        }
+
         // Actualizar los valores del registro
         cliente.nombre = nombre;
         cliente.apellido = apellido;
