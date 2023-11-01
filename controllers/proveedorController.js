@@ -70,6 +70,21 @@ const actualizar = async (req, res) => {
         const proveedor = await ProveedorModels.findOne({
             where: { id_proveedor: id },
         });
+
+        
+        const identificadorRepetido  = await ProveedorModels.findOne({
+            where: { identificador: identificador },
+        });
+
+        if (identificadorRepetido) {
+            return res.status(400).json({
+                message: 'Ya Existe esta Identificación',
+                identificadorRepetido,
+            });
+        }
+       
+        
+       
         // Actualizar los valores del registro
         proveedor.nombre = nombre;
         proveedor.telefono = telefono;
@@ -77,6 +92,8 @@ const actualizar = async (req, res) => {
         proveedor.identificador = identificador
 
         proveedor.save();
+
+        
 
         res.json({ message: 'Actualización exitosa' });
     } catch (error) {
