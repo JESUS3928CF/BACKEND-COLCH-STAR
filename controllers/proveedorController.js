@@ -22,13 +22,14 @@ const consultar = async (req, res) => {
 const agregar = async (req, res) => {
 
     try {
-        const { nombre, telefono,  direccion,  identificador } = req.body;
+        const { nombre, telefono,  direccion,  identificador, tipoIdentificacion } = req.body;
 
-
+        
 
         const identificadorRepetido  = await ProveedorModels.findOne({
-            where: { identificador: identificador },
+            where: { identificador: identificador  } && { tipoIdentificacion: tipoIdentificacion}
         });
+
 
         if (identificadorRepetido) {
             return res.status(400).json({
@@ -38,12 +39,15 @@ const agregar = async (req, res) => {
         }
 
 
+
         //!  Insertar un nuevo cliente en la base de datos
         await ProveedorModels.create({
             nombre,
             telefono,
             direccion,
-            identificador
+            identificador,
+            tipoIdentificacion
+
         });
 
         /// Mensaje de respuesta
@@ -62,7 +66,7 @@ const agregar = async (req, res) => {
 const actualizar = async (req, res) => {
     try {
 
-        const { nombre, telefono, direccion,  identificador  } = req.body;
+        const { nombre, telefono, direccion,  identificador,tipoIdentificacion } = req.body;
 
         const id = req.params.id;
         console.log(id);
@@ -103,6 +107,7 @@ const actualizar = async (req, res) => {
         proveedor.telefono = telefono;
         proveedor.direccion = direccion;
         proveedor.identificador = identificador
+        proveedor.tipoIdentificacion = tipoIdentificacion
 
         proveedor.save();
 
