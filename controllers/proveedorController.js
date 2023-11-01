@@ -72,15 +72,28 @@ const actualizar = async (req, res) => {
         });
 
         
-        const identificadorRepetido  = await ProveedorModels.findOne({
-            where: { identificador: identificador },
-        });
+        // const identificadorRepetido  = await ProveedorModels.findOne({
+        //     where: { identificador: identificador },
+        // });
 
-        if (identificadorRepetido) {
-            return res.status(400).json({
-                message: 'Ya Existe esta Identificación',
-                identificadorRepetido,
+        // if (identificadorRepetido) {
+        //     return res.status(400).json({
+        //         message: 'Ya Existe esta Identificación',
+        //         identificadorRepetido,
+        //     });
+        // }
+        
+        if (identificador !== proveedor.identificador) {
+            const identificadorRepetido = await ProveedorModels.findOne({
+                where: { identificador: identificador },
             });
+
+            if (identificadorRepetido) {
+                return res.status(400).json({
+                    message: 'Ya Existe esta Identificación',
+                    identificadorRepetido,
+                });
+            }
         }
        
         
