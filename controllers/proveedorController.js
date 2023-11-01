@@ -22,15 +22,15 @@ const consultar = async (req, res) => {
 const agregar = async (req, res) => {
 
     try {
-        const { nombre, telefono,  direccion,  identificador, tipoIdentificacion } = req.body;
+        const { nombre, telefono, direccion, identificador, tipoIdentificacion } = req.body;
 
-        
 
-        const identificadorRepetido  = await ProveedorModels.findOne({
+
+        const identificadorRepetido = await ProveedorModels.findOne({
             where: {
                 identificador: identificador,
                 tipoIdentificacion: tipoIdentificacion
-              }
+            }
         });
 
 
@@ -69,7 +69,7 @@ const agregar = async (req, res) => {
 const actualizar = async (req, res) => {
     try {
 
-        const { nombre, telefono, direccion,  identificador,tipoIdentificacion } = req.body;
+        const { nombre, telefono, direccion, identificador, tipoIdentificacion } = req.body;
 
         const id = req.params.id;
         console.log(id);
@@ -78,21 +78,14 @@ const actualizar = async (req, res) => {
             where: { id_proveedor: id },
         });
 
-        
-        // const identificadorRepetido  = await ProveedorModels.findOne({
-        //     where: { identificador: identificador },
-        // });
 
-        // if (identificadorRepetido) {
-        //     return res.status(400).json({
-        //         message: 'Ya Existe esta Identificación',
-        //         identificadorRepetido,
-        //     });
-        // }
-        
+
         if (identificador !== proveedor.identificador) {
             const identificadorRepetido = await ProveedorModels.findOne({
-                where: { identificador: identificador },
+                where: {
+                    identificador: identificador,
+                    tipoIdentificacion: tipoIdentificacion
+                },
             });
 
             if (identificadorRepetido) {
@@ -102,9 +95,9 @@ const actualizar = async (req, res) => {
                 });
             }
         }
-       
-        
-       
+
+
+
         // Actualizar los valores del registro
         proveedor.nombre = nombre;
         proveedor.telefono = telefono;
@@ -114,7 +107,7 @@ const actualizar = async (req, res) => {
 
         proveedor.save();
 
-        
+
 
         res.json({ message: 'Actualización exitosa' });
     } catch (error) {
@@ -147,5 +140,5 @@ const cambiarEstado = async (req, res) => {
 }
 
 
-module.exports = { consultar, agregar,actualizar, cambiarEstado };
+module.exports = { consultar, agregar, actualizar, cambiarEstado };
 
