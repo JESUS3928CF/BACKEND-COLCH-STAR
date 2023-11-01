@@ -86,7 +86,7 @@ const actualizar = async (req, res) => {
                     identificador: identificador,
                     tipoIdentificacion: tipoIdentificacion
                 },
-            });
+            })
 
             if (identificadorRepetido) {
                 return res.status(400).json({
