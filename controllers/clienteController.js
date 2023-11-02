@@ -22,13 +22,23 @@ const consultar = async (req, res) => {
 const agregar = async (req, res) => {
 
     try {
-        const { nombre, apellido, telefono, email, direccion, cedula } = req.body;
+        const { nombre, apellido, telefono, email, direccion, identificacion, tipoIdentificacion} = req.body;
 
 
-         /// Mensaje de respuesta
-         res.json({
-             message: 'Cliente agregado exitosamente',
-         });
+        const identificacionRepetido = await ClienteModels.findOne({
+            where: {
+                identificacion: identificacion,
+                tipoIdentificacion: tipoIdentificacion
+            }
+        });
+
+        if (identificacionRepetido) {
+            return res.status(400).json({
+                message: 'Ya exite esta identidicación',
+                identificacionRepetido,
+            });
+        }
+         
 
 
         //!  Insertar un nuevo cliente en la base de datos
@@ -38,7 +48,13 @@ const agregar = async (req, res) => {
             telefono,
             email,
             direccion,
-            cedula,
+            identificacion,
+            tipoIdentificacion,
+        });
+
+        /// Mensaje de respuesta
+        res.json({
+            message: 'Cliente agregado exitosamente',
         });
 
          emailClienteRegistrado({ email, nombre });
@@ -56,7 +72,7 @@ const agregar = async (req, res) => {
 const actualizar = async (req, res) => {
     try {
 
-        const { nombre, apellido, telefono, email, direccion, cedula } = req.body;
+        const { nombre, apellido, telefono, email, direccion, identificacion, tipoIdentificacion } = req.body;
 
         const id = req.params.id;
         console.log(id);
@@ -64,14 +80,32 @@ const actualizar = async (req, res) => {
         const cliente = await ClienteModels.findOne({
             where: { id_cliente: id },
         });
+
+        
+        if (identificacion !== cliente.identificacion) {
+            const identificacionRepetido = await ClienteModels.findOne({
+                where: { identificacion: identificacion,
+                tipoIdentificacion: tipoIdentificacion
+            },
+            });
+
+            if (identificacionRepetido) {
+                return res.status(400).json({
+                    message: 'Ya Existe esta Identificación',
+                    identificacionRepetido,
+                });
+            }
+        }
+    
+
         // Actualizar los valores del registro
         cliente.nombre = nombre;
         cliente.apellido = apellido;
         cliente.telefono = telefono;
         cliente.email = email;
         cliente.direccion = direccion
-        cliente.cedula = cedula
-
+        cliente.identificacion = identificacion
+        cliente.tipoIdentificacion = tipoIdentificacion
         cliente.save();
 
         res.json({ message: 'Actualización exitosa' });
