@@ -80,7 +80,7 @@ const actualizar = async (req, res) => {
 
 
 
-        if (identificador !== proveedor.identificador) {
+        if (identificador !== proveedor.identificador || tipoIdentificacion !==proveedor.tipoIdentificacion) {
             const identificadorRepetido = await ProveedorModels.findOne({
                 where: {
                     identificador: identificador,
