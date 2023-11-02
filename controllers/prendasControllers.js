@@ -1,6 +1,23 @@
 const { PrendasModels } = require("../models/PrendasModel.js");
 const fs = require("fs");
 
+
+const consultarOne= async ( req, res) =>{
+
+  try{
+
+    const id = req.params.id
+
+    const prendasOne =await PrendasModels.findOne({where: {id_prenda:id}});
+    res.status(200).json(prendasOne)
+  } catch(e){
+    console.log("error a consultar la tabla prendas:", e);
+    res.status(500).json({ e: "Error al consultar la tabla prendas" });
+  }
+
+
+}
+
 const consultar = async (req, res) => {
   try {
     //Consulatr los registros de las prendas
@@ -16,7 +33,7 @@ const consultar = async (req, res) => {
 
 const agregar = async (req, res) => {
   try {
-    const { nombre, cantidad, precio, tipo_de_tela, genero } = req.body;
+    const { nombre, cantidad, precio, tipo_de_tela, genero, publicado } = req.body;
 
     console.log("Datos que se enviaran a la db", req.body);
     console.log("img", req.file);
@@ -35,6 +52,7 @@ const agregar = async (req, res) => {
       tipo_de_tela,
       imagen: req.file.filename,
       genero,
+      publicado
     });
 
     res.status(200).json({ menssage: "Prenda agregada exitosamente" });
@@ -46,7 +64,7 @@ const agregar = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    const { nombre, cantidad, precio, tipo_de_tela,genero} = req.body;
+    const { nombre, cantidad, precio, tipo_de_tela,genero,publicado} = req.body;
     const id = req.params.id;
     console.log(id)
     const prenda = await PrendasModels.findOne({
@@ -58,14 +76,19 @@ const update = async (req, res) => {
     prenda.precio = precio;
     prenda.tipo_de_tela = tipo_de_tela;
     prenda.genero = genero;
+    prenda.publicado=publicado;
 
     if(req.file){
         const imagenPath = 'uploads/prenda/'+ prenda.imagen;
         if(imagenPath && fs.existsSync(imagenPath)){
             fs.unlink(imagenPath,(error)=>{
+              if(error){
                 console.error('Error al eliminar la imagen',error)
+                return next();
+                
+              }
             });
-            return next();
+            
         }
         prenda.imagen=req.file.filename
     }
@@ -111,9 +134,11 @@ const cambiarPublicacion = async (req, res)=>{
         })
         prenda.publicado=!estado
         prenda.save()
+
+        res.json({message: 'Se cambio el estado de la publicacion de la prendas'})
     }catch (error){
         res.status(500).json({message: 'No se cambio el estado de la publicacion'})
     }
 }
 
-module.exports = { consultar, agregar, update, cambiarEstado, cambiarPublicacion };
+module.exports = { consultar, agregar, update, cambiarEstado, cambiarPublicacion, consultarOne};
