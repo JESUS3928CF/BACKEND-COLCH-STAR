@@ -72,7 +72,6 @@ const actualizar = async (req, res) => {
         producto.cantidad = cantidad;
         producto.precio = precio;
         producto.fk_prenda = fk_prenda
-        producto.tipoIdentificacion = tipoIdentificacion
 
         /// Verificar si se subió una imagen nueva
         if(req.file){
@@ -133,7 +132,7 @@ const cambiarPublicacion = async (req, res)=>{
         const {estado}=req.body;
         const id = req.params.id
 
-        const producto =await ProductosModels.findOne({
+        const producto =await ProductoModels.findOne({
 
             where: {id_producto: id},
 
