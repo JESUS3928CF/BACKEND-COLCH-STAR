@@ -23,6 +23,7 @@ const RolModels = db.define(
         estado: {
             type: Sequelize.BOOLEAN,
             allowNull: false,
+            defaultValue: true, //! Establece el valor por defecto del estado como true
         },
     },
     {

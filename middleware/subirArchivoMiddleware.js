@@ -30,4 +30,16 @@ const subirArchivoPrenda = (req, res, next) => {
     });
 };
 
-module.exports = { subirArchivoDiseno, subirArchivoPrenda}
+//* Función para subir un archivo a la carpeta 'prendas'
+const subirArchivoProducto = (req, res, next) => {
+    const upload = multer(configurarMulter('productos')).single('imagen');
+    upload(req, res, function (error) {
+        if (error) {
+            res.json({ mensaje: error });
+        } 
+
+        return next();
+    });
+};
+
+module.exports = { subirArchivoDiseno, subirArchivoPrenda, subirArchivoProducto}

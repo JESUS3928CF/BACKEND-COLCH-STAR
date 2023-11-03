@@ -22,7 +22,25 @@ const consultar = async (req, res) => {
 const agregar = async (req, res) => {
 
     try {
-        const { nombre, telefono,  direccion,  identificador } = req.body;
+        const { nombre, telefono, direccion, identificador, tipoIdentificacion } = req.body;
+
+
+
+        const identificadorRepetido = await ProveedorModels.findOne({
+            where: {
+                identificador: identificador,
+                tipoIdentificacion: tipoIdentificacion
+            }
+        });
+
+
+        if (identificadorRepetido) {
+            return res.status(400).json({
+                message: 'Ya Existe esta Identificación',
+                identificadorRepetido,
+            });
+        }
+
 
 
         //!  Insertar un nuevo cliente en la base de datos
@@ -30,7 +48,9 @@ const agregar = async (req, res) => {
             nombre,
             telefono,
             direccion,
-            identificador
+            identificador,
+            tipoIdentificacion
+
         });
 
         /// Mensaje de respuesta
@@ -49,7 +69,7 @@ const agregar = async (req, res) => {
 const actualizar = async (req, res) => {
     try {
 
-        const { nombre, telefono, direccion,  identificador  } = req.body;
+        const { nombre, telefono, direccion, identificador, tipoIdentificacion } = req.body;
 
         const id = req.params.id;
         console.log(id);
@@ -57,13 +77,37 @@ const actualizar = async (req, res) => {
         const proveedor = await ProveedorModels.findOne({
             where: { id_proveedor: id },
         });
+
+
+
+        if (identificador !== proveedor.identificador || tipoIdentificacion !==proveedor.tipoIdentificacion) {
+            const identificadorRepetido = await ProveedorModels.findOne({
+                where: {
+                    identificador: identificador,
+                    tipoIdentificacion: tipoIdentificacion
+                },
+            })
+
+            if (identificadorRepetido) {
+                return res.status(400).json({
+                    message: 'Ya Existe esta Identificación',
+                    identificadorRepetido,
+                });
+            }
+        }
+
+
+
         // Actualizar los valores del registro
         proveedor.nombre = nombre;
         proveedor.telefono = telefono;
         proveedor.direccion = direccion;
         proveedor.identificador = identificador
+        proveedor.tipoIdentificacion = tipoIdentificacion
 
         proveedor.save();
+
+
 
         res.json({ message: 'Actualización exitosa' });
     } catch (error) {
@@ -96,5 +140,5 @@ const cambiarEstado = async (req, res) => {
 }
 
 
-module.exports = { consultar, agregar,actualizar, cambiarEstado };
+module.exports = { consultar, agregar, actualizar, cambiarEstado };
 
