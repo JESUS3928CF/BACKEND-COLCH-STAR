@@ -34,7 +34,7 @@ const agregar = async (req, res) => {
 
         if (identificacionRepetido) {
             return res.status(400).json({
-                message: 'Ya exite esta identidicación',
+                message: 'Ya exite esta Identificación',
                 identificacionRepetido,
             });
         }
@@ -82,7 +82,7 @@ const actualizar = async (req, res) => {
         });
 
         
-        if (identificacion !== cliente.identificacion) {
+        if (identificacion !== cliente.identificacion || tipoIdentificacion !==cliente.tipoIdentificacion) {
             const identificacionRepetido = await ClienteModels.findOne({
                 where: { identificacion: identificacion,
                 tipoIdentificacion: tipoIdentificacion
