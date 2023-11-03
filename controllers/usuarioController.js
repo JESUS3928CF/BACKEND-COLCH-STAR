@@ -1,5 +1,5 @@
 const { UsuarioModels } = require('../models/UsuariosModel');
-const { RolModels } = require('../models/RolModels');
+const { RolModels } = require('../models/RolModel');
 
 //! Importamos la dependencia
 const bcrypt = require('bcrypt');

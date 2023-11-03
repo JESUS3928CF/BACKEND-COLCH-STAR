@@ -1,7 +1,7 @@
 //! Necesitamos importar esto
 const Sequelize = require('sequelize');
 const db = require('../config/db');
-const { RolModels } = require('./RolModels');
+const { RolModels } = require('./RolModel');
 
 
 const UsuarioModels = db.define(
