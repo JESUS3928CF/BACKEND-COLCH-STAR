@@ -20,11 +20,9 @@ const UsuarioModels = db.define(
         },
         telefono: {
             type: Sequelize.STRING,
-            unique: true
         },
         email: {
             type: Sequelize.STRING,
-            unique: true
         },
         contrasena: {
             type: Sequelize.STRING,

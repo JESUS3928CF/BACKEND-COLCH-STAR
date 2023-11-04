@@ -77,20 +77,20 @@ const agregar = async (req, res) => {
             where: { telefono: telefono },
         });
 
-        const correoOcupado = await UsuarioModels.findOne({
-            where: { email: email },
-        });
-
         if (telOcupado) {
-            return res.json({
-                message: 'Teléfono en uso',
+            return res.status(400).json({
+                message: 'Ya exite este teléfono',
                 telOcupado,
             });
         }
 
+        const correoOcupado = await UsuarioModels.findOne({
+            where: { email: email },
+        });
+
         if (correoOcupado) {
-            return res.json({
-                message: 'Correo en uso',
+            return res.status(400).json({
+                message: 'Ya exite esta Email',
                 correoOcupado,
             });
         }
@@ -127,6 +127,7 @@ const actualizar = async (req, res) => {
         const usuario = await UsuarioModels.findOne({
             where: { id_usuario: id },
         });
+        
 
         if (usuario == null)
             return res.json({ message: 'Usuario no encontrado' });
