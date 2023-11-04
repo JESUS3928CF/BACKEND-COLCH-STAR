@@ -22,14 +22,13 @@ const consultar = async (req, res) => {
 const agregar = async (req, res) => {
 
     try {
-        const { nombre, fecha_creacion} = req.body;
+        const { nombre} = req.body;
 
-        console.log('Datos recibidos:', { nombre, fecha_creacion });
+        console.log('Datos recibidos:', { nombre});
 
         //!  Insertar un nuevo cliente en la base de datos
         await RolModels.create({
             nombre,
-            fecha_creacion,
         });
 
         /// Mensaje de respuesta
@@ -49,7 +48,7 @@ const agregar = async (req, res) => {
 const actualizar = async (req, res) => {
     try {
 
-        const { nombre, fecha_creacion } = req.body;
+        const { nombre } = req.body;
 
         const id = req.params.id;
         console.log(id);
@@ -62,7 +61,6 @@ const actualizar = async (req, res) => {
 
         // Actualizar los valores del registro
         rol.nombre = nombre;
-        rol.fecha_creacion = fecha_creacion;
         rol.save();
 
         res.json({ message: 'Actualización exitosa' });
