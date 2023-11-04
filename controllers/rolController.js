@@ -69,28 +69,43 @@ const agregar = async (req, res) => {
         res.status(500).json({ message: 'Error al agregar el rol' });
     }
 };
-//! Actualizar un rol y sus permisos
 
+
+// //! Actualizar un rol y sus permisos
 const actualizar = async (req, res) => {
     try {
-        const { nombre } = req.body;
+        const { nombre, permisos } = req.body;
+        const id_rol = req.params.id; // Obtiene el ID desde la ruta
 
-        const id = req.params.id;
-        console.log(id);
+        console.log('Datos recibidos:', { id_rol, nombre, permisos });
 
-        const rol = await RolModels.findOne({
-            where: { id_rol: id },
+        // Actualiza el rol en la base de datos
+        const rolActualizado = await RolModels.update(
+            { nombre },
+            { where: { id_rol: id_rol } }
+        );
+
+        // Elimina los permisos existentes para este rol
+        await ConfiguracionModels.destroy({ where: { fk_rol: id_rol } });
+
+        // Inserta los nuevos permisos para el rol
+        for (let value of permisos) {
+            await ConfiguracionModels.create({
+                fk_rol: id_rol,
+                permiso: value,
+            });
+        }
+
+        // Mensaje de respuesta
+        res.json({
+            message: 'Rol actualizado exitosamente',
         });
-
-        // Actualizar los valores del registro
-        rol.nombre = nombre;
-        rol.save();
-
-        res.json({ message: 'Actualización exitosa' });
     } catch (error) {
+        // Envía una respuesta al cliente indicando el error
         res.status(500).json({ message: 'Error al actualizar el rol' });
     }
 };
+
 
 //! Actualizar un estado de rol
 
