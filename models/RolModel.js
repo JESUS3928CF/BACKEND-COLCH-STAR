@@ -18,8 +18,11 @@ const RolModels = db.define(
         fecha_creacion: {
             type: Sequelize.DATE,
             allowNull: false,
-            defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'), // Establece la fecha de creación actual
+            defaultValue: Sequelize.literal(
+                "CONVERT_TZ(NOW(), '+00:00', '-05:00')"
+            ),
         },
+
         estado: {
             type: Sequelize.BOOLEAN,
             allowNull: false,
