@@ -75,7 +75,7 @@ const actualizar = async (req, res) => {
         const { nombre, apellido, telefono, email, direccion, identificacion, tipoIdentificacion } = req.body;
 
         const id = req.params.id;
-        console.log(id);
+        console.log(id, nombre);
 
         const cliente = await ClienteModels.findOne({
             where: { id_cliente: id },

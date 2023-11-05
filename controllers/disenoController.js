@@ -123,7 +123,7 @@ const cambiarPublicacion = async (req, res) => {
 
         diseno.save();
 
-        res.json({ message: 'Se cambio el estado de publicación' });
+        res.status(200).json({ message: 'Se cambio el estado de publicación' });
     } catch (error) {
         res.status(500).json({ message: 'No se cambio el estado de publicación' });
     }

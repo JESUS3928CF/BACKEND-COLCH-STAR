@@ -72,7 +72,6 @@ const actualizar = async (req, res) => {
         producto.cantidad = cantidad;
         producto.precio = precio;
         producto.fk_prenda = fk_prenda
-        producto.tipoIdentificacion = tipoIdentificacion
 
         /// Verificar si se subió una imagen nueva
         if(req.file){
@@ -133,15 +132,18 @@ const cambiarPublicacion = async (req, res)=>{
         const {estado}=req.body;
         const id = req.params.id
 
-        const producto =await ProductosModels.findOne({
+        const producto =await ProductoModels.findOne({
 
             where: {id_producto: id},
 
         })
         producto.publicado=!estado
         producto.save()
+
+        res.status(200).json({ message: 'Se cambio el estado de publicación' });
+
     }catch (error){
-        res.status(500).json({message: 'No se cambio el estado de la publicacion'})
+        res.status(500).json({message: 'No se cambio el estado de la publicación'})
     }
 }
 

@@ -10,7 +10,7 @@ router.get("/", consultar );
 //* Insert One
 router.post("/",subirArchivoProducto, agregar );
 
-//* Uddate
+//* Update
 router.patch('/:id',subirArchivoProducto, actualizar);
 
 //* Cambiar estado
