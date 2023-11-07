@@ -10,7 +10,7 @@ const routerDiseno = require('./disenoRoutes');
 const routerPrecioDiseno = require('./precioDisenoRoutes');
 const routerRol = require('./rolRoutes');
 const routerColors= require('./colorsRoutes')
-const routerPrendasColors=require('./colorsPrenda')
+const routerPrendasColors=require('./colorsPrendaRouter')
 
 
 
