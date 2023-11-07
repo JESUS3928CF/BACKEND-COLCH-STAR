@@ -127,7 +127,7 @@ const actualizar = async (req, res) => {
         const usuario = await UsuarioModels.findOne({
             where: { id_usuario: id },
         });
-        
+
 
         if (usuario == null)
             return res.json({ message: 'Usuario no encontrado' });
