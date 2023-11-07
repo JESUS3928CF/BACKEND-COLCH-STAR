@@ -127,7 +127,32 @@ const actualizar = async (req, res) => {
         const usuario = await UsuarioModels.findOne({
             where: { id_usuario: id },
         });
+
+        if(telefono !== usuario.telefono){
+            const telOcupado = await UsuarioModels.findOne({
+                where:{telefono : telefono},
+            });
+            if(telOcupado){
+                return res.status(400).json({
+                    message: 'Ya Existe este Teléfono',
+                    telOcupado,
+                });
+            }
+        }
+
+        if (email !== usuario.email) {
+            const correoOcupado = await UsuarioModels.findOne({
+                where: { email: email },
+            });
         
+            if (correoOcupado) {
+                return res.status(400).json({
+                    message: 'Ya Existe este Email',
+                    correoOcupado,
+                });
+            }
+        }
+
 
         if (usuario == null)
             return res.json({ message: 'Usuario no encontrado' });
