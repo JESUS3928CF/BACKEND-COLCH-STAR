@@ -1,6 +1,7 @@
 //! Necesitamos importar esto
 const Sequelize = require('sequelize');
 const db = require('../config/db');
+const { PrendasModels } = require('./PrendasModel');
 
 const ProductoModels = db.define(
     'producto',
@@ -42,5 +43,6 @@ const ProductoModels = db.define(
     }
 );
 
+ProductoModels.belongsTo(PrendasModels, { foreignKey: 'fk_prenda' }); /// Establecer la relación
 
 module.exports = { ProductoModels };
