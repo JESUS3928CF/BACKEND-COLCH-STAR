@@ -1,3 +1,4 @@
+const { PrendasModels } = require("../models/PrendasModel");
 const { ProductoModels } = require("../models/ProductoModel");
 const fs = require('fs')
 
@@ -6,9 +7,15 @@ const consultar = async (req, res) => {
     try {
 
         /// Consultando todos los registros
-        const productos = await ProductoModels.findAll();
-
-        //- Forma de inviar un JSON
+        const productos = await ProductoModels.findAll({
+            include: [
+                {
+                    model: PrendasModels, // Modelo de Prendas
+                    attributes: ['imagen'], // Selecciona los atributos que necesitas, en este caso, solo la imagen
+                }
+            ]
+        });
+         //- Forma de inviar un JSON
         res.status(200).json(productos);
 
 
