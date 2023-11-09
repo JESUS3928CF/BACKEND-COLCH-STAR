@@ -10,29 +10,8 @@ const consult= async(req,res)=>{
 
     try{
         const colors = await colorModels.findAll()
-        const prendaColors = await colorsPrendasmodel.findAll()
-        const prenda= await PrendasModels.findAll()
-
-
-
-        const colorConLaPrenda= new Map()
-
-        prendaColors.forEach((fk_prenda)=>{
-            console.log(colorConLaPrenda)
-            if(!colorConLaPrenda.has(fk_prenda.fk_color)){
-                colorConLaPrenda.set(fk_prenda.fk_color,[])
-            }
-            colorConLaPrenda.get(fk_prenda.fk_color).push(fk_prenda.fk_prenda);
-        })
-
-        const prendasYColor= colors.map((color)=>({
-            id_color: color.id_color,
-            codigo: color.codigo,
-            prendaColor: colorConLaPrenda.get(color.id_color)||[],
-        }))
-
-
-        res.status(200).json(prendasYColor)
+        
+        res.status(200).json(colors)
     } catch (error){
         res.status(500).json({ error: 'Error al consultar el color' });
         console.log(error)

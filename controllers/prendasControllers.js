@@ -2,21 +2,8 @@ const { PrendasModels } = require("../models/PrendasModel.js");
 const fs = require("fs");
 
 
-const consultarOne= async ( req, res) =>{
-
-  try{
-
-    const id = req.params.id
-
-    const prendasOne =await PrendasModels.findOne({where: {id_prenda:id}});
-    res.status(200).json(prendasOne)
-  } catch(e){
-    console.log("error a consultar la tabla prendas:", e);
-    res.status(500).json({ e: "Error al consultar la tabla prendas" });
-  }
 
 
-}
 
 const consultar = async (req, res) => {
   try {
@@ -141,4 +128,4 @@ const cambiarPublicacion = async (req, res)=>{
     }
 }
 
-module.exports = { consultar, agregar, update, cambiarEstado, cambiarPublicacion, consultarOne};
+module.exports = { consultar, agregar, update, cambiarEstado, cambiarPublicacion};

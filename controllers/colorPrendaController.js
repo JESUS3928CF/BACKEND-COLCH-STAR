@@ -5,41 +5,25 @@ const {colorModels}=require('../models/colorModel.js')
 const consult = async (req,res)=>{
     try{
 
-        // const prendaColor= await colorsPrendasmodel.findAll();
+        const prendaColor= await colorsPrendasmodel.findAll();
+
+
         // const prendas = await PrendasModels.findAll();
-        // const colors=  await colorModels.findAll();
-
         // const coloresDeLaprenda= new Map();
-        // const prenda= new Map();
 
-        // coloresDeLaprenda.forEach((colores)=>{
-        //     if(!coloresDeLaprenda.has(colores.fk_color)){
-        //         coloresDeLaprenda.set(colores.fk_color,[]);
+        // prendaColor.forEach((fk_prenda)=>{
+        //     if(!coloresDeLaprenda.has(fk_prenda.id_prenda)){
+        //         coloresDeLaprenda.set(fk_prenda.id_prenda,[]);
         //     }
-        //     coloresDeLaprenda.get(colores.fk_color).push(colores.colores)
+        //     coloresDeLaprenda.get(fk_prenda.id_prenda).push(fk_prenda.fk_prenda)
         // })
 
-        // prendas.forEach((prendaColors)=>{
-        //     if(!prenda.has(prendaColors.fk_prenda)){
-        //         prenda.set(prendaColors.fk_prenda,[])
-        //     }
-        //     prenda.get(fk_prenda).push(prendaColors.prendaColors)
-        // })
+        // const colosPrendas = prendas.map((p) => ({
+        //     id_prenda: p.id_prenda,
+        //     nombre: p.nombre,
+        //     colorPrenas: colosPrendas.get(p.id_prenda) || [],
+        // }));
 
-
-
-        const prendaColor= await colorsPrendasmodel.findAll({
-            include: [
-                {
-                    model: PrendasModels,
-                    attributes: ['nombre']
-                },
-                {
-                    model: colorModels,
-                    attributes: ['color'],
-                }
-            ]
-        })
 
         res.status(200).json(prendaColor)
     }catch(e){
