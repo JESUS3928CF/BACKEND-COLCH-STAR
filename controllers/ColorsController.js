@@ -1,5 +1,7 @@
 const{colorModels}= require('../models/colorModel')
 const {colorsPrendasmodel} = require('../models/ColorsPrendasModels.js')
+const { PrendasModels } = require("../models/PrendasModel.js");
+
 
 
 
@@ -9,16 +11,18 @@ const consult= async(req,res)=>{
     try{
         const colors = await colorModels.findAll()
         const prendaColors = await colorsPrendasmodel.findAll()
+        const prenda= await PrendasModels.findAll()
+
+
 
         const colorConLaPrenda= new Map()
 
-        prendaColors.forEach((coloresDeLaPrenda)=>{
-            if(!colorConLaPrenda.has(coloresDeLaPrenda.fk_color)){
-                colorConLaPrenda.set(coloresDeLaPrenda.fk_color,[])
+        prendaColors.forEach((fk_prenda)=>{
+            console.log(colorConLaPrenda)
+            if(!colorConLaPrenda.has(fk_prenda.fk_color)){
+                colorConLaPrenda.set(fk_prenda.fk_color,[])
             }
-            colorConLaPrenda.get(coloresDeLaPrenda.fk_color).push(coloresDeLaPrenda.coloresDeLaPrenda);
-
-            
+            colorConLaPrenda.get(fk_prenda.fk_color).push(fk_prenda.fk_prenda);
         })
 
         const prendasYColor= colors.map((color)=>({
