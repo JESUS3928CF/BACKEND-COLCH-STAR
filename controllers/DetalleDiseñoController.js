@@ -18,5 +18,6 @@ const consultar = async (req, res) => {
 };
 
 
+
 module.exports = { consultar, };
 
