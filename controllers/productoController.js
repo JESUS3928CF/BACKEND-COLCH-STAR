@@ -30,7 +30,7 @@ const consultar = async (req, res) => {
 const agregar = async (req, res) => {
 
     try {
-        const { nombre, cantidad, precio, fk_prenda } = req.body;
+        const { nombre, cantidad, precio, fk_prenda, publicado } = req.body;
 
 
         if(!req.file) {
@@ -44,7 +44,8 @@ const agregar = async (req, res) => {
             cantidad,
             precio,
             imagen : req.file.filename,
-            fk_prenda
+            fk_prenda,
+            publicado
             
 
         });
@@ -65,7 +66,7 @@ const agregar = async (req, res) => {
 const actualizar = async (req, res) => {
     try {
 
-        const { nombre, cantidad, precio, fk_prenda } = req.body;
+        const { nombre, cantidad, precio, fk_prenda, publicado } = req.body;
 
         const id = req.params.id;
         console.log(id);
@@ -79,6 +80,7 @@ const actualizar = async (req, res) => {
         producto.cantidad = cantidad;
         producto.precio = precio;
         producto.fk_prenda = fk_prenda
+        producto.publicado = publicado
 
         /// Verificar si se subió una imagen nueva
         if(req.file){
@@ -118,7 +120,7 @@ const cambiarEstado = async (req, res) => {
 
         console.log('actualizar esto');
         const id = req.params.id;
-        console.log(id);
+        // console.log(id);
 
         const producto = await ProductoModels.findOne({
             where: { id_producto: id },
@@ -144,7 +146,9 @@ const cambiarPublicacion = async (req, res)=>{
             where: {id_producto: id},
 
         })
+        // Actualizar el estado contrario al que se le envía 
         producto.publicado=!estado
+
         producto.save()
 
         res.status(200).json({ message: 'Se cambio el estado de publicación' });
