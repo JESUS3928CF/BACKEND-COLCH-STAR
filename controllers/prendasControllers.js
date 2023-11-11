@@ -1,15 +1,67 @@
 const { PrendasModels } = require("../models/PrendasModel.js");
+const {colorModels}=require('../models/colorModel.js')
+const {colorsPrendasmodel} = require('../models/ColorsPrendasModels.js')
+
 const fs = require("fs");
-
-
-
-
 
 const consultar = async (req, res) => {
   try {
     //Consulatr los registros de las prendas
     const prendas = await PrendasModels.findAll();
-    res.status(200).json(prendas);
+    const colors = await colorModels.findAll();
+    const colorsPrenda = await colorsPrendasmodel.findAll();
+
+
+    const TablaIntermedia= new Map()
+    const nombreColors=new Map()
+
+
+    colors.forEach((color)=>{
+      if(!nombreColors.has(color.id_color)){
+        nombreColors.set(color.id_color,[])
+      }
+      nombreColors.get(color.id_color).push(color.color)
+    })
+
+
+
+    colorsPrenda.forEach((fk_color)=>{
+
+      if(!TablaIntermedia.has(fk_color.fk_prenda)){
+          TablaIntermedia.set(fk_color.fk_prenda,[])
+
+      }
+      TablaIntermedia.get(fk_color.fk_prenda).push(fk_color.fk_color)
+  })
+
+
+  const ColoresDelaPrenda= prendas.map((colors)=>({
+
+    id_prenda: colors.id_prenda,
+    nombre:   colors.nombre,
+    cantidad: colors.cantidad,
+    precio: colors.precio,
+    tipo_de_tela: colors.tipo_de_tela,  
+    imagen: colors.imagen,
+    genero: colors.genero,
+    publicado: colors.publicado,
+    estado: colors.estado,
+    fk_color: TablaIntermedia.get(colors.id_prenda)||[],
+    color : (()=>{
+      const result = [];
+      TablaIntermedia.get(colors.id_prenda).forEach((fk_color)=>{
+        result.push(nombreColors.get(fk_color)||[]);
+      });
+      return result;
+
+    })(),
+ 
+}))
+
+
+    res.status(200).json(ColoresDelaPrenda);
+
+
   } catch (error) {
     console.log("error a consultar la tabla prendas:", error);
     res.status(500).json({ error: "Error al consultar la tabla prendas" });
