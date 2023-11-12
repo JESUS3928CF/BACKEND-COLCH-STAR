@@ -1,4 +1,9 @@
-const checkAut = (req, res, next) => {
+const { UsuarioModels } = require('../models/UsuariosModel');
+const { RolModels } = require('../models/RolModel');
+const jwt = require('jsonwebtoken');
+const { ConfiguracionModels } = require('../models/ConfiguracionModel');
+
+const checkAut = async (req, res, next) => {
     let token;
 
     // Buscar en el objeto de header la autorización
@@ -8,8 +13,40 @@ const checkAut = (req, res, next) => {
     ) {
         try {
             token = req.headers.authorization.split(' ')[1];
-            console.log(token);
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+            const usuario = await UsuarioModels.findByPk(decoded.id, {
+                attributes: {
+                    exclude: ['contrasena', 'token'],
+                },
+                include: [{ model: RolModels, attributes: ['nombre'] }],
+            });
+
+            /// Consultando todos los registros de permisos
+            const permisos = await ConfiguracionModels.findAll();
+
+            const permisosUsuario = new Map();
+            permisosUsuario.set(usuario.fk_rol, []);
+
+            permisos.forEach((permiso) => {
+                console.log(permiso);
+                if (permiso.fk_rol === usuario.fk_rol) {
+                    permisosUsuario.get(usuario.fk_rol).push(permiso.permiso);
+                }
+            });
+
+            console.log(permisosUsuario);
+
+            req.usuario = {
+                id_usuario: usuario.id_usuario,
+                nombre: usuario.nombre,
+                apellido: usuario.apellido,
+                rol: usuario.rol,
+                permisos: permisosUsuario.get(usuario.fk_rol) || []
+            };
+            return next();
         } catch (error) {
+            console.log(error);
             const e = new Error('Token no valido');
             return res.status(403).json({ message: e.message });
         }

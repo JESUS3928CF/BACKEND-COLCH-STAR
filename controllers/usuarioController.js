@@ -6,8 +6,7 @@ const bcrypt = require('bcrypt');
 const { generarJWT } = require('../helpers/generarJWT.js');
 
 //! autenticar un usuario con JWT
-const autenticar =  async (req, res) => {
-    
+const autenticar = async (req, res) => {
     const { email, contrasena } = req.body;
 
     try {
@@ -44,31 +43,31 @@ const autenticar =  async (req, res) => {
             return res.status(403).json({ message: error.message });
         }
 
-        //! en ves de retornar solo el token retornamos el usuario con la información que queremos retornar cuando se autentique
-        res.json({
-            /// Quitar la info no deseada y solo mostrar la necesaria
-            profile: {
-                //!- me toca ponerle profile por que allá en el from yo rectifico por el profile para mostrar las rutas
-                id_usuario: usuario.id_usuario,
-                nombre: usuario.nombre,
-                email: usuario.email,
-                token: generarJWT(usuario.id),
-            },
-        });
+        // res.json({
+        //     /// Quitar la info no deseada y solo mostrar la necesaria
+        //     profile: {
+        //         id_usuario: usuario.id_usuario,
+        //         nombre: usuario.nombre,
+        //         email: usuario.email,
+        //         token: generarJWT(usuario.id_usuario),
+        //     },
+        // });
 
-        
+        res.json({
+            token: generarJWT(usuario.id_usuario),
+        });
     } catch (error) {
         console.log('Error al consultar el registro del usuario:', error);
         res.status(500).json({
             error: 'Error al consultar el registro del usuario',
         });
     }
-}
+};
 
 const perfil = (req, res) => {
-    console.log(req)
-    res.json({ message : "Mostrando perfil"})
-}
+    const { usuario } = req;
+    res.json({ usuario });
+};
 
 const consultar = async (req, res) => {
     try {
@@ -128,7 +127,7 @@ const agregar = async (req, res) => {
             nombre,
             apellido,
             telefono,
-            email : email.toLowerCase(),
+            email: email.toLowerCase(),
             contrasena: hashedContrasena, /// Guarda la contraseña cifrada en la base de datos
             fk_rol,
         });
@@ -157,11 +156,11 @@ const actualizar = async (req, res) => {
             where: { id_usuario: id },
         });
 
-        if(telefono !== usuario.telefono){
+        if (telefono !== usuario.telefono) {
             const telOcupado = await UsuarioModels.findOne({
-                where:{telefono : telefono},
+                where: { telefono: telefono },
             });
-            if(telOcupado){
+            if (telOcupado) {
                 return res.status(400).json({
                     message: 'Ya Existe este Teléfono',
                     telOcupado,
@@ -173,7 +172,7 @@ const actualizar = async (req, res) => {
             const correoOcupado = await UsuarioModels.findOne({
                 where: { email: email },
             });
-        
+
             if (correoOcupado) {
                 return res.status(400).json({
                     message: 'Ya Existe este Email',
@@ -181,7 +180,6 @@ const actualizar = async (req, res) => {
                 });
             }
         }
-
 
         if (usuario == null)
             return res.json({ message: 'Usuario no encontrado' });
@@ -236,7 +234,6 @@ const actualizarContrasena = async (req, res) => {
 };
 
 //! Actualizar un cliente
-
 const cambiarEstado = async (req, res) => {
     try {
         console.log('Se hizo unn estado');
@@ -267,5 +264,5 @@ module.exports = {
     cambiarEstado,
     actualizarContrasena,
     autenticar,
-    perfil
+    perfil,
 };
