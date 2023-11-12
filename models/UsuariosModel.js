@@ -23,6 +23,7 @@ const UsuarioModels = db.define(
         },
         email: {
             type: Sequelize.STRING,
+            unique: true
         },
         contrasena: {
             type: Sequelize.STRING,
@@ -30,6 +31,9 @@ const UsuarioModels = db.define(
         estado: {
             type: Sequelize.BOOLEAN,
             defaultValue: true, //! Establece el valor por defecto del estado como true
+        },
+        token: {
+            type: Sequelize.STRING(20)
         },
         fk_rol: {
             type: Sequelize.INTEGER(5),

@@ -10,11 +10,8 @@ const routerDiseno = require('./disenoRoutes');
 const routerPrecioDiseno = require('./precioDisenoRoutes');
 const routerRol = require('./rolRoutes');
 const routerColors= require('./colorsRoutes')
-const routerDetalleDiseno = require('./DetalleDiseñoRouter')
-
-
-
-
+const routerDetalleDiseno = require('./DetalleDiseñoRouter');
+const { checkAut } = require('../middleware/authMidlleware');
 
 
 function routerApi(app){
@@ -26,7 +23,7 @@ function routerApi(app){
     router.use('/usuarios', routerUsuario);
     router.use('/ventas', routerVenta);
     router.use('/prendas',routerPrendas)
-    router.use('/disenos', routerDiseno);
+    router.use('/disenos' ,routerDiseno);
     router.use('/precio_disenos', routerPrecioDiseno);
     router.use('/rol', routerRol);
     router.use('/colors',routerColors)

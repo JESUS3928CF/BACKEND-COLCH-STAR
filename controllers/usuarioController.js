@@ -1,11 +1,13 @@
-const { UsuarioModels } = require('../models/UsuariosModel');
-const { RolModels } = require('../models/RolModel');
+const { UsuarioModels } = require('../models/UsuariosModel.js');
+const { RolModels } = require('../models/RolModel.js');
 
 //! Importamos la dependencia
 const bcrypt = require('bcrypt');
+const { generarJWT } = require('../helpers/generarJWT.js');
 
-//! Consultar un registro relacionado con Sequelize
-const login = async (req, res) => {
+//! autenticar un usuario con JWT
+const autenticar =  async (req, res) => {
+    
     const { email, contrasena } = req.body;
 
     try {
@@ -20,26 +22,53 @@ const login = async (req, res) => {
             ],
         });
 
+        /// Verificar si no se encontró el registro
         if (!usuario) {
-            return res.json({ message: 'Usuario no encontrado' });
+            const error = new Error('El usuario no existe');
+            return res.status(403).json({ message: error.message });
         }
-        /// Verificar si se encontró el registro
 
+        /// Verificar que este habilitado
+        if (!usuario.estado) {
+            const error = new Error('Tu cuenta se encuentra deshabilitada');
+            return res.status(403).json({ message: error.message });
+        }
+
+        /// validar la contraseña
         const contrasenaValida = await bcrypt.compare(
             contrasena,
             usuario.contrasena
         );
         if (!contrasenaValida) {
-            return res.json({ message: 'Contraseña incorrecta' });
+            const error = new Error('Contraseña incorrecta');
+            return res.status(403).json({ message: error.message });
         }
-        res.json(usuario);
+
+        //! en ves de retornar solo el token retornamos el usuario con la información que queremos retornar cuando se autentique
+        res.json({
+            /// Quitar la info no deseada y solo mostrar la necesaria
+            profile: {
+                //!- me toca ponerle profile por que allá en el from yo rectifico por el profile para mostrar las rutas
+                id_usuario: usuario.id_usuario,
+                nombre: usuario.nombre,
+                email: usuario.email,
+                token: generarJWT(usuario.id),
+            },
+        });
+
+        
     } catch (error) {
         console.log('Error al consultar el registro del usuario:', error);
         res.status(500).json({
             error: 'Error al consultar el registro del usuario',
         });
     }
-};
+}
+
+const perfil = (req, res) => {
+    console.log(req)
+    res.json({ message : "Mostrando perfil"})
+}
 
 const consultar = async (req, res) => {
     try {
@@ -89,8 +118,8 @@ const agregar = async (req, res) => {
         });
 
         if (correoOcupado) {
-            return res.status(400).json({
-                message: 'Ya exite esta Email',
+            return res.status(403).json({
+                message: 'Ya existe este Email',
                 correoOcupado,
             });
         }
@@ -99,7 +128,7 @@ const agregar = async (req, res) => {
             nombre,
             apellido,
             telefono,
-            email,
+            email : email.toLowerCase(),
             contrasena: hashedContrasena, /// Guarda la contraseña cifrada en la base de datos
             fk_rol,
         });
@@ -236,6 +265,7 @@ module.exports = {
     agregar,
     actualizar,
     cambiarEstado,
-    login,
     actualizarContrasena,
+    autenticar,
+    perfil
 };
