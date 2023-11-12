@@ -1,9 +1,9 @@
 const { PrendasModels } = require("../models/PrendasModel.js");
 const {colorModels}=require('../models/colorModel.js')
 const {colorsPrendasmodel} = require('../models/ColorsPrendasModels.js')
+const {TallaModels}= require('../models/TallaModel.js')
 
 const fs = require("fs");
-const { where } = require("sequelize");
 
 const consultar = async (req, res) => {
   try {
@@ -11,11 +11,22 @@ const consultar = async (req, res) => {
     const prendas = await PrendasModels.findAll();
     const colors = await colorModels.findAll();
     const colorsPrenda = await colorsPrendasmodel.findAll();
+    const Tallas = await TallaModels.findAll();
 
 
     const TablaIntermedia= new Map()
     const nombreColors=new Map()
+    const tallas= new Map()
 
+
+
+    Tallas.forEach((talla)=>{
+      if(!tallas.has(talla.fk_prenda)){
+        tallas.set(talla.fk_prenda,[])
+      }
+      tallas.get(talla.fk_prenda).push(talla.talla)
+
+    })
 
     colors.forEach((color)=>{
       if(!nombreColors.has(color.id_color)){
@@ -55,7 +66,8 @@ const consultar = async (req, res) => {
       return result||[];
 
     })(),
- 
+    
+    Talla: tallas.get(colors.id_prenda)||[]
 }))
 
 
@@ -76,7 +88,7 @@ const agregar = async (req, res) => {
 
 
 
-    const { nombre, cantidad, precio, tipo_de_tela, genero, publicado, colores } = req.body;
+    const { nombre, cantidad, precio, tipo_de_tela, genero, publicado, colores,tallas } = req.body;
 
     console.log("Datos que se enviaran a la db", req.body);
     console.log("img", req.file);
@@ -98,17 +110,20 @@ const agregar = async (req, res) => {
       
     });
 
-    console.log('Colores',colores)
 
     for (let id_color of colores.split(',')) {
      await colorsPrendasmodel.create({
           fk_color:parseInt(id_color),
-          fk_prenda: newPrenda.id_prenda,
-
-
-          
+          fk_prenda: newPrenda.id_prenda, 
       });
   }
+
+  for (let value of tallas) {
+    await TallaModels.create({
+         talla: value,
+         fk_prenda: newPrenda.id_prenda, 
+     });
+ }
 
 
     res.status(200).json({ menssage: "Prenda agregada exitosamente" });
@@ -120,7 +135,7 @@ const agregar = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    const { nombre, cantidad, precio, tipo_de_tela,genero,publicado,colores} = req.body;
+    const { nombre, cantidad, precio, tipo_de_tela,genero,publicado,colores,tallas} = req.body;
     const id_prenda = req.params.id;
     const prenda= await PrendasModels.findOne({
       where: {id_prenda:id_prenda}
@@ -157,6 +172,7 @@ const update = async (req, res) => {
     
 
     await colorsPrendasmodel.destroy({where:{fk_prenda: id_prenda}})
+    await TallaModels.destroy({where: {fk_prenda:id_prenda}})
 
     for (let id_color of colores.split(',')) {
       await colorsPrendasmodel.create({
@@ -165,6 +181,13 @@ const update = async (req, res) => {
            
        });
    }
+
+   for (let value of tallas) {
+    await TallaModels.create({
+         talla: value,
+         fk_prenda: id_prenda, 
+     });
+ }
 
 
     res.json({
