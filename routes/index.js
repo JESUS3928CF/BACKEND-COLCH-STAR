@@ -11,6 +11,7 @@ const routerPrecioDiseno = require('./precioDisenoRoutes');
 const routerRol = require('./rolRoutes');
 const routerColors= require('./colorsRoutes')
 const routerDetalleDiseno = require('./DetalleDiseñoRouter')
+const routerTallas= require('./tallasRouter')
 
 
 
@@ -31,6 +32,7 @@ function routerApi(app){
     router.use('/rol', routerRol);
     router.use('/colors',routerColors)
     router.use('/detalle_diseno',routerDetalleDiseno)
+    router.use('/tallas', routerTallas)
 
 }
 
