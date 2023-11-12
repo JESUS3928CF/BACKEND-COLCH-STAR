@@ -1,3 +1,5 @@
+const { DetalleDiseñoModels } = require("../models/DetalleDiseñoModel");
+const { DisenoModels } = require("../models/DisenoModel");
 const { PrendasModels } = require("../models/PrendasModel");
 const { ProductoModels } = require("../models/ProductoModel");
 const fs = require('fs')
@@ -5,20 +7,65 @@ const fs = require('fs')
 
 const consultar = async (req, res) => {
     try {
-
         /// Consultando todos los registros
         const productos = await ProductoModels.findAll({
             include: [
                 {
                     model: PrendasModels, // Modelo de Prendas
-                    attributes: ['imagen','nombre',  'precio' , 'genero','tipo_de_tela'], // Selecciona los atributos que necesitas, en este caso, solo la imagen
-                }
-            ]
+                    attributes: [
+                        'imagen',
+                        'nombre',
+                        'precio',
+                        'genero',
+                        'tipo_de_tela',
+                    ], // Selecciona los atributos que necesitas, en este caso, solo la imagen
+                },
+            ],
         });
-         //- Forma de inviar un JSON
-        res.status(200).json(productos);
 
+        /// Consultando los diseños
+        const detalle_diseno = await DetalleDiseñoModels.findAll({
+            include: [
+                {
+                    model: DisenoModels, // Modelo de Prendas
+                    attributes: ['imagen', 'nombre'], // Selecciona los atributos que necesitas, en este caso, solo la imagen
+                },
+            ],
+        });
 
+        const productosConDisenos = new Map();
+
+        detalle_diseno.forEach((diseno) => {
+            if (!productosConDisenos.has(diseno.fk_producto)) {
+                productosConDisenos.set(diseno.fk_producto, []);
+            }
+            console.log(diseno);
+            console.log(
+                productosConDisenos.get(diseno.fk_producto).push({
+                    nombre: diseno.diseno.nombre,
+                    imagen: diseno.diseno.imagen,
+                })
+            );
+        });
+
+        console.log(productosConDisenos);
+
+        //- Forma de inviar un JSON
+        // res.status(200).json(productos);
+        const productoConDisenos = productos.map((producto) => ({
+            id_producto: producto.id_producto,
+            nombre: producto.nombre,
+            cantidad: producto.cantidad,
+            precio: producto.precio,
+            estado: producto.estado,
+            imagen: producto.imagen,
+            publicado: producto.publicado,
+            fk_prenda: producto.fk_prenda,
+            prenda: producto.prenda,
+            disenos: productosConDisenos.get(producto.id_producto) || [],
+        }));
+
+        res.status(200).json(productoConDisenos);
     } catch (error) {
         console.log('Error al consultar la tabla producto:', error);
         res.status(500).json({ error: 'Error al consultar la tabla producto' });
@@ -46,9 +93,8 @@ const agregar = async (req, res) => {
             imagen : req.file.filename,
             fk_prenda,
             publicado
-            
-
         });
+        
 
         /// Mensaje de respuesta
         res.json({
