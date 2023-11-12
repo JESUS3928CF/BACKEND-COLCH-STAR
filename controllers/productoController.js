@@ -1,7 +1,9 @@
 const { DetalleDiseñoModels } = require("../models/DetalleDiseñoModel");
 const { DisenoModels } = require("../models/DisenoModel");
+const { PrecioDisenoModels } = require("../models/PrecioDisenoModel");
 const { PrendasModels } = require("../models/PrendasModel");
 const { ProductoModels } = require("../models/ProductoModel");
+
 const fs = require('fs')
 
 
@@ -28,14 +30,21 @@ const consultar = async (req, res) => {
             include: [
                 {
                     model: DisenoModels, // Modelo de Prendas
-                    attributes: ['imagen', 'nombre'], // Selecciona los atributos que necesitas, en este caso, solo la imagen
+                    attributes: ['imagen', 'nombre' ], // Selecciona los atributos que necesitas, en este caso, solo la imagen
                 },
+                {
+                    model: PrecioDisenoModels, // Modelo de Prendas
+                    attributes: [ 'tamano','precio' ], // Selecciona los atributos que necesitas, en este caso, solo la imagen
+                },
+            
             ],
         });
 
         const productosConDisenos = new Map();
 
         detalle_diseno.forEach((diseno) => {
+
+            // console.log(diseno);
             if (!productosConDisenos.has(diseno.fk_producto)) {
                 productosConDisenos.set(diseno.fk_producto, []);
             }
@@ -44,13 +53,16 @@ const consultar = async (req, res) => {
                 productosConDisenos.get(diseno.fk_producto).push({
                     nombre: diseno.diseno.nombre,
                     imagen: diseno.diseno.imagen,
+                    precio: diseno.precio_diseno.precio,
+                    tamano: diseno.precio_diseno.tamano,
                 })
             );
         });
 
-        console.log(productosConDisenos);
+         console.log(productosConDisenos);
 
-        //- Forma de inviar un JSON
+
+        //- Forma de inviar un JSON-
         // res.status(200).json(productos);
         const productoConDisenos = productos.map((producto) => ({
             id_producto: producto.id_producto,
@@ -77,7 +89,7 @@ const consultar = async (req, res) => {
 const agregar = async (req, res) => {
 
     try {
-        const { nombre, cantidad, precio, fk_prenda, publicado } = req.body;
+        const { nombre, cantidad, precio, fk_prenda, publicado, disenos } = req.body;
 
 
         if(!req.file) {
@@ -86,7 +98,7 @@ const agregar = async (req, res) => {
 
 
         //!  Insertar un nuevo cliente en la base de datos
-        await ProductoModels.create({
+         const nuevoProducto = await ProductoModels.create({
             nombre,
             cantidad,
             precio,
@@ -94,6 +106,18 @@ const agregar = async (req, res) => {
             fk_prenda,
             publicado
         });
+        console.log(nuevoProducto)
+        console.log(disenos)
+        disenosArray = JSON.parse(disenos)
+        for (let value of disenosArray) {
+            await DetalleDiseñoModels.create({
+                fk_producto: nuevoProducto.id_producto,
+                fk_diseno: value.id_diseno,
+                fk_precio_diseno: value.id_precio_diseno
+            });
+        }
+        
+    
         
 
         /// Mensaje de respuesta
@@ -102,6 +126,7 @@ const agregar = async (req, res) => {
         });
 
     } catch (error) {
+        console.log(error)
         // Envía una respuesta al cliente indicando el error
         res.status(500).json({ message: 'Error al agregar el Producto' });
     }
