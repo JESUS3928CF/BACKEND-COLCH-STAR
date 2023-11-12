@@ -3,6 +3,7 @@ const {colorModels}=require('../models/colorModel.js')
 const {colorsPrendasmodel} = require('../models/ColorsPrendasModels.js')
 
 const fs = require("fs");
+const { where } = require("sequelize");
 
 const consultar = async (req, res) => {
   try {
@@ -46,13 +47,12 @@ const consultar = async (req, res) => {
     genero: colors.genero,
     publicado: colors.publicado,
     estado: colors.estado,
-    fk_color: TablaIntermedia.get(colors.id_prenda)||[],
     color : (()=>{
       const result = [];
       TablaIntermedia.get(colors.id_prenda).forEach((fk_color)=>{
         result.push(nombreColors.get(fk_color)||[]);
       });
-      return result;
+      return result||[];
 
     })(),
  
@@ -72,7 +72,11 @@ const consultar = async (req, res) => {
 
 const agregar = async (req, res) => {
   try {
-    const { nombre, cantidad, precio, tipo_de_tela, genero, publicado } = req.body;
+
+
+
+
+    const { nombre, cantidad, precio, tipo_de_tela, genero, publicado, colores } = req.body;
 
     console.log("Datos que se enviaran a la db", req.body);
     console.log("img", req.file);
@@ -82,17 +86,30 @@ const agregar = async (req, res) => {
         message: `Error la imagen de la prenda es obligatoria`,
       });
     }
-    console.log(req.body);
 
-    await PrendasModels.create({
+    const newPrenda= await PrendasModels.create({
       nombre,
       cantidad,
       precio,
       tipo_de_tela,
       imagen: req.file.filename,
       genero,
-      publicado
+      publicado,
+      
     });
+
+    console.log('Colores',colores)
+
+    for (let id_color of colores.split(',')) {
+     await colorsPrendasmodel.create({
+          fk_color:parseInt(id_color),
+          fk_prenda: newPrenda.id_prenda,
+
+
+          
+      });
+  }
+
 
     res.status(200).json({ menssage: "Prenda agregada exitosamente" });
   } catch (error) {
@@ -103,19 +120,23 @@ const agregar = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    const { nombre, cantidad, precio, tipo_de_tela,genero,publicado} = req.body;
-    const id = req.params.id;
-    console.log(id)
-    const prenda = await PrendasModels.findOne({
-      where: { id_prenda: id },
-    });
+    const { nombre, cantidad, precio, tipo_de_tela,genero,publicado,colores} = req.body;
+    const id_prenda = req.params.id;
+    const prenda= await PrendasModels.findOne({
+      where: {id_prenda:id_prenda}
+    })
 
-    prenda.nombre = nombre;
-    prenda.cantidad = cantidad;
-    prenda.precio = precio;
-    prenda.tipo_de_tela = tipo_de_tela;
-    prenda.genero = genero;
-    prenda.publicado=publicado;
+
+    const actualizadoPrenda = await PrendasModels.update({
+      nombre,
+        cantidad,
+        precio,
+        tipo_de_tela,
+        genero,
+        publicado,
+    },{where: {id_prenda:id_prenda}}
+    );
+
 
     if(req.file){
         const imagenPath = 'uploads/prenda/'+ prenda.imagen;
@@ -131,10 +152,19 @@ const update = async (req, res) => {
         }
         prenda.imagen=req.file.filename
     }
-
-    prenda.save()
-
    
+
+    
+
+    await colorsPrendasmodel.destroy({where:{fk_prenda: id_prenda}})
+
+    for (let id_color of colores.split(',')) {
+      await colorsPrendasmodel.create({
+           fk_color:parseInt(id_color),
+           fk_prenda: id_prenda,
+           
+       });
+   }
 
 
     res.json({

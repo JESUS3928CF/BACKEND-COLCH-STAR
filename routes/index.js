@@ -10,7 +10,6 @@ const routerDiseno = require('./disenoRoutes');
 const routerPrecioDiseno = require('./precioDisenoRoutes');
 const routerRol = require('./rolRoutes');
 const routerColors= require('./colorsRoutes')
-const routerPrendasColors=require('./colorsPrendaRouter')
 const routerDetalleDiseno = require('./DetalleDiseñoRouter')
 
 
@@ -31,7 +30,6 @@ function routerApi(app){
     router.use('/precio_disenos', routerPrecioDiseno);
     router.use('/rol', routerRol);
     router.use('/colors',routerColors)
-    router.use('/prendasColors',routerPrendasColors)
     router.use('/detalle_diseno',routerDetalleDiseno)
 
 }
