@@ -1,28 +1,79 @@
 const { PrendasModels } = require("../models/PrendasModel.js");
+const {colorModels}=require('../models/colorModel.js')
+const {colorsPrendasmodel} = require('../models/ColorsPrendasModels.js')
+const {TallaModels}= require('../models/TallaModel.js')
+
 const fs = require("fs");
-
-
-const consultarOne= async ( req, res) =>{
-
-  try{
-
-    const id = req.params.id
-
-    const prendasOne =await PrendasModels.findOne({where: {id_prenda:id}});
-    res.status(200).json(prendasOne)
-  } catch(e){
-    console.log("error a consultar la tabla prendas:", e);
-    res.status(500).json({ e: "Error al consultar la tabla prendas" });
-  }
-
-
-}
 
 const consultar = async (req, res) => {
   try {
     //Consulatr los registros de las prendas
     const prendas = await PrendasModels.findAll();
-    res.status(200).json(prendas);
+    const colors = await colorModels.findAll();
+    const colorsPrenda = await colorsPrendasmodel.findAll();
+    const Tallas = await TallaModels.findAll();
+
+
+    const TablaIntermedia= new Map()
+    const nombreColors=new Map()
+    const tallas= new Map()
+
+
+
+    Tallas.forEach((talla)=>{
+      if(!tallas.has(talla.fk_prenda)){
+        tallas.set(talla.fk_prenda,[])
+      }
+      tallas.get(talla.fk_prenda).push(talla.talla)
+
+    })
+
+    colors.forEach((color)=>{
+      if(!nombreColors.has(color.id_color)){
+        nombreColors.set(color.id_color,[])
+      }
+      nombreColors.get(color.id_color).push(color.color)
+    })
+
+
+
+    colorsPrenda.forEach((fk_color)=>{
+
+      if(!TablaIntermedia.has(fk_color.fk_prenda)){
+          TablaIntermedia.set(fk_color.fk_prenda,[])
+
+      }
+      TablaIntermedia.get(fk_color.fk_prenda).push(fk_color.fk_color)
+  })
+
+
+  const ColoresDelaPrenda= prendas.map((colors)=>({
+
+    id_prenda: colors.id_prenda,
+    nombre:   colors.nombre,
+    cantidad: colors.cantidad,
+    precio: colors.precio,
+    tipo_de_tela: colors.tipo_de_tela,  
+    imagen: colors.imagen,
+    genero: colors.genero,
+    publicado: colors.publicado,
+    estado: colors.estado,
+    color : (()=>{
+      const result = [];
+      TablaIntermedia.get(colors.id_prenda).forEach((fk_color)=>{
+        result.push(nombreColors.get(fk_color)||[]);
+      });
+      return result||[];
+
+    })(),
+    
+    Talla: tallas.get(colors.id_prenda)||[]
+}))
+
+
+    res.status(200).json(ColoresDelaPrenda);
+
+
   } catch (error) {
     console.log("error a consultar la tabla prendas:", error);
     res.status(500).json({ error: "Error al consultar la tabla prendas" });
@@ -33,7 +84,11 @@ const consultar = async (req, res) => {
 
 const agregar = async (req, res) => {
   try {
-    const { nombre, cantidad, precio, tipo_de_tela, genero, publicado } = req.body;
+
+
+
+
+    const { nombre, cantidad, precio, tipo_de_tela, genero, publicado, colores,tallas } = req.body;
 
     console.log("Datos que se enviaran a la db", req.body);
     console.log("img", req.file);
@@ -43,17 +98,33 @@ const agregar = async (req, res) => {
         message: `Error la imagen de la prenda es obligatoria`,
       });
     }
-    console.log(req.body);
 
-    await PrendasModels.create({
+    const newPrenda= await PrendasModels.create({
       nombre,
       cantidad,
       precio,
       tipo_de_tela,
       imagen: req.file.filename,
       genero,
-      publicado
+      publicado,
+      
     });
+
+
+    for (let id_color of colores.split(',')) {
+     await colorsPrendasmodel.create({
+          fk_color:parseInt(id_color),
+          fk_prenda: newPrenda.id_prenda, 
+      });
+  }
+
+  for (let value of tallas) {
+    await TallaModels.create({
+         talla: value,
+         fk_prenda: newPrenda.id_prenda, 
+     });
+ }
+
 
     res.status(200).json({ menssage: "Prenda agregada exitosamente" });
   } catch (error) {
@@ -64,19 +135,23 @@ const agregar = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    const { nombre, cantidad, precio, tipo_de_tela,genero,publicado} = req.body;
-    const id = req.params.id;
-    console.log(id)
-    const prenda = await PrendasModels.findOne({
-      where: { id_prenda: id },
-    });
+    const { nombre, cantidad, precio, tipo_de_tela,genero,publicado,colores,tallas} = req.body;
+    const id_prenda = req.params.id;
+    const prenda= await PrendasModels.findOne({
+      where: {id_prenda:id_prenda}
+    })
 
-    prenda.nombre = nombre;
-    prenda.cantidad = cantidad;
-    prenda.precio = precio;
-    prenda.tipo_de_tela = tipo_de_tela;
-    prenda.genero = genero;
-    prenda.publicado=publicado;
+
+    const actualizadoPrenda = await PrendasModels.update({
+      nombre,
+        cantidad,
+        precio,
+        tipo_de_tela,
+        genero,
+        publicado,
+    },{where: {id_prenda:id_prenda}}
+    );
+
 
     if(req.file){
         const imagenPath = 'uploads/prenda/'+ prenda.imagen;
@@ -92,10 +167,27 @@ const update = async (req, res) => {
         }
         prenda.imagen=req.file.filename
     }
-
-    prenda.save()
-
    
+
+    
+
+    await colorsPrendasmodel.destroy({where:{fk_prenda: id_prenda}})
+    await TallaModels.destroy({where: {fk_prenda:id_prenda}})
+
+    for (let id_color of colores.split(',')) {
+      await colorsPrendasmodel.create({
+           fk_color:parseInt(id_color),
+           fk_prenda: id_prenda,
+           
+       });
+   }
+
+   for (let value of tallas) {
+    await TallaModels.create({
+         talla: value,
+         fk_prenda: id_prenda, 
+     });
+ }
 
 
     res.json({
@@ -141,4 +233,4 @@ const cambiarPublicacion = async (req, res)=>{
     }
 }
 
-module.exports = { consultar, agregar, update, cambiarEstado, cambiarPublicacion, consultarOne};
+module.exports = { consultar, agregar, update, cambiarEstado, cambiarPublicacion};

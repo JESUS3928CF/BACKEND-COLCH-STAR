@@ -27,7 +27,6 @@ function routerApi(app){
     router.use('/precio_disenos', routerPrecioDiseno);
     router.use('/rol', routerRol);
     router.use('/colors',routerColors)
-    router.use('/colors',routerColors)
     router.use('/detalle_diseno',routerDetalleDiseno)
 
 }

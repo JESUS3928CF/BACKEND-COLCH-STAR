@@ -1,11 +1,16 @@
 const{colorModels}= require('../models/colorModel')
+const {colorsPrendasmodel} = require('../models/ColorsPrendasModels.js')
+const { PrendasModels } = require("../models/PrendasModel.js");
+
+
+
 
 
 const consult= async(req,res)=>{
 
     try{
         const colors = await colorModels.findAll()
-
+        
         res.status(200).json(colors)
     } catch (error){
         res.status(500).json({ error: 'Error al consultar el color' });
