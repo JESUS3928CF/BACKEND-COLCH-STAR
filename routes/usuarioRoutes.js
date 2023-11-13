@@ -11,10 +11,10 @@ router.post('/login', autenticar);
 
 
 //* Find all
-router.get("/", checkAut , consultar );
+router.get("/" , consultar );
 
 //* Insert One
-router.post("/", agregar );
+router.post('/', agregar);
 
 //* actualizar
 router.patch('/:id', actualizar);
@@ -28,7 +28,7 @@ router.patch('/cambiarContrasena/:id', actualizarContrasena);
 router.patch('/estado/:id', cambiarEstado);
 
 //* Obtener el perfil de un usuario
-router.get("/perfil", checkAut, perfil)
+router.get("/perfil", perfil)
 
 
 module.exports = router;

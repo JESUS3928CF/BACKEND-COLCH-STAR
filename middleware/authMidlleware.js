@@ -2,6 +2,7 @@ const { UsuarioModels } = require('../models/UsuariosModel');
 const { RolModels } = require('../models/RolModel');
 const jwt = require('jsonwebtoken');
 const { ConfiguracionModels } = require('../models/ConfiguracionModel');
+const { json } = require('body-parser');
 
 const checkAut = async (req, res, next) => {
     let token;
@@ -29,33 +30,36 @@ const checkAut = async (req, res, next) => {
             permisosUsuario.set(usuario.fk_rol, []);
 
             permisos.forEach((permiso) => {
-                console.log(permiso);
                 if (permiso.fk_rol === usuario.fk_rol) {
                     permisosUsuario.get(usuario.fk_rol).push(permiso.permiso);
                 }
             });
-
-            console.log(permisosUsuario);
 
             req.usuario = {
                 id_usuario: usuario.id_usuario,
                 nombre: usuario.nombre,
                 apellido: usuario.apellido,
                 rol: usuario.rol,
-                permisos: permisosUsuario.get(usuario.fk_rol) || []
+                permisos: permisosUsuario.get(usuario.fk_rol) || [],
             };
             return next();
         } catch (error) {
             console.log(error);
             const e = new Error('Token no valido');
-            return res.status(403).json({ message: e.message });
+            
+            res.status(403).json({ message: e.message });
+            // Llama a `next` con el error en lugar de enviar la respuesta directamente
+            return next(e);
         }
     }
 
     // en caso contrario mandar un error
     if (!token) {
-        const error = new Error('Token no Válido o inexistente');
-        res.status(403).json({ message: error.message });
+        // Llama a `next` con el error en lugar de enviar la respuesta directamente
+         const e = new Error('Token no Válido o inexistente');
+
+         res.status(403).json({ message: e.message });
+        return next(e);
     }
 
     next();
