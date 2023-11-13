@@ -79,6 +79,7 @@ const actualizar = async (req, res) => {
 
         console.log('Datos recibidos:', { id_rol, nombre, permisos });
 
+        
         // Actualiza el rol en la base de datos
         const rolActualizado = await RolModels.update(
             { nombre },
