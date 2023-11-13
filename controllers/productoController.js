@@ -137,7 +137,7 @@ const agregar = async (req, res) => {
 const actualizar = async (req, res) => {
     try {
 
-        const { nombre, cantidad, precio, fk_prenda, publicado } = req.body;
+        const { nombre, cantidad, precio, fk_prenda, publicado,disenos } = req.body;
 
         const id = req.params.id;
         console.log(id);
@@ -175,6 +175,20 @@ const actualizar = async (req, res) => {
 
         producto.save();
 
+
+        disenosArray = JSON.parse(disenos)
+        for (let value of disenosArray) {
+            await DetalleDiseñoModels.create({
+                fk_producto: nuevoProducto.id_producto,
+                fk_diseno: value.id_diseno,
+                fk_precio_diseno: value.id_precio_diseno
+            });
+        }
+
+
+
+
+        
 
 
         res.json({ message: 'Actualización exitosa' });
