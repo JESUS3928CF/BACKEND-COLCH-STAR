@@ -86,8 +86,6 @@ const agregar = async (req, res) => {
   try {
 
 
-
-
     const { nombre, cantidad, precio, tipo_de_tela, genero, publicado, colores,tallas } = req.body;
 
     console.log("Datos que se enviaran a la db", req.body);

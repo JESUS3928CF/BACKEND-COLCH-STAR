@@ -12,6 +12,7 @@ const routerRol = require('./rolRoutes');
 const routerColors= require('./colorsRoutes')
 const routerDetalleDiseno = require('./DetalleDiseñoRouter')
 const routerTallas= require('./tallasRouter')
+const routerPrendasColors = require('./colorsPrendasrouter')
 
 
 
@@ -33,6 +34,7 @@ function routerApi(app){
     router.use('/colors',routerColors)
     router.use('/detalle_diseno',routerDetalleDiseno)
     router.use('/tallas', routerTallas)
+    router.use('/colorsPrendas', routerPrendasColors)
 
 }
 
