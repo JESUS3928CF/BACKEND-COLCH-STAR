@@ -4,6 +4,7 @@ const { RolModels } = require('../models/RolModel.js');
 //! Importamos la dependencia
 const bcrypt = require('bcrypt');
 const { generarJWT } = require('../helpers/generarJWT.js');
+const { ConfiguracionModels } = require('../models/ConfiguracionModel.js');
 
 //! autenticar un usuario con JWT
 const autenticar = async (req, res) => {
@@ -13,12 +14,24 @@ const autenticar = async (req, res) => {
         /// Consultar el registro
         const usuario = await UsuarioModels.findOne({
             where: { email: email },
-            include: [
-                {
-                    model: RolModels,
-                    attributes: ['nombre'],
-                },
-            ],
+            attributes: {
+                exclude: ['token'],
+            },
+            include: [{ model: RolModels, attributes: ['nombre'] }],
+        });
+
+        console.log(usuario)
+
+        /// Consultando todos los registros de permisos
+        const permisos = await ConfiguracionModels.findAll();
+
+        const permisosUsuario = new Map();
+        permisosUsuario.set(usuario.fk_rol, []);
+
+        permisos.forEach((permiso) => {
+            if (permiso.fk_rol === usuario.fk_rol) {
+                permisosUsuario.get(usuario.fk_rol).push(permiso.permiso);
+            }
         });
 
         /// Verificar si no se encontró el registro
@@ -43,19 +56,21 @@ const autenticar = async (req, res) => {
             return res.status(403).json({ message: error.message });
         }
 
-        // res.json({
-        //     /// Quitar la info no deseada y solo mostrar la necesaria
-        //     profile: {
-        //         id_usuario: usuario.id_usuario,
-        //         nombre: usuario.nombre,
-        //         email: usuario.email,
-        //         token: generarJWT(usuario.id_usuario),
-        //     },
-        // });
-
         res.json({
-            token: generarJWT(usuario.id_usuario),
+            /// Quitar la info no deseada y solo mostrar la necesaria
+            usuario: {
+                id_usuario: usuario.id_usuario,
+                nombre: usuario.nombre,
+                apellido: usuario.apellido,
+                rol: usuario.rol,
+                permisos: permisosUsuario.get(usuario.fk_rol) || [],
+                token: generarJWT(usuario.id_usuario),
+            },
         });
+
+        // res.json({
+        //     token: generarJWT(usuario.id_usuario),
+        // });
     } catch (error) {
         console.log('Error al consultar el registro del usuario:', error);
         res.status(500).json({
@@ -66,6 +81,7 @@ const autenticar = async (req, res) => {
 
 const perfil = (req, res) => {
     const { usuario } = req;
+    console.log( usuario )
     res.json({ usuario });
 };
 

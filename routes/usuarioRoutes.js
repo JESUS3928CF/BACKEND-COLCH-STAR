@@ -28,7 +28,7 @@ router.patch('/cambiarContrasena/:id', actualizarContrasena);
 router.patch('/estado/:id', cambiarEstado);
 
 //* Obtener el perfil de un usuario
-router.get("/perfil", perfil)
+router.get("/perfil", checkAut ,perfil)
 
 
 module.exports = router;
