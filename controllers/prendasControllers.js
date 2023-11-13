@@ -165,6 +165,8 @@ const update = async (req, res) => {
         }
         prenda.imagen=req.file.filename
     }
+
+    prenda.save()
    
 
     
