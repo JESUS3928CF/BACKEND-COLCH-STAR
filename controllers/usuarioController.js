@@ -20,7 +20,11 @@ const autenticar = async (req, res) => {
             include: [{ model: RolModels, attributes: ['nombre', 'estado'] }],
         });
 
-        console.log(usuario);
+        /// Verificar si no se encontró el registro
+        if (!usuario) {
+            const error = new Error('El usuario no existe');
+            return res.status(403).json({ message: error.message });
+        }
 
         /// Consultando todos los registros de permisos
         const permisos = await ConfiguracionModels.findAll();
@@ -33,12 +37,6 @@ const autenticar = async (req, res) => {
                 permisosUsuario.get(usuario.fk_rol).push(permiso.permiso);
             }
         });
-
-        /// Verificar si no se encontró el registro
-        if (!usuario) {
-            const error = new Error('El usuario no existe');
-            return res.status(403).json({ message: error.message });
-        }
 
         /// Verificar que este habilitado
         if (!usuario.estado) {
