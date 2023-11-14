@@ -176,6 +176,9 @@ const actualizar = async (req, res) => {
         producto.save();
 
         await DetalleDiseñoModels.destroy({ where: { fk_diseno: id } });
+        await DetalleDiseñoModels.destroy({ where: { fk_precio_diseno: id } });
+        await DetalleDiseñoModels.destroy({ where: { fk_producto: id } });
+
 
 
 
