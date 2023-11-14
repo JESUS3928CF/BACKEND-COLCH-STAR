@@ -175,21 +175,20 @@ const actualizar = async (req, res) => {
 
         producto.save();
 
+        await DetalleDiseñoModels.destroy({ where: { fk_diseno: id } });
+
+
 
         disenosArray = JSON.parse(disenos)
         for (let value of disenosArray) {
             await DetalleDiseñoModels.create({
-                fk_producto: nuevoProducto.id_producto,
+                fk_producto: producto.id_producto,
                 fk_diseno: value.id_diseno,
                 fk_precio_diseno: value.id_precio_diseno
             });
-        }
-
-
-
+        }    
 
         
-
 
         res.json({ message: 'Actualización exitosa' });
     } catch (error) {
