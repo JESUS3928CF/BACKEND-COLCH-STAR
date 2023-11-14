@@ -17,10 +17,10 @@ const autenticar = async (req, res) => {
             attributes: {
                 exclude: ['token'],
             },
-            include: [{ model: RolModels, attributes: ['nombre'] }],
+            include: [{ model: RolModels, attributes: ['nombre', 'estado'] }],
         });
 
-        console.log(usuario)
+        console.log(usuario);
 
         /// Consultando todos los registros de permisos
         const permisos = await ConfiguracionModels.findAll();
@@ -43,6 +43,14 @@ const autenticar = async (req, res) => {
         /// Verificar que este habilitado
         if (!usuario.estado) {
             const error = new Error('Tu cuenta se encuentra deshabilitada');
+            return res.status(403).json({ message: error.message });
+        }
+
+        /// Verificar que el rol este habilitado
+        if (!usuario.rol.estado) {
+            const error = new Error(
+                `El rol de ${usuario.rol.nombre} se encuentra deshabilitado`
+            );
             return res.status(403).json({ message: error.message });
         }
 
