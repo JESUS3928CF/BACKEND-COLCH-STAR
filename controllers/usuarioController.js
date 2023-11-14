@@ -1,44 +1,88 @@
-const { UsuarioModels } = require('../models/UsuariosModel');
-const { RolModels } = require('../models/RolModel');
+const { UsuarioModels } = require('../models/UsuariosModel.js');
+const { RolModels } = require('../models/RolModel.js');
 
 //! Importamos la dependencia
 const bcrypt = require('bcrypt');
+const { generarJWT } = require('../helpers/generarJWT.js');
+const { ConfiguracionModels } = require('../models/ConfiguracionModel.js');
 
-//! Consultar un registro relacionado con Sequelize
-const login = async (req, res) => {
+//! autenticar un usuario con JWT
+const autenticar = async (req, res) => {
     const { email, contrasena } = req.body;
 
     try {
         /// Consultar el registro
         const usuario = await UsuarioModels.findOne({
             where: { email: email },
-            include: [
-                {
-                    model: RolModels,
-                    attributes: ['nombre'],
-                },
-            ],
+            attributes: {
+                exclude: ['token'],
+            },
+            include: [{ model: RolModels, attributes: ['nombre'] }],
         });
 
-        if (!usuario) {
-            return res.json({ message: 'Usuario no encontrado' });
-        }
-        /// Verificar si se encontró el registro
+        console.log(usuario)
 
+        /// Consultando todos los registros de permisos
+        const permisos = await ConfiguracionModels.findAll();
+
+        const permisosUsuario = new Map();
+        permisosUsuario.set(usuario.fk_rol, []);
+
+        permisos.forEach((permiso) => {
+            if (permiso.fk_rol === usuario.fk_rol) {
+                permisosUsuario.get(usuario.fk_rol).push(permiso.permiso);
+            }
+        });
+
+        /// Verificar si no se encontró el registro
+        if (!usuario) {
+            const error = new Error('El usuario no existe');
+            return res.status(403).json({ message: error.message });
+        }
+
+        /// Verificar que este habilitado
+        if (!usuario.estado) {
+            const error = new Error('Tu cuenta se encuentra deshabilitada');
+            return res.status(403).json({ message: error.message });
+        }
+
+        /// validar la contraseña
         const contrasenaValida = await bcrypt.compare(
             contrasena,
             usuario.contrasena
         );
         if (!contrasenaValida) {
-            return res.json({ message: 'Contraseña incorrecta' });
+            const error = new Error('Contraseña incorrecta');
+            return res.status(403).json({ message: error.message });
         }
-        res.json(usuario);
+
+        res.json({
+            /// Quitar la info no deseada y solo mostrar la necesaria
+            usuario: {
+                id_usuario: usuario.id_usuario,
+                nombre: usuario.nombre,
+                apellido: usuario.apellido,
+                rol: usuario.rol,
+                permisos: permisosUsuario.get(usuario.fk_rol) || [],
+                token: generarJWT(usuario.id_usuario),
+            },
+        });
+
+        // res.json({
+        //     token: generarJWT(usuario.id_usuario),
+        // });
     } catch (error) {
         console.log('Error al consultar el registro del usuario:', error);
         res.status(500).json({
             error: 'Error al consultar el registro del usuario',
         });
     }
+};
+
+const perfil = (req, res) => {
+    const { usuario } = req;
+    console.log( usuario )
+    res.json({ usuario });
 };
 
 const consultar = async (req, res) => {
@@ -89,8 +133,8 @@ const agregar = async (req, res) => {
         });
 
         if (correoOcupado) {
-            return res.status(400).json({
-                message: 'Ya exite esta Email',
+            return res.status(403).json({
+                message: 'Ya existe este Email',
                 correoOcupado,
             });
         }
@@ -99,7 +143,7 @@ const agregar = async (req, res) => {
             nombre,
             apellido,
             telefono,
-            email,
+            email: email.toLowerCase(),
             contrasena: hashedContrasena, /// Guarda la contraseña cifrada en la base de datos
             fk_rol,
         });
@@ -128,11 +172,11 @@ const actualizar = async (req, res) => {
             where: { id_usuario: id },
         });
 
-        if(telefono !== usuario.telefono){
+        if (telefono !== usuario.telefono) {
             const telOcupado = await UsuarioModels.findOne({
-                where:{telefono : telefono},
+                where: { telefono: telefono },
             });
-            if(telOcupado){
+            if (telOcupado) {
                 return res.status(400).json({
                     message: 'Ya Existe este Teléfono',
                     telOcupado,
@@ -144,7 +188,7 @@ const actualizar = async (req, res) => {
             const correoOcupado = await UsuarioModels.findOne({
                 where: { email: email },
             });
-        
+
             if (correoOcupado) {
                 return res.status(400).json({
                     message: 'Ya Existe este Email',
@@ -152,7 +196,6 @@ const actualizar = async (req, res) => {
                 });
             }
         }
-
 
         if (usuario == null)
             return res.json({ message: 'Usuario no encontrado' });
@@ -207,7 +250,6 @@ const actualizarContrasena = async (req, res) => {
 };
 
 //! Actualizar un cliente
-
 const cambiarEstado = async (req, res) => {
     try {
         console.log('Se hizo unn estado');
@@ -236,6 +278,7 @@ module.exports = {
     agregar,
     actualizar,
     cambiarEstado,
-    login,
     actualizarContrasena,
+    autenticar,
+    perfil,
 };
