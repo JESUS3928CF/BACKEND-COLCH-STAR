@@ -93,7 +93,7 @@ const actualizar = async (req, res) => {
             })
 
             if (identificadorRepetido) {
-                return res.status(400).json({
+                return res.status(403).json({
                     message: 'Ya Existe esta Identificación',
                     identificadorRepetido,
                 });
