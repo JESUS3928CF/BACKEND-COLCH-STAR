@@ -128,7 +128,7 @@ const agregar = async (req, res) => {
         });
 
         if (telOcupado) {
-            return res.status(400).json({
+            return res.status(403).json({
                 message: 'Ya exite este teléfono',
                 telOcupado,
             });
@@ -183,7 +183,7 @@ const actualizar = async (req, res) => {
                 where: { telefono: telefono },
             });
             if (telOcupado) {
-                return res.status(400).json({
+                return res.status(403).json({
                     message: 'Ya Existe este Teléfono',
                     telOcupado,
                 });
@@ -196,7 +196,7 @@ const actualizar = async (req, res) => {
             });
 
             if (correoOcupado) {
-                return res.status(400).json({
+                return res.status(403).json({
                     message: 'Ya Existe este Email',
                     correoOcupado,
                 });
