@@ -62,20 +62,28 @@ const consultar = async (req, res) => {
          console.log(productosConDisenos);
 
 
-        //- Forma de inviar un JSON-
-        // res.status(200).json(productos);
-        const productoConDisenos = productos.map((producto) => ({
-            id_producto: producto.id_producto,
-            nombre: producto.nombre,
-            cantidad: producto.cantidad,
-            precio: producto.precio,
-            estado: producto.estado,
-            imagen: producto.imagen,
-            publicado: producto.publicado,
-            fk_prenda: producto.fk_prenda,
-            prenda: producto.prenda,
-            disenos: productosConDisenos.get(producto.id_producto) || [],
-        }));
+          const productoConDisenos = productos.map((producto) => {
+            const precioPrenda = producto.prenda.precio;
+            const preciosDisenos = productosConDisenos.get(producto.id_producto) || [];
+
+            // Calcular el precio total sumando el precio de la prenda y el precio de cada diseño
+            const precioTotal = preciosDisenos.reduce((total, diseno) => total + diseno.precio_diseno, precioPrenda);
+
+            console.log(precioTotal)
+
+            return {
+                id_producto: producto.id_producto,
+                nombre: producto.nombre,
+                cantidad: producto.cantidad,
+                precio: precioTotal, // Usar el precio total calculado
+                estado: producto.estado,
+                imagen: producto.imagen,
+                publicado: producto.publicado,
+                fk_prenda: producto.fk_prenda,
+                prenda: producto.prenda,
+                disenos: preciosDisenos,
+            };
+        });
 
         res.status(200).json(productoConDisenos);
     } catch (error) {

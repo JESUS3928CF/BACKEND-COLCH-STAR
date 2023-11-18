@@ -17,7 +17,7 @@ const PrendasModels = db.define(
             type: Sequelize.INTEGER,
         },
         precio:{
-            type: Sequelize.DOUBLE,
+            type: Sequelize.FLOAT,
         },
         tipo_de_tela:{
             type:Sequelize.STRING,
