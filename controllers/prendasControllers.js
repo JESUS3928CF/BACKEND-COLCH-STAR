@@ -108,10 +108,12 @@ const agregar = async (req, res) => {
       
     });
 
+    coloresArray= JSON.parse(colores)
 
-    for (let id_color of colores.split(',')) {
+
+    for (let value of coloresArray.split(',')) {
      await colorsPrendasmodel.create({
-          fk_color:parseInt(id_color),
+          fk_color: value.parseInt(id_color),
           fk_prenda: newPrenda.id_prenda, 
       });
   }
