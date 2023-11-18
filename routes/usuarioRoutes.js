@@ -11,21 +11,21 @@ router.post('/login', autenticar);
 
 
 //* Find all
-router.get("/" , consultar );
+router.get('/', checkAut, consultar);
 
 //* Insert One
-router.post('/', agregar);
+router.post('/', checkAut , agregar);
 
 //* actualizar
-router.patch('/:id', actualizar);
+router.patch('/:id', checkAut, actualizar);
 
 
 //* actualizar
-router.patch('/cambiarContrasena/:id', actualizarContrasena);
+router.patch('/cambiarContrasena/:id', checkAut, actualizarContrasena);
 
 
 //* Cambiar estado
-router.patch('/estado/:id', cambiarEstado);
+router.patch('/estado/:id',checkAut,  cambiarEstado);
 
 //* Obtener el perfil de un usuario
 router.get("/perfil", checkAut ,perfil)
