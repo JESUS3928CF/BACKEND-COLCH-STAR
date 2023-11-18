@@ -37,7 +37,7 @@ const PrendasModels = db.define(
         estado:{
             type: Sequelize.BOOLEAN,
             allowNull: false,
-            defaultValue: false,            
+            defaultValue: true,            
         },
     },{
         tableName: 'prenda'
