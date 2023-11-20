@@ -77,9 +77,6 @@ const actualizar = async (req, res) => {
         const { nombre, permisos } = req.body;
         const id_rol = req.params.id; // Obtiene el ID desde la ruta
 
-        console.log('Datos recibidos:', { id_rol, nombre, permisos });
-
-        
         // Actualiza el rol en la base de datos
         const rolActualizado = await RolModels.update(
             { nombre },
