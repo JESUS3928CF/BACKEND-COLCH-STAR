@@ -45,6 +45,18 @@ const agregar = async (req, res) => {
     try {
         const { nombre, permisos } = req.body;
 
+        // Verificar si el nombre ya está ocupado
+        const nombreOcupado = await RolModels.findOne({
+            where: { nombre: nombre },
+        });
+
+        if (nombreOcupado) {
+            return res.status(403).json({
+                message: 'Ya existe este Rol',
+                nombreOcupado,
+            });
+        }
+
         console.log('Datos recibidos:', { nombre, permisos });
 
         //!  Insertar un nuevo rol en la base de datos
@@ -76,6 +88,25 @@ const actualizar = async (req, res) => {
     try {
         const { nombre, permisos } = req.body;
         const id_rol = req.params.id; // Obtiene el ID desde la ruta
+
+        // Verifica la existencia del rol actualizado
+        const rol = await RolModels.findOne({
+            where: { id_rol: id_rol },
+        });
+
+        // Si el nombre ha cambiado, verifica si el nuevo nombre ya está ocupado
+        if (nombre !== rol.nombre) {
+            const nombreOcupado = await RolModels.findOne({
+                where: { nombre: nombre },
+            });
+
+            if (nombreOcupado) {
+                return res.status(403).json({
+                    message: 'Ya existe este Rol',
+                    nombreOcupado,
+                });
+            }
+        }
 
         // Actualiza el rol en la base de datos
         const rolActualizado = await RolModels.update(
