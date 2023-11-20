@@ -18,7 +18,7 @@ const ProductoModels = db.define(
             type: Sequelize.INTEGER,
         },
         precio: {
-            type: Sequelize.STRING,
+            type: Sequelize.FLOAT,
         },
         estado: {
             type: Sequelize.BOOLEAN,
