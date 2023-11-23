@@ -1,14 +1,15 @@
 const express = require("express");
 const {consultar, agregar, actualizar, cambiarEstado} = require('../controllers/rolController');
+const { checkAut } = require("../middleware/authMidlleware");
 const router = express.Router();
 
 /// peticiones para roles
 
 //* Find all
-router.get("/", consultar );
+router.get('/' , consultar);
 
 //* Insert One
-router.post("/", agregar );
+router.post('/', agregar);
 
 //* Update
 router.patch('/:id', actualizar);
