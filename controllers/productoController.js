@@ -64,27 +64,19 @@ const consultar = async (req, res) => {
 
         //- Forma de inviar un JSON-
         // res.status(200).json(productos);
-        const productoConDisenos = productos.map((producto) => {
-            // Convertir el precio de la prenda a número
-            const precioPrenda = parseFloat(producto.prenda.precio);
-            
-            // Calcular el precio total del producto
-            const preciosDisenos = productosConDisenos.get(producto.id_producto) || [];
-            const precioTotal = preciosDisenos.reduce((total, diseno) => total + parseFloat(diseno.precio), precioPrenda);
+        const productoConDisenos = productos.map((producto) => ({
+            id_producto: producto.id_producto,
+            nombre: producto.nombre,
+            cantidad: producto.cantidad,
+            precio: producto.precio,
+            estado: producto.estado,
+            imagen: producto.imagen,
+            publicado: producto.publicado,
+            fk_prenda: producto.fk_prenda,
+            prenda: producto.prenda,
+            disenos: productosConDisenos.get(producto.id_producto) || [],
+        }));
 
-            return {
-                id_producto: producto.id_producto,
-                nombre: producto.nombre,
-                cantidad: producto.cantidad,
-                precio: precioTotal.toFixed(2), // Redondear a 2 decimales
-                estado: producto.estado,
-                imagen: producto.imagen,
-                publicado: producto.publicado,
-                fk_prenda: producto.fk_prenda,
-                prenda: producto.prenda,
-                disenos: preciosDisenos,
-            };
-        });
         res.status(200).json(productoConDisenos);
     } catch (error) {
         console.log('Error al consultar la tabla producto:', error);
@@ -96,36 +88,43 @@ const consultar = async (req, res) => {
 
 const agregar = async (req, res) => {
     try {
-        const { nombre, cantidad, precio, fk_prenda, publicado, disenos } = req.body;
+        const { nombre, cantidad, fk_prenda, publicado, disenos } = req.body;
 
         if (!req.file) {
             return res.json({ message: `Error la imagen del diseño es requerida` });
         }
 
-        //! Convertir precio a número
-        const precioNumerico = parseFloat(precio);
+        //! Obtener el precio de la prenda
+        const prenda = await PrendasModels.findByPk(fk_prenda);
+        const precioPrenda = parseFloat(prenda.precio);
 
-        //! Insertar un nuevo producto en la base de datos
+        //! Calcular el precio total sumando el precio de la prenda y los precios de los diseños
+        const disenosArray = JSON.parse(disenos);
+
+        const promises = disenosArray.map(async (value) => {
+            // Obtener el precio de cada diseño
+            const precioDiseno = await PrecioDisenoModels.findByPk(value.id_precio_diseno);
+            return parseFloat(precioDiseno.precio);
+        });
+
+        const preciosDiseños = await Promise.all(promises);
+        const precioTotal = preciosDiseños.reduce((total, precio) => total + precio, precioPrenda);
+
+        //! Insertar un nuevo producto en la base de datos con el precio total calculado
         const nuevoProducto = await ProductoModels.create({
             nombre,
             cantidad,
-            precio: precioNumerico, // Utilizar el valor numérico
+            precio: precioTotal, // Utilizar el precio total calculado
             imagen: req.file.filename,
             fk_prenda,
-            publicado
+            publicado,
         });
-
-        console.log(nuevoProducto);
-        console.log(disenos);
-
-        // Convertir la cadena JSON de disenos a un array de objetos
-        const disenosArray = JSON.parse(disenos);
 
         for (let value of disenosArray) {
             await DetalleDiseñoModels.create({
                 fk_producto: nuevoProducto.id_producto,
                 fk_diseno: value.id_diseno,
-                fk_precio_diseno: value.id_precio_diseno
+                fk_precio_diseno: value.id_precio_diseno,
             });
         }
 
@@ -133,13 +132,13 @@ const agregar = async (req, res) => {
         res.json({
             message: 'Producto agregado exitosamente',
         });
-
     } catch (error) {
         console.log(error);
         // Envía una respuesta al cliente indicando el error
         res.status(500).json({ message: 'Error al agregar el Producto' });
     }
-}
+};
+
 
 
 // ! Actualizar un proveedor
