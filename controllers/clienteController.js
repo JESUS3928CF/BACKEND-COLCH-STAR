@@ -33,7 +33,7 @@ const agregar = async (req, res) => {
         });
 
         if (identificacionRepetido) {
-            return res.status(400).json({
+            return res.status(403).json({
                 message: 'Ya exite esta Identificación',
                 identificacionRepetido,
             });
@@ -90,7 +90,7 @@ const actualizar = async (req, res) => {
             });
 
             if (identificacionRepetido) {
-                return res.status(400).json({
+                return res.status(403).json({
                     message: 'Ya Existe esta Identificación',
                     identificacionRepetido,
                 });

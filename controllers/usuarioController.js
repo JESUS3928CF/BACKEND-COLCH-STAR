@@ -17,10 +17,14 @@ const autenticar = async (req, res) => {
             attributes: {
                 exclude: ['token'],
             },
-            include: [{ model: RolModels, attributes: ['nombre'] }],
+            include: [{ model: RolModels, attributes: ['nombre', 'estado'] }],
         });
 
-        console.log(usuario)
+        /// Verificar si no se encontró el registro
+        if (!usuario) {
+            const error = new Error('El usuario no existe');
+            return res.status(403).json({ message: error.message });
+        }
 
         /// Consultando todos los registros de permisos
         const permisos = await ConfiguracionModels.findAll();
@@ -34,15 +38,17 @@ const autenticar = async (req, res) => {
             }
         });
 
-        /// Verificar si no se encontró el registro
-        if (!usuario) {
-            const error = new Error('El usuario no existe');
-            return res.status(403).json({ message: error.message });
-        }
-
         /// Verificar que este habilitado
         if (!usuario.estado) {
             const error = new Error('Tu cuenta se encuentra deshabilitada');
+            return res.status(403).json({ message: error.message });
+        }
+
+        /// Verificar que el rol este habilitado
+        if (!usuario.rol.estado) {
+            const error = new Error(
+                `El rol de ${usuario.rol.nombre} se encuentra deshabilitado`
+            );
             return res.status(403).json({ message: error.message });
         }
 
@@ -122,7 +128,7 @@ const agregar = async (req, res) => {
         });
 
         if (telOcupado) {
-            return res.status(400).json({
+            return res.status(403).json({
                 message: 'Ya exite este teléfono',
                 telOcupado,
             });
@@ -177,7 +183,7 @@ const actualizar = async (req, res) => {
                 where: { telefono: telefono },
             });
             if (telOcupado) {
-                return res.status(400).json({
+                return res.status(403).json({
                     message: 'Ya Existe este Teléfono',
                     telOcupado,
                 });
@@ -190,7 +196,7 @@ const actualizar = async (req, res) => {
             });
 
             if (correoOcupado) {
-                return res.status(400).json({
+                return res.status(403).json({
                     message: 'Ya Existe este Email',
                     correoOcupado,
                 });

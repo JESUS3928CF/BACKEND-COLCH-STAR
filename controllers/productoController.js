@@ -87,50 +87,59 @@ const consultar = async (req, res) => {
 //! Agregar producto
 
 const agregar = async (req, res) => {
-
     try {
-        const { nombre, cantidad, precio, fk_prenda, publicado, disenos } = req.body;
+        const { nombre, cantidad, fk_prenda, publicado, disenos } = req.body;
 
-
-        if(!req.file) {
+        if (!req.file) {
             return res.json({ message: `Error la imagen del diseño es requerida` });
         }
 
+        //! Obtener el precio de la prenda
+        const prenda = await PrendasModels.findByPk(fk_prenda);
+        const precioPrenda = parseFloat(prenda.precio);
 
-        //!  Insertar un nuevo cliente en la base de datos
-         const nuevoProducto = await ProductoModels.create({
+        //! Calcular el precio total sumando el precio de la prenda y los precios de los diseños
+        const disenosArray = JSON.parse(disenos);
+
+        const promises = disenosArray.map(async (value) => {
+            // Obtener el precio de cada diseño
+            const precioDiseno = await PrecioDisenoModels.findByPk(value.id_precio_diseno);
+            return parseFloat(precioDiseno.precio);
+        });
+
+        const preciosDiseños = await Promise.all(promises);
+        const precioTotal = preciosDiseños.reduce((total, precio) => total + precio, precioPrenda);
+
+        //! Insertar un nuevo producto en la base de datos con el precio total calculado
+        const nuevoProducto = await ProductoModels.create({
             nombre,
             cantidad,
-            precio,
-            imagen : req.file.filename,
+            precio: precioTotal, // Utilizar el precio total calculado
+            imagen: req.file.filename,
             fk_prenda,
-            publicado
+            publicado,
         });
-        console.log(nuevoProducto)
-        console.log(disenos)
-        disenosArray = JSON.parse(disenos)
+
         for (let value of disenosArray) {
             await DetalleDiseñoModels.create({
                 fk_producto: nuevoProducto.id_producto,
                 fk_diseno: value.id_diseno,
-                fk_precio_diseno: value.id_precio_diseno
+                fk_precio_diseno: value.id_precio_diseno,
             });
         }
-        
-    
-        
 
         /// Mensaje de respuesta
         res.json({
             message: 'Producto agregado exitosamente',
         });
-
     } catch (error) {
-        console.log(error)
+        console.log(error);
         // Envía una respuesta al cliente indicando el error
         res.status(500).json({ message: 'Error al agregar el Producto' });
     }
-}
+};
+
+
 
 // ! Actualizar un proveedor
 
@@ -176,6 +185,9 @@ const actualizar = async (req, res) => {
         producto.save();
 
         await DetalleDiseñoModels.destroy({ where: { fk_diseno: id } });
+        await DetalleDiseñoModels.destroy({ where: { fk_precio_diseno: id } });
+        await DetalleDiseñoModels.destroy({ where: { fk_producto: id } });
+
 
 
 
