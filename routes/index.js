@@ -13,6 +13,8 @@ const routerColors= require('./colorsRoutes')
 const routerDetalleDiseno = require('./DetalleDiseñoRouter')
 const routerTallas= require('./tallasRouter')
 const routerPrendasColors = require('./colorsPrendasrouter')
+const routerCompra = require('./compraRoutes')
+
 
 const { checkAut } = require('../middleware/authMidlleware');
 
@@ -37,6 +39,8 @@ function routerApi(app){
     router.use('/detalle_diseno',routerDetalleDiseno)
     router.use('/tallas', routerTallas)
     router.use('/colorsPrendas', routerPrendasColors)
+    router.use('/compra', routerCompra)
+
 
 }
 
