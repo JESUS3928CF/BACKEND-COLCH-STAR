@@ -1,4 +1,4 @@
-const CompraModels  = require("../models/CompraModel");
+const {CompraModels}  = require("../models/CompraModel");
 const { ProveedorModels } = require("../models/ProveedorModel");
 
 const consultar = async (req, res) => {
