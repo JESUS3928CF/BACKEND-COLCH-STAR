@@ -6,4 +6,4 @@ const {consult} = require('../controllers/comprasDetallesController')
 router.get('/',consult);
 
 
-module.exports =router
+module.exports = router

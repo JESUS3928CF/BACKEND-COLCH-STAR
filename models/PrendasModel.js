@@ -1,6 +1,5 @@
 const Sequelize = require('sequelize')
 const db = require('../config/db');
-const { Model } = Sequelize;
 
 
 const PrendasModels = db.define(

@@ -34,4 +34,4 @@ const CompraModels = db.define('compra', {
 CompraModels.belongsTo(ProveedorModels, { foreignKey: 'fk_proveedor', as: 'proveedor' });
 ProveedorModels.hasMany(CompraModels, { foreignKey: 'fk_proveedor', as: 'compra' });
 
-module.exports = CompraModels;
+module.exports = {CompraModels};

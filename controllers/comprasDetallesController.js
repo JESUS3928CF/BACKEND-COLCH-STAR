@@ -1,10 +1,10 @@
-const {ComprasDetallesModels} = require('../models/compraDetallesModel.js')
+const {DetalleCompraModels} = require('../models/compraDetallesModel.js')
 
 
 const consult = async (req,res)=>{
     try{
         
-        const comprasDetalles= await ComprasDetallesModels.findAll()
+        const comprasDetalles= await DetalleCompraModels.findAll()
         res.status(200).json(comprasDetalles)
 
     }catch(error){
