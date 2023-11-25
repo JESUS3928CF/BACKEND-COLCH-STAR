@@ -4,6 +4,7 @@ const {colorsPrendasmodel} = require('../models/ColorsPrendasModels.js')
 const {TallaModels}= require('../models/TallaModel.js')
 
 const fs = require("fs");
+const { where } = require("sequelize");
 
 const consultar = async (req, res) => {
   try {
@@ -108,10 +109,12 @@ const agregar = async (req, res) => {
       
     });
 
+    coloresArray= JSON.parse(colores)
 
-    for (let id_color of colores.split(',')) {
+
+    for (let value of coloresArray) {
      await colorsPrendasmodel.create({
-          fk_color:parseInt(id_color),
+          fk_color: value.id_color,
           fk_prenda: newPrenda.id_prenda, 
       });
   }
@@ -133,22 +136,22 @@ const agregar = async (req, res) => {
 
 const update = async (req, res) => {
   try {
+
     const { nombre, cantidad, precio, tipo_de_tela,genero,publicado,colores,tallas} = req.body;
-    const id_prenda = req.params.id;
+
+    const id = req.params.id;
+
     const prenda= await PrendasModels.findOne({
-      where: {id_prenda:id_prenda}
+      where: {id_prenda:id}
     })
 
+    prenda.nombre=nombre;
+    prenda.cantidad=cantidad;
+    prenda.precio=precio;
+    prenda.tipo_de_tela=tipo_de_tela;
+    prenda.genero=genero;
+    prenda.publicado= publicado;
 
-    const actualizadoPrenda = await PrendasModels.update({
-      nombre,
-        cantidad,
-        precio,
-        tipo_de_tela,
-        genero,
-        publicado,
-    },{where: {id_prenda:id_prenda}}
-    );
 
 
     if(req.file){
@@ -167,25 +170,25 @@ const update = async (req, res) => {
     }
 
     prenda.save()
-   
 
-    
+    await colorsPrendasmodel.destroy({where:{fk_color: id}});
+    await colorsPrendasmodel.destroy({where:{fk_prenda: id}})
+    await TallaModels.destroy({where:{fk_prenda:id}})
+    await TallaModels.destroy( {where:{ talla: id}})
 
-    await colorsPrendasmodel.destroy({where:{fk_prenda: id_prenda}})
-    await TallaModels.destroy({where: {fk_prenda:id_prenda}})
 
-    for (let id_color of colores.split(',')) {
-      await colorsPrendasmodel.create({
-           fk_color:parseInt(id_color),
-           fk_prenda: id_prenda,
-           
-       });
-   }
+    coloresArray= JSON.parse(colores)
+    for (let value of coloresArray) {
+     await colorsPrendasmodel.create({
+          fk_color: value.id_color,
+          fk_prenda: prenda.id_prenda, 
+      });
+  }
 
    for (let value of tallas) {
     await TallaModels.create({
          talla: value,
-         fk_prenda: id_prenda, 
+         fk_prenda: prenda.id_prenda, 
      });
  }
 
