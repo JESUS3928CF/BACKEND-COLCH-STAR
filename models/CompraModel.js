@@ -1,5 +1,5 @@
 //! Necesitamos importar esto
-const { Sequelize } = require('sequelize');
+const Sequelize = require('sequelize')
 const db = require('../config/db');
 const {ProveedorModels} = require('../models/ProveedorModel');
 
