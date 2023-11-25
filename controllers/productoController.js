@@ -145,9 +145,7 @@ const agregar = async (req, res) => {
 
 const actualizar = async (req, res) => {
     try {
-
-        const { nombre, cantidad, precio, fk_prenda, publicado,disenos } = req.body;
-
+        const { nombre, cantidad, fk_prenda, publicado, disenos } = req.body;
         const id = req.params.id;
         console.log(id);
 
@@ -155,25 +153,35 @@ const actualizar = async (req, res) => {
             where: { id_producto: id },
         });
 
+        // Obtener el precio de la prenda seleccionada
+        const prenda = await PrendasModels.findByPk(fk_prenda);
+        const precioPrenda = parseFloat(prenda.precio);
+
+        // Calcular el precio total sumando el precio de la prenda y los precios de los diseños
+        const disenosArray = JSON.parse(disenos);
+        const promises = disenosArray.map(async (value) => {
+            const precioDiseno = await PrecioDisenoModels.findByPk(value.id_precio_diseno);
+            return parseFloat(precioDiseno.precio);
+        });
+
+        const preciosDiseños = await Promise.all(promises);
+        const precioTotal = preciosDiseños.reduce((total, precio) => total + precio, precioPrenda);
+
         // Actualizar los valores del registro
         producto.nombre = nombre;
         producto.cantidad = cantidad;
-        producto.precio = precio;
-        producto.fk_prenda = fk_prenda
-        producto.publicado = publicado
+        producto.precio = precioTotal; // Utilizar el precio total calculado
+        producto.fk_prenda = fk_prenda;
+        producto.publicado = publicado;
 
         /// Verificar si se subió una imagen nueva
-        if(req.file){
+        if (req.file) {
             /// Eliminar la imagen anterior
-            const imagenPath = 'uploads/productos/' + producto.imagen; //- ruta de la imagen
+            const imagenPath = 'uploads/productos/' + producto.imagen;
             if (imagenPath && fs.existsSync(imagenPath)) {
-                //- fs.existsSync(imagenPath) Para verificar que exista el archivo en esa ruta
                 fs.unlink(imagenPath, (error) => {
                     if (error) {
-                        console.error(
-                            'Error al eliminar el archivo de imagen:',
-                            error
-                        );
+                        console.error('Error al eliminar el archivo de imagen:', error);
                         return next();
                     }
                 });
@@ -183,32 +191,28 @@ const actualizar = async (req, res) => {
         }
 
         producto.save();
-
+        
+        // estas líneas se encargan de eliminar los registros existentes en la tabla DetalleDiseñoModels 
+        // asociados al producto identificado por el id antes de que se añadan nuevos registros Esto asegura que los detalles de los diseños 
+        // (DetalleDiseñoModels) asociados al producto se actualicen según la nueva información proporcionada en la solicitud.
         await DetalleDiseñoModels.destroy({ where: { fk_diseno: id } });
         await DetalleDiseñoModels.destroy({ where: { fk_precio_diseno: id } });
         await DetalleDiseñoModels.destroy({ where: { fk_producto: id } });
 
-
-
-
-        disenosArray = JSON.parse(disenos)
         for (let value of disenosArray) {
             await DetalleDiseñoModels.create({
                 fk_producto: producto.id_producto,
                 fk_diseno: value.id_diseno,
-                fk_precio_diseno: value.id_precio_diseno
+                fk_precio_diseno: value.id_precio_diseno,
             });
-        }    
-
-        
+        }
 
         res.json({ message: 'Actualización exitosa' });
     } catch (error) {
-        console.log(error)
+        console.log(error);
         res.status(500).json({ message: 'Error al actualizar el producto ' });
     }
-}
-//! Actualizar un cliente
+};
 
 const cambiarEstado = async (req, res) => {
     try {
