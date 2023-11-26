@@ -1,5 +1,7 @@
-const CompraModels  = require("../models/CompraModel");
+const {CompraModels}  = require("../models/CompraModel");
 const { ProveedorModels } = require("../models/ProveedorModel");
+const {DetalleCompraModels} = require('../models/compraDetallesModel.js')
+
 
 const consultar = async (req, res) => {
     try {
@@ -29,14 +31,32 @@ const consultar = async (req, res) => {
 
 const agregar = async (req, res) => {
     try {
-        const { total_de_compra, fecha, fk_proveedor } = req.body;
+        const { total_de_compra, fecha, fk_proveedor,DetallesCompras } = req.body;
 
-        await CompraModels.create({
+        const compras = await CompraModels.create({
             total_de_compra,
             fecha,
             fk_proveedor,
         });
 
+
+
+
+        for (let value of DetallesCompras) {
+
+            await  DetalleCompraModels.create({
+                fk_compra: compras.id_compra,
+                cantidad: value.cantidad,
+                precio: value.precio,
+                diseno: value.diseno,
+                fk_prenda: value.fk_prenda
+                
+            })
+           
+        }
+           
+
+        
         /// Mensaje de respuesta
         res.json({
             message: 'Compra agregada exitosamente',
