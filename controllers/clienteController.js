@@ -108,7 +108,7 @@ const actualizar = async (req, res) => {
         cliente.tipoIdentificacion = tipoIdentificacion
         cliente.save();
 
-        res.json({ message: 'Actualización exitosa' });
+        res.json({ message: 'Actualización exitosa', cliente });
     } catch (error) {
         res.status(500).json({ message: 'Error al actualizar el cliente' });
     }
