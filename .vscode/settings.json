@@ -8,5 +8,6 @@
         "Publicacion",
         "tamano"
     ],
-    "DockerRun.DisableDockerrc": true
+    "DockerRun.DisableDockerrc": true,
+    "editor.inlineSuggest.showToolbar": "always"
 }
