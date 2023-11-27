@@ -22,7 +22,17 @@ const autenticar = async (req, res) => {
 
         /// Verificar si no se encontró el registro
         if (!usuario) {
-            const error = new Error('El usuario no existe');
+            const error = new Error('Usuario o Contraseña son incorrectos');
+            return res.status(403).json({ message: error.message });
+        }
+
+        /// validar la contraseña
+        const contrasenaValida = await bcrypt.compare(
+            contrasena,
+            usuario.contrasena
+        );
+        if (!contrasenaValida || !usuario) {
+            const error = new Error('Usuario o Contraseña son incorrectos');
             return res.status(403).json({ message: error.message });
         }
 
@@ -49,16 +59,6 @@ const autenticar = async (req, res) => {
             const error = new Error(
                 `El rol de ${usuario.rol.nombre} se encuentra deshabilitado`
             );
-            return res.status(403).json({ message: error.message });
-        }
-
-        /// validar la contraseña
-        const contrasenaValida = await bcrypt.compare(
-            contrasena,
-            usuario.contrasena
-        );
-        if (!contrasenaValida) {
-            const error = new Error('Contraseña incorrecta');
             return res.status(403).json({ message: error.message });
         }
 
