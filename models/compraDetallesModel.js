@@ -15,9 +15,6 @@ const DetalleCompraModels = db.define('detalle_compra', {
     precio: {
         type: Sequelize.FLOAT,
     },
-    diseno: {
-        type: Sequelize.STRING,
-    },
     fk_compra: {
         type: Sequelize.INTEGER,
         references: {

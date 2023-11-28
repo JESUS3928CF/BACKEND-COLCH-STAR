@@ -33,13 +33,15 @@ const consult = async (req,res)=>{
 
 const agregar = async (req, res) => {
     try {
-        const { cantidad, precio, diseno, fk_compra, fk_prenda } = req.body;
+        const { cantidad, precio,  fk_compra, fk_prenda } = req.body;
+
+
+
 
         // Crea el nuevo detalle de compra
         await DetalleCompraModels.create({
             cantidad,
             precio,
-            diseno,
             fk_compra,
             fk_prenda,
         });
@@ -57,7 +59,7 @@ const agregar = async (req, res) => {
 
 const actualizar = async (req, res) => {
     try {
-        const {cantidad, precio, diseno, fk_compra, fk_prenda } = req.body;
+        const {cantidad, precio,  fk_compra, fk_prenda } = req.body;
 
         const id = req.params.id;
 
@@ -68,7 +70,6 @@ const actualizar = async (req, res) => {
         // Realiza la actualización de los campos deseados
         detalle_compra.cantidad = cantidad;
         detalle_compra.precio = precio;
-        detalle_compra.diseno = diseno;
         detalle_compra.fk_compra = fk_compra;
         detalle_compra.fk_prenda = fk_prenda;
         detalle_compra.save();
