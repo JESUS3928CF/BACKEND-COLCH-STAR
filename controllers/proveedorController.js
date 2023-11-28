@@ -40,7 +40,7 @@ const agregar = async (req, res) => {
         });
 
         if (identificadorRepetido) {
-            return res.status(400).json({
+            return res.status(403).json({
                 message: 'Ya Existe esta Identificación',
                 identificadorRepetido,
             });
@@ -48,7 +48,7 @@ const agregar = async (req, res) => {
 
 
         //!  Insertar un nuevo cliente en la base de datos
-        await ProveedorModels.create({
+         const nuevoProveedor = await ProveedorModels.create({
             nombre,
             telefono,
             direccion,
@@ -59,7 +59,7 @@ const agregar = async (req, res) => {
 
         /// Mensaje de respuesta
         res.json({
-            message: 'Proveedor agregado exitosamente',
+            message: 'Proveedor agregado exitosamente', nuevoProveedor
         });
 
     } catch (error) {
@@ -113,7 +113,7 @@ const actualizar = async (req, res) => {
 
 
 
-        res.json({ message: 'Actualización exitosa' });
+        res.json({ message: 'Actualización exitosa', proveedor});
     } catch (error) {
         res.status(500).json({ message: 'Error al actualizar el proveedor ' });
     }
