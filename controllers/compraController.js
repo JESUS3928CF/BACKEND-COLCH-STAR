@@ -53,7 +53,7 @@ const agregar = async (req, res) => {
                 cantidad: value.cantidad,
                 precio: value.precio,
                 diseno: value.diseno,
-                fk_prenda: value.fk_prenda
+                fk_prenda: value.fk_prenda || null
                 
             })
            
