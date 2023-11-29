@@ -130,7 +130,7 @@ const agregar = async (req, res) => {
 
         /// Mensaje de respuesta
         res.json({
-            message: 'Producto agregado exitosamente',
+            message: 'Producto agregado exitosamente', nuevoProducto
         });
     } catch (error) {
         console.log(error);
@@ -207,7 +207,7 @@ const actualizar = async (req, res) => {
             });
         }
 
-        res.json({ message: 'Actualización exitosa' });
+        res.json({ message: 'Actualización exitosa',producto });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Error al actualizar el producto ' });
