@@ -27,7 +27,7 @@ const agregar = async (req, res) => {
         }
 
         //!  Insertar un nuevo diseño en la base de datos
-        await DisenoModels.create({
+        const nuevoDiseno = await DisenoModels.create({
             nombre,
             imagen : req.file.filename,
             publicado
@@ -35,7 +35,7 @@ const agregar = async (req, res) => {
 
         /// Mensaje de respuesta
         res.json({
-            message: 'Diseño agregado exitosamente',
+            message: 'Diseño agregado exitosamente', nuevoDiseno
         });       
     } catch (error) {
         // Envía una respuesta al cliente indicando el error
