@@ -59,7 +59,7 @@ const consultar = async (req, res) => {
             );
         });
 
-         console.log(productosConDisenos);
+        //  console.log(productosConDisenos);
 
 
         //- Forma de inviar un JSON-
@@ -89,7 +89,7 @@ const consultar = async (req, res) => {
 const agregar = async (req, res) => {
     try {
         const { nombre, cantidad, fk_prenda, publicado, disenos } = req.body;
-
+        console.log(req.file)
         if (!req.file) {
             return res.json({ message: `Error la imagen del diseño es requerida` });
         }
@@ -119,6 +119,8 @@ const agregar = async (req, res) => {
             fk_prenda,
             publicado,
         });
+
+        // console.log(imagen)
 
         for (let value of disenosArray) {
             await DetalleDiseñoModels.create({
@@ -219,7 +221,7 @@ const cambiarEstado = async (req, res) => {
 
         const { estado } = req.body;
 
-        console.log('actualizar esto');
+        // console.log('actualizar esto');
         const id = req.params.id;
         // console.log(id);
 
