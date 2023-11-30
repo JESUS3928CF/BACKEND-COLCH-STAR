@@ -27,6 +27,24 @@ const consultar = async (req, res) => {
     }
 };
 
+
+const constOne = async (req,res)=>{
+
+    try{
+        const id = req.params.id
+        const comprasOne= await CompraModels.findOne({
+            where: {id_compra:id}
+        })
+    
+        res.status(200).json(comprasOne)
+
+    }catch(e){
+        res.status(500).json({e: 'Error al consultar'})
+    }
+
+   
+}
+
 //! Agregar una compra
 
 const agregar = async (req, res) => {
@@ -44,15 +62,14 @@ const agregar = async (req, res) => {
         });
 
 
+        detallesComprasArray = JSON.parse(DetallesCompras)
 
-
-        for (let value of DetallesCompras) {
+        for (let value of detallesComprasArray) {
 
             await  DetalleCompraModels.create({
                 fk_compra: compras.id_compra,
                 cantidad: value.cantidad,
                 precio: value.precio,
-                diseno: value.diseno,
                 fk_prenda: value.fk_prenda || null
                 
             })
@@ -195,4 +212,4 @@ const cambiarEstado = async (req, res) => {
     }
 }
 
-module.exports = { consultar, agregar, actualizar, cambiarEstado};
+module.exports = { consultar,constOne, agregar, actualizar, cambiarEstado};

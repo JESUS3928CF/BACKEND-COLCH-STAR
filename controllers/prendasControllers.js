@@ -33,7 +33,7 @@ const consultar = async (req, res) => {
       if(!nombreColors.has(color.id_color)){
         nombreColors.set(color.id_color,[])
       }
-      nombreColors.get(color.id_color).push(color.color)
+      nombreColors.get(color.id_color).push({color : color.color, id_color: color.id_color})
     })
 
 

@@ -1,7 +1,7 @@
 const express = require("express");
-const {consultar, agregar, actualizar, cambiarEstado} = require('../controllers/compraController');
+const {consultar, constOne,agregar, actualizar, cambiarEstado} = require('../controllers/compraController');
 const router = express.Router();
-
+ 
 /// peticiones para clientes
 
 //* Find all

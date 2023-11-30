@@ -30,6 +30,23 @@ const consult = async (req,res)=>{
     }
 }
 
+const constOne = async (req,res)=>{
+
+    try{
+        const id = req.params.id
+        const comprasDetallesOne= await DetalleCompraModels.findOne({
+            where: {id_detalle_compra:id}
+        })
+    
+        res.status(200).json(comprasDetallesOne)
+
+    }catch(e){
+        res.status(500).json({e: 'Error al consultar'})
+    }
+
+   
+}
+
 
 const agregar = async (req, res) => {
     try {
@@ -45,6 +62,12 @@ const agregar = async (req, res) => {
             fk_compra,
             fk_prenda,
         });
+
+
+
+
+
+
 
         // Mensaje de respuesta
         res.json({
@@ -83,4 +106,4 @@ const actualizar = async (req, res) => {
 };
 
 
-module.exports = {consult, agregar, actualizar}
+module.exports = {consult, agregar, actualizar,constOne}
