@@ -5,7 +5,8 @@ const { RolModels } = require('../models/RolModel.js');
 const bcrypt = require('bcrypt');
 const { generarJWT } = require('../helpers/generarJWT.js');
 const { ConfiguracionModels } = require('../models/ConfiguracionModel.js');
-
+const shortid = require('shortid');
+const emailRecuperarPassword = require('../helpers/emailRecuperarPassword.js');
 //! autenticar un usuario con JWT
 const autenticar = async (req, res) => {
     const { email, contrasena } = req.body;
@@ -73,10 +74,6 @@ const autenticar = async (req, res) => {
                 token: generarJWT(usuario.id_usuario),
             },
         });
-
-        // res.json({
-        //     token: generarJWT(usuario.id_usuario),
-        // });
     } catch (error) {
         console.log('Error al consultar el registro del usuario:', error);
         res.status(500).json({
@@ -87,9 +84,82 @@ const autenticar = async (req, res) => {
 
 const perfil = (req, res) => {
     const { usuario } = req;
-    console.log( usuario )
+    console.log(usuario);
     res.json({ usuario });
 };
+
+/// Recuperar contraseña
+
+const passwordPerdida = async (req, res) => {
+    const { email } = req.body;
+
+    const usuario = await UsuarioModels.findOne({
+        where: { email: email },
+    });
+
+    if (!usuario) {
+        const error = new Error('El usuario no existe');
+        return res.status(403).json({ message: error.message });
+    }
+
+    try {
+        usuario.token = shortid.generate() + shortid.generate();
+        usuario.save();
+
+        //* Enviar email con las instrucciones
+        emailRecuperarPassword({
+            email,
+            nombre : usuario.nombre,
+            token: usuario.token
+        }) 
+
+        res.json({
+            message:
+                'Se ha enviado un email con las instrucciones para restablecer la contraseña, si no encuentras el mensaje recuerda revisas la bandeja de span',
+        });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/// Comprobar el token de la contraseña
+const checkToken = async (req, res) => {
+    const { token } = req.params;
+
+    const tokenValido = await UsuarioModels.findOne({
+        where: { token: token },
+    });
+
+    if (tokenValido) return res.json({ message: 'El Token es valido' });
+
+    console.log(tokenValido)
+    res.status(403).json({ message: 'El Token no es valido' });
+};
+
+const newPassword = async (req, res) => {
+    const { token } = req.params;
+    const { contrasena } = req.body;
+
+    const usuario = await UsuarioModels.findOne({
+        where: { token: token },
+    });
+
+    if(!usuario) {
+        const error = new Error('Hubo un error');
+        return res.status(403).json({ message: error.message });
+    }
+    
+    try {
+        usuario.token = null;
+        usuario.contrasena = await bcrypt.hash(contrasena, 10);
+        usuario.save();
+        
+        res.json({ message : "Contraseña modificada correctamente"})
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 
 const consultar = async (req, res) => {
     try {
@@ -287,4 +357,7 @@ module.exports = {
     actualizarContrasena,
     autenticar,
     perfil,
+    passwordPerdida,
+    checkToken,
+    newPassword,
 };
