@@ -2,7 +2,6 @@ const { UsuarioModels } = require('../models/UsuariosModel');
 const { RolModels } = require('../models/RolModel');
 const jwt = require('jsonwebtoken');
 const { ConfiguracionModels } = require('../models/ConfiguracionModel');
-const { json } = require('body-parser');
 
 const checkAut = async (req, res, next) => {
     let token;

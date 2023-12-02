@@ -59,7 +59,7 @@ const consultar = async (req, res) => {
             );
         });
 
-         console.log(productosConDisenos);
+        //  console.log(productosConDisenos);
 
 
         //- Forma de inviar un JSON-
@@ -89,7 +89,7 @@ const consultar = async (req, res) => {
 const agregar = async (req, res) => {
     try {
         const { nombre, cantidad, fk_prenda, publicado, disenos } = req.body;
-
+        console.log(req.file)
         if (!req.file) {
             return res.json({ message: `Error la imagen del diseño es requerida` });
         }
@@ -120,6 +120,8 @@ const agregar = async (req, res) => {
             publicado,
         });
 
+        // console.log(imagen)
+
         for (let value of disenosArray) {
             await DetalleDiseñoModels.create({
                 fk_producto: nuevoProducto.id_producto,
@@ -130,7 +132,7 @@ const agregar = async (req, res) => {
 
         /// Mensaje de respuesta
         res.json({
-            message: 'Producto agregado exitosamente',
+            message: 'Producto agregado exitosamente', nuevoProducto
         });
     } catch (error) {
         console.log(error);
@@ -207,7 +209,7 @@ const actualizar = async (req, res) => {
             });
         }
 
-        res.json({ message: 'Actualización exitosa' });
+        res.json({ message: 'Actualización exitosa',producto });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Error al actualizar el producto ' });
@@ -219,7 +221,7 @@ const cambiarEstado = async (req, res) => {
 
         const { estado } = req.body;
 
-        console.log('actualizar esto');
+        // console.log('actualizar esto');
         const id = req.params.id;
         // console.log(id);
 
