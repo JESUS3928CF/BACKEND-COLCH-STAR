@@ -59,13 +59,13 @@ const consultar = async (req, res) => {
     genero: colors.genero,
     publicado: colors.publicado,
     estado: colors.estado,
-    color : (()=>{
+    color: (() => {
       const result = [];
-      TablaIntermedia.get(colors.id_prenda).forEach((fk_color)=>{
-        result.push(nombreColors.get(fk_color)||[]);
+      TablaIntermedia.get(colors.id_prenda).forEach((fk_color) => {
+        // Use spread (...) operator to merge arrays
+        result.push(...nombreColors.get(fk_color) || []);
       });
-      return result||[];
-
+      return result || [];
     })(),
     
     Talla: tallas.get(colors.id_prenda)||[]
