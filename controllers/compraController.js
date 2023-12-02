@@ -1,59 +1,81 @@
-const {CompraModels}  = require("../models/CompraModel");
-const { ProveedorModels } = require("../models/ProveedorModel");
-const {DetalleCompraModels} = require('../models/compraDetallesModel.js')
-
+const { CompraModels } = require('../models/CompraModel');
+const { PrendasModels } = require('../models/PrendasModel.js');
+const { ProveedorModels } = require('../models/ProveedorModel');
+const { DetalleCompraModels } = require('../models/compraDetallesModel.js');
 
 const consultar = async (req, res) => {
     try {
-
         /// Consultando todos los registros
-        const compra = await CompraModels.findAll({
-        include: [
-            {
-                model: ProveedorModels,
-                as: 'proveedor',
-                attributes: ['nombre'],
-            },
-        ],
-    });
+        const compras = await CompraModels.findAll({
+            include: [
+                {
+                    model: ProveedorModels,
+                    as: 'proveedor',
+                    attributes: ['nombre', 'id_proveedor'],
+                },
+            ],
+        });
 
+        /// Consultando todos los detalles de compras
+        const detallesCompras = await DetalleCompraModels.findAll({
+            include: [
+                {
+                    model: PrendasModels,
+                    as: 'prenda',
+                    attributes: ['nombre', 'id_prenda'],
+                },
+            ],
+        });
+
+        //* Mapa para almacenar los detalles por ventas
+        const detallesPorCompra = new Map();
+
+        //* Buscar los detalles de cada venta
+        detallesCompras.forEach((detalle) => {
+            console.log(detalle, ' Que pasa');
+
+            if (!detallesPorCompra.has(detalle.fk_compra)) {
+                detallesPorCompra.set(detalle.fk_compra, []);
+            }
+
+            detallesPorCompra.get(detalle.fk_compra).push(detalle);
+        });
+
+        // Asociar detalles con compras
+        const comprasConDetalles = compras.map((compra) => {
+            compra.dataValues.detalles =
+                detallesPorCompra.get(compra.id_compra) || [];
+            return compra;
+        });
         //- Forma de inviar un JSON
-        res.status(200).json(compra);
-
-
+        res.status(200).json(comprasConDetalles);
     } catch (error) {
         console.log('Error al consultar la tabla compras:', error);
         res.status(500).json({ error: 'Error al consultar la tabla compras' });
     }
 };
 
+const constOne = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const comprasOne = await CompraModels.findOne({
+            where: { id_compra: id },
+        });
 
-const constOne = async (req,res)=>{
-
-    try{
-        const id = req.params.id
-        const comprasOne= await CompraModels.findOne({
-            where: {id_compra:id}
-        })
-    
-        res.status(200).json(comprasOne)
-
-    }catch(e){
-        res.status(500).json({e: 'Error al consultar'})
+        res.status(200).json(comprasOne);
+    } catch (e) {
+        res.status(500).json({ e: 'Error al consultar' });
     }
-
-   
-}
+};
 
 //! Agregar una compra
 
 const agregar = async (req, res) => {
     try {
-        const { total_de_compra, fecha, fk_proveedor,DetallesCompras } = req.body;
+        const { total_de_compra, fecha, fk_proveedor, DetallesCompras } =
+            req.body;
 
-        console.log(req.body)
-
-
+        console.log(req.body);
 
         const compras = await CompraModels.create({
             total_de_compra,
@@ -61,23 +83,17 @@ const agregar = async (req, res) => {
             fk_proveedor,
         });
 
-
-        detallesComprasArray = JSON.parse(DetallesCompras)
+        detallesComprasArray = JSON.parse(DetallesCompras);
 
         for (let value of detallesComprasArray) {
-
-            await  DetalleCompraModels.create({
+            await DetalleCompraModels.create({
                 fk_compra: compras.id_compra,
                 cantidad: value.cantidad,
                 precio: value.precio,
-                fk_prenda: value.fk_prenda || null
-                
-            })
-           
+                fk_prenda: value.fk_prenda || null,
+            });
         }
-           
 
-        
         /// Mensaje de respuesta
         res.json({
             message: 'Compra agregada exitosamente',
@@ -89,17 +105,14 @@ const agregar = async (req, res) => {
     }
 };
 
-
-
 const actualizar = async (req, res) => {
     try {
-        const { total_de_compra, fecha, fk_proveedor, DetallesCompras } = req.body;
-        const id_compra = req.params.id
+        const { total_de_compra, fecha, fk_proveedor, DetallesCompras } =
+            req.body;
+        const id_compra = req.params.id;
 
-        
         // Verifica si la compra existe
         const compraExistente = await CompraModels.findByPk(id_compra);
-
 
         // Actualiza los campos de la compra
         compraExistente.total_de_compra = total_de_compra;
@@ -113,11 +126,14 @@ const actualizar = async (req, res) => {
         for (let value of DetallesCompras) {
             if (value.id_detalle_compra) {
                 // Si tiene un ID, intenta actualizar el detalle existente
-                const detalleCompraExistente = await DetalleCompraModels.findByPk(value.id_detalle_compra);
+                const detalleCompraExistente =
+                    await DetalleCompraModels.findByPk(value.id_detalle_compra);
 
                 if (!detalleCompraExistente) {
                     // Trata el caso donde el detalle de compra no existe
-                    console.log(`El detalle de compra con ID ${value.id_detalle_compra} no existe.`);
+                    console.log(
+                        `El detalle de compra con ID ${value.id_detalle_compra} no existe.`
+                    );
                     continue;
                 }
 
@@ -136,7 +152,7 @@ const actualizar = async (req, res) => {
                     cantidad: value.cantidad,
                     precio: value.precio,
                     diseno: value.diseno,
-                    fk_prenda: value.fk_prenda
+                    fk_prenda: value.fk_prenda,
                 });
             }
         }
@@ -152,46 +168,11 @@ const actualizar = async (req, res) => {
     }
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //! Actualizar un cliente
 
 const cambiarEstado = async (req, res) => {
     try {
-
-        console.log("Se hizo una estado");
+        console.log('Se hizo una estado');
         const { estado } = req.body;
 
         console.log('actualizar esto');
@@ -210,6 +191,6 @@ const cambiarEstado = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'no se cambio el estado' });
     }
-}
+};
 
-module.exports = { consultar,constOne, agregar, actualizar, cambiarEstado};
+module.exports = { consultar, constOne, agregar, actualizar, cambiarEstado };

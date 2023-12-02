@@ -18,11 +18,6 @@ const routerCompraDetalles = require('./compraDetallesRouter')
 
 const { checkAut } = require('../middleware/authMidlleware');
 
-
-
-
-
-
 function routerApi(app){
     const router = express.Router();
     app.use("/api", router)
@@ -39,7 +34,7 @@ function routerApi(app){
     router.use('/detalle_diseno',routerDetalleDiseno)
     router.use('/tallas', routerTallas)
     router.use('/colorsPrendas', routerPrendasColors)
-    router.use('/compra', routerCompra)
+    router.use('/compras', routerCompra)
     router.use('/compraDetalles',routerCompraDetalles)
 
 
