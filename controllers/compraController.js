@@ -83,7 +83,9 @@ const agregar = async (req, res) => {
             fk_proveedor,
         });
 
-        detallesComprasArray = JSON.parse(DetallesCompras);
+        console.log(DetallesCompras)
+
+        let detallesComprasArray = (DetallesCompras);
 
         for (let value of detallesComprasArray) {
             await DetalleCompraModels.create({
@@ -168,7 +170,7 @@ const actualizar = async (req, res) => {
     }
 };
 
-//! Actualizar un cliente
+//! Actualizar una compra
 
 const cambiarEstado = async (req, res) => {
     try {
