@@ -141,17 +141,20 @@ const update = async (req, res) => {
 
     const id = req.params.id;
 
+    console.log(nombre)
+    console.log(colores)
+
+
     const prenda= await PrendasModels.findOne({
       where: {id_prenda:id}
     })
 
-    prenda.nombre=nombre;
+    prenda.nombre= nombre;
     prenda.cantidad=cantidad;
     prenda.precio=precio;
     prenda.tipo_de_tela=tipo_de_tela;
     prenda.genero=genero;
     prenda.publicado= publicado;
-
 
 
     if(req.file){
@@ -169,7 +172,7 @@ const update = async (req, res) => {
         prenda.imagen=req.file.filename
     }
 
-    prenda.save()
+  
 
     await colorsPrendasmodel.destroy({where:{fk_color: id}});
     await colorsPrendasmodel.destroy({where:{fk_prenda: id}})
@@ -191,6 +194,8 @@ const update = async (req, res) => {
          fk_prenda: prenda.id_prenda, 
      });
  }
+
+ prenda.save()
 
 
     res.json({
