@@ -34,9 +34,8 @@ function routerApi(app){
     router.use('/detalle_diseno',routerDetalleDiseno)
     router.use('/tallas', routerTallas)
     router.use('/colorsPrendas', routerPrendasColors)
-    router.use('/compras', routerCompra)
+    router.use('/compras', checkAut , routerCompra)
     router.use('/compraDetalles',routerCompraDetalles)
-
 
 }
 
