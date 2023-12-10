@@ -30,11 +30,11 @@ const consultar = async (req, res) => {
             include: [
                 {
                     model: DisenoModels, // Modelo de Prendas
-                    attributes: ['imagen', 'nombre' ], // Selecciona los atributos que necesitas, en este caso, solo la imagen
+                    attributes: ['id_diseno','imagen', 'nombre' ], // Selecciona los atributos que necesitas, en este caso, solo la imagen
                 },
                 {
                     model: PrecioDisenoModels, // Modelo de Prendas
-                    attributes: [ 'tamano','precio' ], // Selecciona los atributos que necesitas, en este caso, solo la imagen
+                    attributes: [ 'id_precio_diseno','tamano','precio' ], // Selecciona los atributos que necesitas, en este caso, solo la imagen
                 },
             
             ],
@@ -51,8 +51,10 @@ const consultar = async (req, res) => {
             console.log(diseno);
             console.log(
                 productosConDisenos.get(diseno.fk_producto).push({
+                    id_diseno: diseno.diseno.id_diseno,
                     nombre: diseno.diseno.nombre,
                     imagen: diseno.diseno.imagen,
+                    id_precio_diseno: diseno.precio_diseno.id_precio_diseno,
                     precio: diseno.precio_diseno.precio,
                     tamano: diseno.precio_diseno.tamano,
                 })
