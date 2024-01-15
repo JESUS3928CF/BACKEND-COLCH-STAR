@@ -1,3 +1,5 @@
+const {formatDate, formatMoney} = require('../helpers/formatearDatos.js');
+
 const { CompraModels } = require('../models/CompraModel');
 const { PrendasModels } = require('../models/PrendasModel.js');
 const { ProveedorModels } = require('../models/ProveedorModel');
@@ -32,8 +34,6 @@ const consultar = async (req, res) => {
 
         //* Buscar los detalles de cada venta
         detallesCompras.forEach((detalle) => {
-            console.log(detalle, ' Que pasa');
-
             if (!detallesPorCompra.has(detalle.fk_compra)) {
                 detallesPorCompra.set(detalle.fk_compra, []);
             }
@@ -45,6 +45,9 @@ const consultar = async (req, res) => {
         const comprasConDetalles = compras.map((compra) => {
             compra.dataValues.detalles =
                 detallesPorCompra.get(compra.id_compra) || [];
+            compra.fecha = formatDate(compra.fecha);
+            compra.total_de_compra = formatMoney(compra.total_de_compra);
+
             return compra;
         });
         //- Forma de inviar un JSON
@@ -83,9 +86,9 @@ const agregar = async (req, res) => {
             fk_proveedor,
         });
 
-        console.log(DetallesCompras)
+        console.log(DetallesCompras);
 
-        let detallesComprasArray = (DetallesCompras);
+        let detallesComprasArray = DetallesCompras;
 
         for (let value of detallesComprasArray) {
             await DetalleCompraModels.create({

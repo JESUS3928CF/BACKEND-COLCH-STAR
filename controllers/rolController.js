@@ -1,6 +1,7 @@
 const { RolModels } = require('../models/RolModel.js');
 const { ConfiguracionModels } = require('../models/ConfiguracionModel.js');
 const { constants } = require('buffer');
+const {formatDate} = require('../helpers/formatearDatos.js')
 
 const consultar = async (req, res) => {
     try {
@@ -21,13 +22,11 @@ const consultar = async (req, res) => {
             permisosPorRol.get(permiso.fk_rol).push(permiso.permiso);
         });
 
-        
-
         // Formatear los resultados para incluir los permisos en los roles
         const rolesConPermisos = roles.map((rol) => ({
             id_rol: rol.id_rol,
             nombre: rol.nombre,
-            fecha_creacion: rol.fecha_creacion,
+            fecha_creacion: formatDate(rol.fecha_creacion),
             estado: rol.estado,
             permisos: permisosPorRol.get(rol.id_rol) || [],
         }));
@@ -82,7 +81,6 @@ const agregar = async (req, res) => {
     }
 };
 
-
 // //! Actualizar un rol y sus permisos
 const actualizar = async (req, res) => {
     try {
@@ -134,7 +132,6 @@ const actualizar = async (req, res) => {
         res.status(500).json({ message: 'Error al actualizar el rol' });
     }
 };
-
 
 //! Actualizar un estado de rol
 

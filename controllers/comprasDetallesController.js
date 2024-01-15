@@ -1,59 +1,48 @@
-const {DetalleCompraModels} = require('../models/compraDetallesModel.js')
-const {PrendasModels} = require('../models/PrendasModel.js')
-const {CompraModels} = require('../models/CompraModel.js')
+const { DetalleCompraModels } = require('../models/compraDetallesModel.js');
+const { PrendasModels } = require('../models/PrendasModel.js');
+const { CompraModels } = require('../models/CompraModel.js');
 
 
-const consult = async (req,res)=>{
-    try{
-        
-        const comprasDetalles= await DetalleCompraModels.findAll({
-            include:[
+const consult = async (req, res) => {
+    try {
+        const comprasDetalles = await DetalleCompraModels.findAll({
+            include: [
                 {
                     model: PrendasModels,
-                    as:'prenda',
+                    as: 'prenda',
                     attributes: ['nombre'],
-
                 },
                 {
                     model: CompraModels,
-                    as:'compra',
+                    as: 'compra',
                     attributes: ['fecha'],
-
                 },
-
-            ]
-        })
-        res.status(200).json(comprasDetalles)
-
-    }catch(error){
-        res.status(500).json({message: 'Error al consultar los detalles d elas prendas'})
+            ],
+        });
+        res.status(200).json(comprasDetalles);
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error al consultar los detalles delas compras',
+        });
     }
-}
+};
 
-const constOne = async (req,res)=>{
+const constOne = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const comprasDetallesOne = await DetalleCompraModels.findOne({
+            where: { id_detalle_compra: id },
+        });
 
-    try{
-        const id = req.params.id
-        const comprasDetallesOne= await DetalleCompraModels.findOne({
-            where: {id_detalle_compra:id}
-        })
-    
-        res.status(200).json(comprasDetallesOne)
-
-    }catch(e){
-        res.status(500).json({e: 'Error al consultar'})
+        res.status(200).json(comprasDetallesOne);
+    } catch (e) {
+        res.status(500).json({ e: 'Error al consultar' });
     }
-
-   
-}
-
+};
 
 const agregar = async (req, res) => {
     try {
-        const { cantidad, precio,  fk_compra, fk_prenda } = req.body;
-
-
-
+        const { cantidad, precio, fk_compra, fk_prenda } = req.body;
 
         // Crea el nuevo detalle de compra
         await DetalleCompraModels.create({
@@ -63,12 +52,6 @@ const agregar = async (req, res) => {
             fk_prenda,
         });
 
-
-
-
-
-
-
         // Mensaje de respuesta
         res.json({
             message: 'Detalle de compra agregado exitosamente',
@@ -76,13 +59,15 @@ const agregar = async (req, res) => {
     } catch (error) {
         console.error(error);
         // Envía una respuesta al cliente indicando el error
-        res.status(500).json({ message: 'Error al agregar el detalle de compra' });
+        res.status(500).json({
+            message: 'Error al agregar el detalle de compra',
+        });
     }
 };
 
 const actualizar = async (req, res) => {
     try {
-        const {cantidad, precio,  fk_compra, fk_prenda } = req.body;
+        const { cantidad, precio, fk_compra, fk_prenda } = req.body;
 
         const id = req.params.id;
 
@@ -101,9 +86,10 @@ const actualizar = async (req, res) => {
             message: 'Detalle de compra actualizado exitosamente',
         });
     } catch (error) {
-        res.status(500).json({ message: 'Error al actualizar el detalle de compra' });
+        res.status(500).json({
+            message: 'Error al actualizar el detalle de compra',
+        });
     }
 };
 
-
-module.exports = {consult, agregar, actualizar,constOne}
+module.exports = { consult, agregar, actualizar, constOne };
