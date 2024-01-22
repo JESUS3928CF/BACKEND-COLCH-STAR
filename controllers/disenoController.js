@@ -27,7 +27,7 @@ const agregar = async (req, res) => {
         }
 
         //!  Insertar un nuevo diseño en la base de datos
-        await DisenoModels.create({
+        const nuevoDiseno = await DisenoModels.create({
             nombre,
             imagen : req.file.filename,
             publicado
@@ -35,7 +35,7 @@ const agregar = async (req, res) => {
 
         /// Mensaje de respuesta
         res.json({
-            message: 'Diseño agregado exitosamente',
+            message: 'Diseño agregado exitosamente', nuevoDiseno
         });       
     } catch (error) {
         // Envía una respuesta al cliente indicando el error
@@ -84,6 +84,7 @@ const actualizar = async (req, res) => {
         res.json({ message: 'Actualización exitosa' });
     } catch (error) {
         res.status(500).json({ message: 'Error al actualizar el diseño' });
+        console.log(error)
     }
 }
 
@@ -108,5 +109,25 @@ const cambiarEstado = async (req, res) => {
     }
 }
 
+//! cambiar el estado de publicación de un diseño
+const cambiarPublicacion = async (req, res) => {
+    try {
+        const { estado } = req.body;
+        const id = req.params.id;
 
-module.exports = { agregar, consultar, actualizar, cambiarEstado };
+        const diseno = await DisenoModels.findOne({
+            where: { id_diseno: id },
+        });
+        // Actualizar el estado contrario al que se le envía 
+        diseno.publicado = !estado;
+
+        diseno.save();
+
+        res.status(200).json({ message: 'Se cambio el estado de publicación' });
+    } catch (error) {
+        res.status(500).json({ message: 'No se cambio el estado de publicación' });
+    }
+}
+
+
+module.exports = { agregar, consultar, actualizar, cambiarEstado, cambiarPublicacion };

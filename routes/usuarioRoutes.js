@@ -1,28 +1,51 @@
 const express = require("express");
-const {consultar, agregar, actualizar, cambiarEstado, login, actualizarContrasena} = require('../controllers/usuarioController');
+const {
+    consultar,
+    agregar,
+    actualizar,
+    cambiarEstado,
+    actualizarContrasena,
+    autenticar,
+    perfil,
+    passwordPerdida,
+    checkToken,
+    newPassword
+} = require('../controllers/usuarioController');
+const { checkAut } = require("../middleware/authMidlleware");
 const router = express.Router();
 
 /// peticiones para clientes
+//* Restablecer contraseña
+router.post("/password-perdida", passwordPerdida )
 
-//* Find one
-router.post("/login", login );
+//* verificar el token para poder restablecer la contraseña
+router.get("/password-perdida/:token", checkToken )
+
+router.post('/password-perdida/:token', newPassword );
+
+//* Autenticar un usuario
+router.post('/login', autenticar);
+
 
 //* Find all
-router.get("/", consultar );
+router.get('/', checkAut, consultar);
 
 //* Insert One
-router.post("/", agregar );
+router.post('/', checkAut , agregar);
 
 //* actualizar
-router.patch('/:id', actualizar);
+router.patch('/:id', checkAut, actualizar);
 
 
 //* actualizar
-router.patch('/cambiarContrasena/:id', actualizarContrasena);
+router.patch('/cambiarContrasena/:id', checkAut, actualizarContrasena);
 
 
 //* Cambiar estado
-router.patch('/estado/:id', cambiarEstado);
+router.patch('/estado/:id',checkAut,  cambiarEstado);
+
+//* Obtener el perfil de un usuario
+router.get("/perfil", checkAut ,perfil)
 
 
 module.exports = router;

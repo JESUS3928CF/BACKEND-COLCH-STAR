@@ -1,38 +1,79 @@
-const { UsuarioModels } = require('../models/UsuariosModel');
-const { RolModels } = require('../models/RolModels');
+const { UsuarioModels } = require('../models/UsuariosModel.js');
+const { RolModels } = require('../models/RolModel.js');
 
 //! Importamos la dependencia
 const bcrypt = require('bcrypt');
-
-//! Consultar un registro relacionado con Sequelize
-const login = async (req, res) => {
+const { generarJWT } = require('../helpers/generarJWT.js');
+const { ConfiguracionModels } = require('../models/ConfiguracionModel.js');
+const shortid = require('shortid');
+const emailRecuperarPassword = require('../helpers/emailRecuperarPassword.js');
+//! autenticar un usuario con JWT
+const autenticar = async (req, res) => {
     const { email, contrasena } = req.body;
 
     try {
         /// Consultar el registro
         const usuario = await UsuarioModels.findOne({
             where: { email: email },
-            include: [
-                {
-                    model: RolModels,
-                    attributes: ['nombre'],
-                },
-            ],
+            attributes: {
+                exclude: ['token'],
+            },
+            include: [{ model: RolModels, attributes: ['nombre', 'estado'] }],
         });
 
+        /// Verificar si no se encontró el registro
         if (!usuario) {
-            return res.json({ message: 'Usuario no encontrado' });
+            const error = new Error('Usuario o Contraseña son incorrectos');
+            return res.status(403).json({ message: error.message });
         }
-        /// Verificar si se encontró el registro
 
+        /// validar la contraseña
         const contrasenaValida = await bcrypt.compare(
             contrasena,
             usuario.contrasena
         );
-        if (!contrasenaValida) {
-            return res.json({ message: 'Contraseña incorrecta' });
+        if (!contrasenaValida || !usuario) {
+            const error = new Error('Usuario o Contraseña son incorrectos');
+            return res.status(403).json({ message: error.message });
         }
-        res.json(usuario);
+
+        /// Consultando todos los registros de permisos
+        const permisos = await ConfiguracionModels.findAll();
+
+        const permisosUsuario = new Map();
+        permisosUsuario.set(usuario.fk_rol, []);
+
+        permisos.forEach((permiso) => {
+            if (permiso.fk_rol === usuario.fk_rol) {
+                permisosUsuario.get(usuario.fk_rol).push(permiso.permiso);
+            }
+        });
+
+        /// Verificar que este habilitado
+        if (!usuario.estado) {
+            const error = new Error('Tu cuenta se encuentra deshabilitada');
+            return res.status(403).json({ message: error.message });
+        }
+
+        /// Verificar que el rol este habilitado
+        if (!usuario.rol.estado) {
+            const error = new Error(
+                `El rol de ${usuario.rol.nombre} se encuentra deshabilitado`
+            );
+            return res.status(403).json({ message: error.message });
+        }
+
+        res.json({
+            /// Quitar la info no deseada y solo mostrar la necesaria
+            usuario: {
+                id_usuario: usuario.id_usuario,
+                nombre: usuario.nombre,
+                apellido: usuario.apellido,
+                rol: usuario.rol,
+                permisos: permisosUsuario.get(usuario.fk_rol) || [],
+                token: generarJWT(usuario.id_usuario),
+            },
+        });
     } catch (error) {
         console.log('Error al consultar el registro del usuario:', error);
         res.status(500).json({
@@ -40,6 +81,85 @@ const login = async (req, res) => {
         });
     }
 };
+
+const perfil = (req, res) => {
+    const { usuario } = req;
+    console.log(usuario);
+    res.json({ usuario });
+};
+
+/// Recuperar contraseña
+
+const passwordPerdida = async (req, res) => {
+    const { email } = req.body;
+
+    const usuario = await UsuarioModels.findOne({
+        where: { email: email },
+    });
+
+    if (!usuario) {
+        const error = new Error('El usuario no existe');
+        return res.status(403).json({ message: error.message });
+    }
+
+    try {
+        usuario.token = shortid.generate() + shortid.generate();
+        usuario.save();
+
+        //* Enviar email con las instrucciones
+        emailRecuperarPassword({
+            email,
+            nombre : usuario.nombre,
+            token: usuario.token
+        }) 
+
+        res.json({
+            message:
+                'Se ha enviado un email con las instrucciones para restablecer la contraseña, si no encuentras el mensaje recuerda revisas la bandeja de span',
+        });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/// Comprobar el token de la contraseña
+const checkToken = async (req, res) => {
+    const { token } = req.params;
+
+    const tokenValido = await UsuarioModels.findOne({
+        where: { token: token },
+    });
+
+    if (tokenValido) return res.json({ message: 'El Token es valido' });
+
+    console.log(tokenValido)
+    res.status(403).json({ message: 'El Token no es valido' });
+};
+
+const newPassword = async (req, res) => {
+    const { token } = req.params;
+    const { contrasena } = req.body;
+
+    const usuario = await UsuarioModels.findOne({
+        where: { token: token },
+    });
+
+    if(!usuario) {
+        const error = new Error('Hubo un error');
+        return res.status(403).json({ message: error.message });
+    }
+    
+    try {
+        usuario.token = null;
+        usuario.contrasena = await bcrypt.hash(contrasena, 10);
+        usuario.save();
+        
+        res.json({ message : "Contraseña modificada correctamente"})
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 
 const consultar = async (req, res) => {
     try {
@@ -77,20 +197,20 @@ const agregar = async (req, res) => {
             where: { telefono: telefono },
         });
 
-        const correoOcupado = await UsuarioModels.findOne({
-            where: { email: email },
-        });
-
         if (telOcupado) {
-            return res.json({
-                message: 'Teléfono en uso',
+            return res.status(403).json({
+                message: 'Ya exite este teléfono',
                 telOcupado,
             });
         }
 
+        const correoOcupado = await UsuarioModels.findOne({
+            where: { email: email },
+        });
+
         if (correoOcupado) {
-            return res.json({
-                message: 'Correo en uso',
+            return res.status(403).json({
+                message: 'Ya existe este Email',
                 correoOcupado,
             });
         }
@@ -99,7 +219,7 @@ const agregar = async (req, res) => {
             nombre,
             apellido,
             telefono,
-            email,
+            email: email.toLowerCase(),
             contrasena: hashedContrasena, /// Guarda la contraseña cifrada en la base de datos
             fk_rol,
         });
@@ -127,6 +247,31 @@ const actualizar = async (req, res) => {
         const usuario = await UsuarioModels.findOne({
             where: { id_usuario: id },
         });
+
+        if (telefono !== usuario.telefono) {
+            const telOcupado = await UsuarioModels.findOne({
+                where: { telefono: telefono },
+            });
+            if (telOcupado) {
+                return res.status(403).json({
+                    message: 'Ya Existe este Teléfono',
+                    telOcupado,
+                });
+            }
+        }
+
+        if (email !== usuario.email) {
+            const correoOcupado = await UsuarioModels.findOne({
+                where: { email: email },
+            });
+
+            if (correoOcupado) {
+                return res.status(403).json({
+                    message: 'Ya Existe este Email',
+                    correoOcupado,
+                });
+            }
+        }
 
         if (usuario == null)
             return res.json({ message: 'Usuario no encontrado' });
@@ -181,7 +326,6 @@ const actualizarContrasena = async (req, res) => {
 };
 
 //! Actualizar un cliente
-
 const cambiarEstado = async (req, res) => {
     try {
         console.log('Se hizo unn estado');
@@ -210,6 +354,10 @@ module.exports = {
     agregar,
     actualizar,
     cambiarEstado,
-    login,
     actualizarContrasena,
+    autenticar,
+    perfil,
+    passwordPerdida,
+    checkToken,
+    newPassword,
 };

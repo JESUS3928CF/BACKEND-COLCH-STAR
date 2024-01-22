@@ -1,7 +1,7 @@
 //! Necesitamos importar esto
 const Sequelize = require('sequelize');
 const db = require('../config/db');
-const { RolModels } = require('./RolModels');
+const { RolModels } = require('./RolModel');
 
 
 const UsuarioModels = db.define(
@@ -20,7 +20,6 @@ const UsuarioModels = db.define(
         },
         telefono: {
             type: Sequelize.STRING,
-            unique: true
         },
         email: {
             type: Sequelize.STRING,
@@ -32,6 +31,9 @@ const UsuarioModels = db.define(
         estado: {
             type: Sequelize.BOOLEAN,
             defaultValue: true, //! Establece el valor por defecto del estado como true
+        },
+        token: {
+            type: Sequelize.STRING(20)
         },
         fk_rol: {
             type: Sequelize.INTEGER(5),

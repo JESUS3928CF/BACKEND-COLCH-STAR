@@ -22,20 +22,44 @@ const consultar = async (req, res) => {
 const agregar = async (req, res) => {
 
     try {
-        const { nombre, telefono,  direccion,  identificador } = req.body;
+        const { nombre, telefono, direccion, identificador, tipoIdentificacion } = req.body;
+
+
+        // findOne se utiliza para buscar un solo registro en la base de datos que cumpla con ciertos criterios.
+
+        // // si la busqueda anterior, se encuntra un  registro que cumple con la condicion de busqueda,
+        // // se ejecuta el bloque de codigo  dentro del if
+
+        // que establece las condiciones de búsqueda. En este caso, se está buscando un registro en la base de datos donde la propiedad 
+        // identificador sea igual al valor de la variable identificador
+        const identificadorRepetido = await ProveedorModels.findOne({
+            where: {
+                identificador: identificador,
+                tipoIdentificacion: tipoIdentificacion
+            }
+        });
+
+        if (identificadorRepetido) {
+            return res.status(403).json({
+                message: 'Ya Existe esta Identificación',
+                identificadorRepetido,
+            });
+        }
 
 
         //!  Insertar un nuevo cliente en la base de datos
-        await ProveedorModels.create({
+         const nuevoProveedor = await ProveedorModels.create({
             nombre,
             telefono,
             direccion,
-            identificador
+            identificador,
+            tipoIdentificacion
+
         });
 
         /// Mensaje de respuesta
         res.json({
-            message: 'Proveedor agregado exitosamente',
+            message: 'Proveedor agregado exitosamente', nuevoProveedor
         });
 
     } catch (error) {
@@ -49,7 +73,7 @@ const agregar = async (req, res) => {
 const actualizar = async (req, res) => {
     try {
 
-        const { nombre, telefono, direccion,  identificador  } = req.body;
+        const { nombre, telefono, direccion, identificador, tipoIdentificacion } = req.body;
 
         const id = req.params.id;
         console.log(id);
@@ -57,15 +81,39 @@ const actualizar = async (req, res) => {
         const proveedor = await ProveedorModels.findOne({
             where: { id_proveedor: id },
         });
+
+
+
+        if (identificador !== proveedor.identificador || tipoIdentificacion !==proveedor.tipoIdentificacion) {
+            const identificadorRepetido = await ProveedorModels.findOne({
+                where: {
+                    identificador: identificador,
+                    tipoIdentificacion: tipoIdentificacion
+                },
+            })
+
+            if (identificadorRepetido) {
+                return res.status(403).json({
+                    message: 'Ya Existe esta Identificación',
+                    identificadorRepetido,
+                });
+            }
+        }
+
+
+
         // Actualizar los valores del registro
         proveedor.nombre = nombre;
         proveedor.telefono = telefono;
         proveedor.direccion = direccion;
         proveedor.identificador = identificador
+        proveedor.tipoIdentificacion = tipoIdentificacion
 
         proveedor.save();
 
-        res.json({ message: 'Actualización exitosa' });
+
+
+        res.json({ message: 'Actualización exitosa', proveedor});
     } catch (error) {
         res.status(500).json({ message: 'Error al actualizar el proveedor ' });
     }
@@ -96,5 +144,5 @@ const cambiarEstado = async (req, res) => {
 }
 
 
-module.exports = { consultar, agregar,actualizar, cambiarEstado };
+module.exports = { consultar, agregar, actualizar, cambiarEstado };
 

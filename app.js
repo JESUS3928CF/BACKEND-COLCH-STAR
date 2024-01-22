@@ -27,6 +27,8 @@ routerApi(app);
 
 /// Carpeta publica de los diseños
 app.use(express.static('uploads/disenos'));
+app.use(express.static('uploads/prenda'))
+app.use(express.static('uploads/productos'))
 
 app.get("/api", (req, res) => {
     res.status(200).send('API DE COLCH STAR');

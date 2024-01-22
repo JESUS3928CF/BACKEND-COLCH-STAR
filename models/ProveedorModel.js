@@ -26,6 +26,10 @@ const ProveedorModels = db.define(
             type: Sequelize.BOOLEAN,
             defaultValue: true, //! Establece el valor por defecto del estado como true
         },
+        tipoIdentificacion: {
+            type: Sequelize.STRING,
+
+        }
     },
     {
         tableName: 'proveedor',

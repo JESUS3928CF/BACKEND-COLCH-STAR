@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize')
 const db = require('../config/db');
 
+
 const PrendasModels = db.define(
     'prenda',
     {
@@ -17,7 +18,7 @@ const PrendasModels = db.define(
             type: Sequelize.INTEGER,
         },
         precio:{
-            type: Sequelize.DOUBLE,
+            type: Sequelize.FLOAT,
         },
         tipo_de_tela:{
             type:Sequelize.STRING,
@@ -37,7 +38,7 @@ const PrendasModels = db.define(
         estado:{
             type: Sequelize.BOOLEAN,
             allowNull: false,
-            defaultValue: false,            
+            defaultValue: true,            
         },
     },{
         tableName: 'prenda'

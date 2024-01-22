@@ -4,6 +4,7 @@ const {
     agregar,
     actualizar,
     cambiarEstado,
+    cambiarPublicacion,
 } = require('../controllers/disenoController.js');
 const router = express.Router();
 
@@ -11,6 +12,7 @@ const router = express.Router();
 const {
     subirArchivoDiseno,
 } = require('../middleware/subirArchivoMiddleware.js');
+const { checkAut } = require('../middleware/authMidlleware.js');
 
 /// peticiones para diseños
 
@@ -18,16 +20,20 @@ const {
 router.get('/', consultar);
 
 //* Insert One
-router.post('/', subirArchivoDiseno, agregar);
+router.post('/', checkAut , subirArchivoDiseno, agregar);
 
 //* Update
-router.put( 
+router.put(
     '/:id',
+    checkAut,
     subirArchivoDiseno, //- Tener listo el middleware en caso de querer actualizar la imagen
     actualizar
 );
 
 //* Cambiar estado
-router.patch('/estado/:id', cambiarEstado);
+router.patch('/estado/:id', checkAut, cambiarEstado);
+
+//* Cambiar estado
+router.patch('/publicado/:id', checkAut, cambiarPublicacion);
 
 module.exports = router;
