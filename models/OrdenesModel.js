@@ -14,11 +14,11 @@ const OrdenesModels = db.define(
         fecha_entrega: {
             type: Sequelize.STRING,
         },
-        total_de_compra: {
+        precio_total: {
             type: Sequelize.FLOAT,
         },
-        precio: {
-            type: Sequelize.FLOAT,
+        estado_de_orden: {
+            type: Sequelize.STRING,
         },
         fk_cliente: {
             type: Sequelize.INTEGER,

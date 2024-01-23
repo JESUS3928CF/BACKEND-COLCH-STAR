@@ -10,45 +10,51 @@ const consultar = async (req, res) => {
         const ordenes = await OrdenesModels.findAll({
             include: [
                 {
-                    model: ProveedorModels,
-                    as: 'proveedor',
-                    attributes: ['nombre', 'id_proveedor'],
+                    model: ClienteModels,
+                    as: 'orden',
+                    attributes: ['nombre', 'apellido', 'identificacion'],
                 },
             ],
         });
 
         /// Consultando todos los detalles de compras
-        const detallesCompras = await DetalleCompraModels.findAll({
-            include: [
-                {
-                    model: PrendasModels,
-                    as: 'prenda',
-                    attributes: ['nombre', 'id_prenda'],
-                },
-            ],
-        });
+        // const detallesCompras = await DetalleCompraModels.findAll({
+        //     include: [
+        //         {
+        //             model: PrendasModels,
+        //             as: 'prenda',
+        //             attributes: ['nombre', 'id_prenda'],
+        //         },
+        //     ],
+        // });
+
+
 
         //* Mapa para almacenar los detalles por ventas
-        const detallesPorCompra = new Map();
+        // const detallesPorCompra = new Map();
 
-        //* Buscar los detalles de cada venta
-        detallesCompras.forEach((detalle) => {
-            if (!detallesPorCompra.has(detalle.fk_compra)) {
-                detallesPorCompra.set(detalle.fk_compra, []);
-            }
+        // // * Buscar los detalles de cada venta
+        // detallesCompras.forEach((detalle) => {
+        //     if (!detallesPorCompra.has(detalle.fk_compra)) {
+        //         detallesPorCompra.set(detalle.fk_compra, []);
+        //     }
 
-            detallesPorCompra.get(detalle.fk_compra).push(detalle);
-        });
+        //     detallesPorCompra.get(detalle.fk_compra).push(detalle);
+        // });
 
-        // Asociar detalles con compras
-        const comprasConDetalles = compras.map((compra) => {
-            compra.dataValues.detalles =
-                detallesPorCompra.get(compra.id_compra) || [];
-            compra.fecha = formatDate(compra.fecha);
-            compra.total_de_compra = formatMoney(compra.total_de_compra);
+        // // Asociar detalles con compras
+        // const comprasConDetalles = compras.map((compra) => {
+        //     compra.dataValues.detalles =
+        //         detallesPorCompra.get(compra.id_compra) || [];
+        //     compra.fecha = formatDate(compra.fecha);
+        //     compra.total_de_compra = formatMoney(compra.total_de_compra);
 
-            return compra;
-        });
+        //     return compra;
+        // });
+
+
+
+
         //- Forma de inviar un JSON
         res.status(200).json(comprasConDetalles);
     } catch (error) {
@@ -57,20 +63,21 @@ const consultar = async (req, res) => {
     }
 };
 
-const constOne = async (req, res) => {
-    try {
-        const id = req.params.id;
-        const comprasOne = await CompraModels.findOne({
-            where: { id_compra: id },
-        });
+// const constOne = async (req, res) => {
+//     try {
+//         const id = req.params.id;
+//         const comprasOne = await CompraModels.findOne({
+//             where: { id_compra: id },
+//         });
 
-        res.status(200).json(comprasOne);
-    } catch (e) {
-        res.status(500).json({ e: 'Error al consultar' });
-    }
-};
+//         res.status(200).json(comprasOne);
+//     } catch (e) {
+//         res.status(500).json({ e: 'Error al consultar' });
+//     }
+// };
 
-//! Agregar una compra
+
+//! Agregar una orden
 
 const agregar = async (req, res) => {
     try {
