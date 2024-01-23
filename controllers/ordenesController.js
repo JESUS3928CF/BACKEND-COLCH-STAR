@@ -2,6 +2,7 @@ const {formatDate, formatMoney} = require('../helpers/formatearDatos.js');
 
 const { OrdenesModels } = require('../models/OrdenesModel.js');
 const { ClienteModels } = require('../models/ClienteModel.js');
+const { ProductoModels } = require('../models/ProductoModel.js');
 
 
 const consultar = async (req, res) => {
@@ -17,16 +18,16 @@ const consultar = async (req, res) => {
             ],
         });
 
-        /// Consultando todos los detalles de compras
-        // const detallesCompras = await DetalleCompraModels.findAll({
-        //     include: [
-        //         {
-        //             model: PrendasModels,
-        //             as: 'prenda',
-        //             attributes: ['nombre', 'id_prenda'],
-        //         },
-        //     ],
-        // });
+        // Consultando todos los detalles de compras
+        const productos = await ProductoModels.findAll({
+            include: [
+                {
+                    model: PrendasModels,
+                    as: 'prenda',
+                    attributes: ['nombre', 'id_prenda'],
+                },
+            ],
+        });
 
 
 
