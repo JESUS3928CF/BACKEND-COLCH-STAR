@@ -2,6 +2,7 @@ const { PrendasModels } = require("../models/PrendasModel.js");
 const {colorModels}=require('../models/colorModel.js')
 const {colorsPrendasmodel} = require('../models/ColorsPrendasModels.js')
 const {TallaModels}= require('../models/TallaModel.js')
+const { formatMoney } = require('../helpers/formatearDatos.js');
 
 const fs = require("fs");
 const { where } = require("sequelize");
@@ -53,7 +54,7 @@ const consultar = async (req, res) => {
     id_prenda: colors.id_prenda,
     nombre:   colors.nombre,
     cantidad: colors.cantidad,
-    precio: colors.precio,
+    precio: formatMoney(colors.precio),
     tipo_de_tela: colors.tipo_de_tela,  
     imagen: colors.imagen,
     genero: colors.genero,

@@ -3,7 +3,7 @@ const { DisenoModels } = require("../models/DisenoModel");
 const { PrecioDisenoModels } = require("../models/PrecioDisenoModel");
 const { PrendasModels } = require("../models/PrendasModel");
 const { ProductoModels } = require("../models/ProductoModel");
-
+const { formatMoney } = require('../helpers/formatearDatos.js');
 const fs = require('fs')
 
 
@@ -70,7 +70,7 @@ const consultar = async (req, res) => {
             id_producto: producto.id_producto,
             nombre: producto.nombre,
             cantidad: producto.cantidad,
-            precio: producto.precio,
+            precio: formatMoney(producto.precio),
             estado: producto.estado,
             imagen: producto.imagen,
             publicado: producto.publicado,

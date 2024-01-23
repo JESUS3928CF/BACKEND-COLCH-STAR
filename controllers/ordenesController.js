@@ -1,14 +1,13 @@
 const {formatDate, formatMoney} = require('../helpers/formatearDatos.js');
 
-const { CompraModels } = require('../models/CompraModel');
-const { PrendasModels } = require('../models/PrendasModel.js');
-const { ProveedorModels } = require('../models/ProveedorModel');
-const { DetalleCompraModels } = require('../models/compraDetallesModel.js');
+const { OrdenesModels } = require('../models/OrdenesModel.js');
+const { ClienteModels } = require('../models/ClienteModel.js');
+
 
 const consultar = async (req, res) => {
     try {
         /// Consultando todos los registros
-        const compras = await CompraModels.findAll({
+        const ordenes = await OrdenesModels.findAll({
             include: [
                 {
                     model: ProveedorModels,
