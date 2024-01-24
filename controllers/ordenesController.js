@@ -81,42 +81,43 @@ const constOne = async (req, res) => {
 
 // //! Agregar una orden
 
-// const agregar = async (req, res) => {
-//     try {
-//         const { total_de_compra, fecha, fk_proveedor, DetallesCompras } =
-//             req.body;
+const agregar = async (req, res) => {
+    try {
+        const { fecha_entrega, precio_total, estado_de_orden, fk_cliente } =
+            req.body;
 
-//         console.log(req.body);
+        console.log(req.body);
 
-//         const compras = await CompraModels.create({
-//             total_de_compra,
-//             fecha,
-//             fk_proveedor,
-//         });
+        const ordenes = await OrdenesModels.create({
+            fecha_entrega,
+            precio_total,
+            estado_de_orden,
+            fk_cliente, 
+        });
 
-//         console.log(DetallesCompras);
+        console.log(DetallesCompras);
 
-//         let detallesComprasArray = DetallesCompras;
+        let detallesComprasArray = DetallesCompras;
 
-//         for (let value of detallesComprasArray) {
-//             await DetalleCompraModels.create({
-//                 fk_compra: compras.id_compra,
-//                 cantidad: value.cantidad,
-//                 precio: value.precio,
-//                 fk_prenda: value.fk_prenda || null,
-//             });
-//         }
+        for (let value of detallesComprasArray) {
+            await DetalleCompraModels.create({
+                fk_compra: compras.id_compra,
+                cantidad: value.cantidad,
+                precio: value.precio,
+                fk_prenda: value.fk_prenda || null,
+            });
+        }
 
-//         /// Mensaje de respuesta
-//         res.json({
-//             message: 'Compra agregada exitosamente',
-//         });
-//     } catch (error) {
-//         console.log(error);
-//         // Envía una respuesta al cliente indicando el error
-//         res.status(500).json({ message: 'Error al agregar la compra' });
-//     }
-// };
+        /// Mensaje de respuesta
+        res.json({
+            message: 'Compra agregada exitosamente',
+        });
+    } catch (error) {
+        console.log(error);
+        // Envía una respuesta al cliente indicando el error
+        res.status(500).json({ message: 'Error al agregar la compra' });
+    }
+};
 
 // const actualizar = async (req, res) => {
 //     try {
