@@ -83,7 +83,7 @@ const constOne = async (req, res) => {
 
 const agregar = async (req, res) => {
     try {
-        const { fecha_entrega, precio_total, estado_de_orden, fk_cliente } =
+        const { fecha_entrega, precio_total, estado_de_orden, fk_cliente, detallesOrdenes } =
             req.body;
 
         console.log(req.body);
