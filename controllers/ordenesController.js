@@ -1,4 +1,4 @@
-const {formatDate, formatMoney} = require('../helpers/formatearDatos.js');
+const { formatDate, formatMoney } = require('../helpers/formatearDatos.js');
 
 const { OrdenesModels } = require('../models/OrdenesModel.js');
 const { ClienteModels } = require('../models/ClienteModel.js');
@@ -31,7 +31,7 @@ const consultar = async (req, res) => {
 
 
         //* Mapa para almacenar los detalles por ventas
-         const detallesPorOrden = new Map();
+        const detallesPorOrden = new Map();
 
         // * Buscar los detalles de cada venta
         detalleOrden.forEach((detalle) => {
@@ -44,9 +44,17 @@ const consultar = async (req, res) => {
 
         // Asociar detalles con cordenes
         const ordenesConDetalles = ordenes.map((orden) => {
-            orden.dataValues.detalles =
-            detallesPorOrden.get(orden.id_orden) || [];
-            orden.fecha_entrega = formatDate(orden.fecha_entrega);
+            orden.dataValues.detalles = detallesPorOrden.get(orden.id_orden) || [];
+
+            // Validar la fecha antes de formatear
+            if (!isNaN(Date.parse(orden.fecha_entrega))) {
+                orden.fecha_entrega = formatDate(orden.fecha_entrega);
+            } else {
+                // Manejar el caso de una fecha no válida
+                console.error('Fecha no válida:', orden.fecha_entrega);
+                // Puedes asignar una fecha por defecto o manejarlo de otra manera
+            }
+
             orden.precio_total = formatMoney(orden.precio_total);
 
             return orden;
@@ -92,7 +100,7 @@ const agregar = async (req, res) => {
             fecha_entrega,
             precio_total,
             estado_de_orden,
-            fk_cliente, 
+            fk_cliente,
         });
 
         console.log(DetallesCompras);
@@ -207,4 +215,4 @@ const agregar = async (req, res) => {
 //     }
 // };
 
-module.exports = { consultar, constOne};
+module.exports = { consultar, constOne };
