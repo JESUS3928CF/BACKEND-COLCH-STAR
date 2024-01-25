@@ -1,10 +1,13 @@
 const express = require("express");
-const {consultar } = require('../controllers/ordenesController');
+const {consultar, agregar } = require('../controllers/ordenesController');
 const router = express.Router();
 
 
 //* Find all
 router.get("/", consultar );
+
+//* Insert One
+router.post("/", agregar );
 
 
 

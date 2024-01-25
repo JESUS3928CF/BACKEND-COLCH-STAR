@@ -103,22 +103,25 @@ const agregar = async (req, res) => {
             fk_cliente,
         });
 
-        console.log(DetallesCompras);
+        console.log(detallesOrdenes);
 
-        let detallesComprasArray = DetallesCompras;
+        let detallesOrdenesArray = detallesOrdenes;
 
-        for (let value of detallesComprasArray) {
-            await DetalleCompraModels.create({
-                fk_compra: compras.id_compra,
+        for (let value of detallesOrdenesArray) {
+            await DetalleOrdenModels.create({
+                fk_orden: ordenes.id_orden,
                 cantidad: value.cantidad,
-                precio: value.precio,
-                fk_prenda: value.fk_prenda || null,
+                subtotal: value.subtotal,
+                descripcion: value.descripcion,
+                fk_producto: value.fk_producto,
+                talla: value.talla,
+                color: value.color || null,
             });
         }
 
         /// Mensaje de respuesta
         res.json({
-            message: 'Compra agregada exitosamente',
+            message: 'Orden agregada exitosamente',
         });
     } catch (error) {
         console.log(error);
@@ -215,4 +218,4 @@ const agregar = async (req, res) => {
 //     }
 // };
 
-module.exports = { consultar, constOne };
+module.exports = { consultar, constOne, agregar };
