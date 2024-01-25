@@ -13,7 +13,7 @@ const consultar = async (req, res) => {
             include: [
                 {
                     model: ClienteModels,
-                    attributes: ['nombre', 'apellido', 'identificacion'],
+                    attributes: ['nombre', 'apellido', 'identificacion', 'direccion' ],
                 },
             ],
         });
