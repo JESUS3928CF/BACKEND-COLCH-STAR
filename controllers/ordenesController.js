@@ -109,9 +109,9 @@ const agregar = async (req, res) => {
 
         for (let value of detallesOrdenesArray) {
             await DetalleOrdenModels.create({
-                fk_orden: ordenes.id_orden,
-                cantidad: value.cantidad,
-                subtotal: value.subtotal,
+                fk_ordad: value.cantidad,
+                subtoden: ordenes.id_orden,
+                cantital: value.subtotal,
                 descripcion: value.descripcion,
                 fk_producto: value.fk_producto,
                 talla: value.talla,
