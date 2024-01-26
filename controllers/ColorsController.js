@@ -24,6 +24,22 @@ const consult= async(req,res)=>{
 const addColors = async(req,res)=>{
     try{
         const {color,codigo}=req.body
+        const  repeatedColors = await colorModels.findOne({
+            where: {color:color,codigo:codigo}
+
+        })
+
+        if(repeatedColors){
+            return res.status(403).json({
+                message:'Ya existe el color',
+                repeatedColors
+            })
+        }
+
+
+
+
+
          await colorModels.create({
             color,
             codigo
