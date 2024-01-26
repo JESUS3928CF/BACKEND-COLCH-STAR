@@ -20,11 +20,11 @@ const dbLocal = new Sequelize(
             idle: 10000,
         },
         operatorAliases: false,
-        dialectOptions: {
-            ssl: {
-                rejectUnauthorized: true,
-            },
-        },
+        // dialectOptions: {
+        //     ssl: {
+        //         rejectUnauthorized: true,
+        //     },
+        // },
     }
 );
 

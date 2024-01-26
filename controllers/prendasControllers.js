@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-const {PrendasModels}= require('../models/PrendasModel.js')
-const fs = require('fs')
-
-=======
 const { PrendasModels } = require("../models/PrendasModel.js");
 const {colorModels}=require('../models/colorModel.js')
 const {colorsPrendasmodel} = require('../models/ColorsPrendasModels.js')
@@ -24,7 +19,6 @@ const consultar = async (req, res) => {
     const TablaIntermedia= new Map()
     const nombreColors=new Map()
     const tallas= new Map()
->>>>>>> main
 
 
 
@@ -94,28 +88,6 @@ const agregar = async (req, res) => {
   try {
 
 
-<<<<<<< HEAD
-        const{nombre,cantidad,precio,tipo_de_tela,genero} = req.body
-        console.log(req.body)
-
-        // if(!req.file){
-        //     return res.json({message:`Error la imagen es obligatoria`})
-        // }
-
-
-        
-        const prendas = await PrendasModels.create(
-            {nombre:'Tomas',cantidad,precio,tipo_de_tela,imagen:req.file.filenaem,genero});
-            
-        res.status(200).json({menssage:'Prenda agregada exitosamente'})
-        console.log(prendas)
-    } catch(error){
-        res.status(500).json({message: 'Error al agregar prenda'})
-
-    }
-
-
-=======
     const { nombre, cantidad, precio, tipo_de_tela, genero, publicado, colores,tallas } = req.body;
 
     console.log("Datos que se enviaran a la db", req.body);
@@ -243,7 +215,6 @@ const cambiarEstado = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Error al cambiar el estado" });
   }
->>>>>>> main
 };
 
 
