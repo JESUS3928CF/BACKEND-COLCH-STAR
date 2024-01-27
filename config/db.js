@@ -44,7 +44,7 @@ const dbRemote = new Sequelize(
 
         dialectOptions: {
             ssl: {
-                rejectUnauthorized: false,
+                rejectUnauthorized: true,
             },
         },
     }
