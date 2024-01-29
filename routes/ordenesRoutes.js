@@ -1,5 +1,5 @@
 const express = require("express");
-const {consultar, agregar } = require('../controllers/ordenesController');
+const {consultar, agregar,cambiarEstadoOrden } = require('../controllers/ordenesController');
 const router = express.Router();
 
 
@@ -10,7 +10,8 @@ router.get("/", consultar );
 router.post("/", agregar );
 
 
-
+//* Update One State
+router.patch('/estado/:id', cambiarEstadoOrden );
 
 
 module.exports = router;

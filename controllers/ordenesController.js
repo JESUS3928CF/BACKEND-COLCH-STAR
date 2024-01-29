@@ -194,28 +194,29 @@ const agregar = async (req, res) => {
 // };
 
 // //! Actualizar una compra
+// cambiar el estado de la orden
+const cambiarEstadoOrden = async (req, res) => {
+    try {
+        console.log('Se hizo una estado');
+        const { estado } = req.body;
 
-// const cambiarEstado = async (req, res) => {
-//     try {
-//         console.log('Se hizo una estado');
-//         const { estado } = req.body;
+        console.log('actualizar esto', estado);
+        const id = req.params.id;
+        console.log(id);
 
-//         console.log('actualizar esto');
-//         const id = req.params.id;
-//         console.log(id);
+        const compra = await OrdenesModels.findOne({
+            where: { id_orden: id },
+        });
+        // Actualizar los valores del registro
+        compra.estado_de_orden = estado;
 
-//         const compra = await CompraModels.findOne({
-//             where: { id_compra: id },
-//         });
-//         // Actualizar los valores del registro
-//         compra.estado = !estado;
+        console.log(compra);
+        compra.save();
 
-//         compra.save();
+        res.json({ message: 'Se cambio el estado de la orden'});
+    } catch (error) {
+        res.status(500).json({ message: 'no se cambio el estado' });
+    }
+};
 
-//         res.json({ message: 'Cambio de estado' });
-//     } catch (error) {
-//         res.status(500).json({ message: 'no se cambio el estado' });
-//     }
-// };
-
-module.exports = { consultar, constOne, agregar };
+module.exports = { consultar, constOne, agregar, cambiarEstadoOrden};
