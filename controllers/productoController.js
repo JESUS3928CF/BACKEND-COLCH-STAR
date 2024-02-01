@@ -4,7 +4,8 @@ const { PrecioDisenoModels } = require("../models/PrecioDisenoModel");
 const { PrendasModels } = require("../models/PrendasModel");
 const { ProductoModels } = require("../models/ProductoModel");
 const { formatMoney } = require('../helpers/formatearDatos.js');
-const fs = require('fs')
+const fs = require('fs');
+const { MovimientosModels } = require("../models/MovimientosModels.js");
 
 
 const consultar = async (req, res) => {
@@ -132,6 +133,9 @@ const agregar = async (req, res) => {
             });
         }
 
+        await MovimientosModels.create({descripcion:'Nuevo producto creado'})
+
+
         /// Mensaje de respuesta
         res.json({
             message: 'Producto agregado exitosamente', nuevoProducto
@@ -202,6 +206,8 @@ const actualizar = async (req, res) => {
         await DetalleDiseñoModels.destroy({ where: { fk_diseno: id } });
         await DetalleDiseñoModels.destroy({ where: { fk_precio_diseno: id } });
         await DetalleDiseñoModels.destroy({ where: { fk_producto: id } });
+        await MovimientosModels.create({descripcion:`Se actualizo el producto #${id}`})
+
 
         for (let value of disenosArray) {
             await DetalleDiseñoModels.create({
@@ -235,6 +241,9 @@ const cambiarEstado = async (req, res) => {
 
         producto.save();
 
+        await MovimientosModels.create({descripcion:`Se cambio el estado al producto #${id}`})
+
+
         res.json({ message: 'Cambio de estado' });
     } catch (error) {
         res.status(500).json({ message: 'no se cambio el estado' });
@@ -255,6 +264,8 @@ const cambiarPublicacion = async (req, res)=>{
         producto.publicado=!estado
 
         producto.save()
+        await MovimientosModels.create({descripcion:`Se cambio el estado de la publicacion al producto #${id}`})
+
 
         res.status(200).json({ message: 'Se cambio el estado de publicación' });
 

@@ -1,5 +1,6 @@
 const{colorModels}= require('../models/colorModel')
-const {colorsPrendasmodel} = require('../models/ColorsPrendasModels.js')
+const {colorsPrendasmodel} = require('../models/ColorsPrendasModels.js');
+const { MovimientosModels } = require('../models/MovimientosModels.js');
 const { PrendasModels } = require("../models/PrendasModel.js");
 
 
@@ -36,14 +37,15 @@ const addColors = async(req,res)=>{
             })
         }
 
-
-
-
-
          await colorModels.create({
             color,
             codigo
         });
+
+        await MovimientosModels.create({descripcion:`Nuevo color creado`})
+
+
+
         res.status(200).json('Color agregado correctamente')
     }catch(e){
         res.status(500).json({e: 'Error al agregar'})
@@ -65,6 +67,8 @@ const updateColors = async(req,res)=>{
         colorsUpdate.codigo=codigo
     
         colorsUpdate.save()
+        await MovimientosModels.create({descripcion: `Se actualizo el color # ${id}`})
+
     
         res.status(200).json({message: 'Actualizacion de color exitosa'})
     

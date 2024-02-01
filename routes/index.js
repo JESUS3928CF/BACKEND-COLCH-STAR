@@ -17,6 +17,7 @@ const routerCompra = require('./compraRoutes')
 const routerCompraDetalles = require('./compraDetallesRouter')
 const routerDetalleOrden = require('./DetalleOrdenRouter')
 const routerOrdenes = require('./ordenesRoutes')
+const routerMovimientos= require('./movimientosRouter')
 
 
 
@@ -42,8 +43,7 @@ function routerApi(app){
     router.use('/compraDetalles',routerCompraDetalles)
     router.use('/DetalleOrden',routerDetalleOrden)
     router.use('/ordenes',routerOrdenes)
-
-
+    router.use('/movimientos',routerMovimientos)
 }
 
 

@@ -1,3 +1,4 @@
+const { MovimientosModels } = require("../models/MovimientosModels");
 const { ProveedorModels } = require("../models/ProveedorModel");
 
 
@@ -57,6 +58,9 @@ const agregar = async (req, res) => {
 
         });
 
+        await MovimientosModels.create({descripcion: 'Nuevo proveedor agregado'})
+
+
         /// Mensaje de respuesta
         res.json({
             message: 'Proveedor agregado exitosamente', nuevoProveedor
@@ -111,6 +115,9 @@ const actualizar = async (req, res) => {
 
         proveedor.save();
 
+        await MovimientosModels.create({descripcion:`Se actualizo el proveedor #${id}`})
+
+
 
 
         res.json({ message: 'Actualización exitosa', proveedor});
@@ -136,6 +143,8 @@ const cambiarEstado = async (req, res) => {
         proveedor.estado = !estado;
 
         proveedor.save();
+        await MovimientosModels.create({descripcion:`Se cambio el estado del proveedor #${id}`})
+
 
         res.json({ message: 'Cambio de estado' });
     } catch (error) {
