@@ -133,68 +133,33 @@ const agregar = async (req, res) => {
     }
 };
 
-// const actualizar = async (req, res) => {
-//     try {
-//         const { total_de_compra, fecha, fk_proveedor, DetallesCompras } =
-//             req.body;
-//         const id_compra = req.params.id;
 
-//         // Verifica si la compra existe
-//         const compraExistente = await CompraModels.findByPk(id_compra);
+//! Editar la orden
 
-//         // Actualiza los campos de la compra
-//         compraExistente.total_de_compra = total_de_compra;
-//         compraExistente.fecha = fecha;
-//         compraExistente.fk_proveedor = fk_proveedor;
+const actualizar = async  (req, res) => {
+    const { fecha_entrega, precio_total, fk_cliente, detallesOrdenes } =
+        req.body;
 
-//         // Guarda los cambios en la base de datos
-//         await compraExistente.save();
+    const id = req.params.id;
 
-//         // Actualiza o agrega nuevos detalles de la compra
-//         for (let value of DetallesCompras) {
-//             if (value.id_detalle_compra) {
-//                 // Si tiene un ID, intenta actualizar el detalle existente
-//                 const detalleCompraExistente =
-//                     await DetalleCompraModels.findByPk(value.id_detalle_compra);
+    try {
+        const orden = await OrdenesModels.findOne({
+            where: { id_orden: id },
+        });
 
-//                 if (!detalleCompraExistente) {
-//                     // Trata el caso donde el detalle de compra no existe
-//                     console.log(
-//                         `El detalle de compra con ID ${value.id_detalle_compra} no existe.`
-//                     );
-//                     continue;
-//                 }
+        // Actualizar los valores del registro
+        orden.fk_cliente = fk_cliente;
+        orden.fecha_entrega = fecha_entrega;
+        orden.precio_total = precio_total;
+        orden.save();
 
-//                 // Actualiza los campos del detalle de compra
-//                 detalleCompraExistente.cantidad = value.cantidad;
-//                 detalleCompraExistente.precio = value.precio;
-//                 detalleCompraExistente.diseno = value.diseno;
-//                 detalleCompraExistente.fk_prenda = value.fk_prenda;
+        res.json({ message: 'Orden actualizada con éxito' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error al actualizar la orden' });
+    }
 
-//                 // Guarda los cambios en la base de datos
-//                 await detalleCompraExistente.save();
-//             } else {
-//                 // Si no tiene un ID, crea un nuevo detalle de compra
-//                 await DetalleCompraModels.create({
-//                     fk_compra: id_compra,
-//                     cantidad: value.cantidad,
-//                     precio: value.precio,
-//                     diseno: value.diseno,
-//                     fk_prenda: value.fk_prenda,
-//                 });
-//             }
-//         }
-
-//         // Mensaje de respuesta
-//         res.json({
-//             message: 'Compra actualizada exitosamente',
-//         });
-//     } catch (error) {
-//         console.error(error);
-//         // Envía una respuesta al cliente indicando el error
-//         res.status(500).json({ message: 'Error al actualizar la compra' });
-//     }
-// };
+    
+}
 
 // //! Actualizar una compra
 // cambiar el estado de la orden
@@ -222,4 +187,10 @@ const cambiarEstadoOrden = async (req, res) => {
     }
 };
 
-module.exports = { consultar, constOne, agregar, cambiarEstadoOrden};
+module.exports = {
+    consultar,
+    constOne,
+    agregar,
+    cambiarEstadoOrden,
+    actualizar,
+};

@@ -1,5 +1,10 @@
 const express = require("express");
-const {consultar, agregar,cambiarEstadoOrden } = require('../controllers/ordenesController');
+const {
+    consultar,
+    agregar,
+    cambiarEstadoOrden,
+    actualizar,
+} = require('../controllers/ordenesController');
 const router = express.Router();
 
 
@@ -8,6 +13,9 @@ router.get("/", consultar );
 
 //* Insert One
 router.post("/", agregar );
+
+//* Update One State
+router.patch('/:id', actualizar );
 
 
 //* Update One State
