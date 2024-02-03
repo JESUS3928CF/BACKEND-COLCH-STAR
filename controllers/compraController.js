@@ -1,6 +1,7 @@
 const {formatDate, formatMoney} = require('../helpers/formatearDatos.js');
 
 const { CompraModels } = require('../models/CompraModel');
+const { MovimientosModels } = require('../models/MovimientosModels.js');
 const { PrendasModels } = require('../models/PrendasModel.js');
 const { ProveedorModels } = require('../models/ProveedorModel');
 const { DetalleCompraModels } = require('../models/compraDetallesModel.js');
@@ -99,6 +100,9 @@ const agregar = async (req, res) => {
             });
         }
 
+         await MovimientosModels.create({descripcion:'Nueva  compra registrada'})
+
+
         /// Mensaje de respuesta
         res.json({
             message: 'Compra agregada exitosamente',
@@ -150,6 +154,11 @@ const actualizar = async (req, res) => {
 
                 // Guarda los cambios en la base de datos
                 await detalleCompraExistente.save();
+                await MovimientosModels.create({descripcion: `Se modifico la compra # ${id_compra}`})
+
+
+
+
             } else {
                 // Si no tiene un ID, crea un nuevo detalle de compra
                 await DetalleCompraModels.create({
@@ -159,6 +168,9 @@ const actualizar = async (req, res) => {
                     diseno: value.diseno,
                     fk_prenda: value.fk_prenda,
                 });
+
+                await MovimientosModels.create({descripcion:`Nuevo detalle de compra para el id: # ${id_compra}`})
+
             }
         }
 
@@ -191,6 +203,9 @@ const cambiarEstado = async (req, res) => {
         compra.estado = !estado;
 
         compra.save();
+
+        await MovimientosModels.create({descripcion:`Se cambio el estado al la compra# ${id}`})
+
 
         res.json({ message: 'Cambio de estado' });
     } catch (error) {

@@ -1,5 +1,6 @@
 const {DisenoModels} = require('../models/DisenoModel.js');
-const fs = require('fs')
+const fs = require('fs');
+const { MovimientosModels } = require('../models/MovimientosModels.js');
 
 const consultar = async (req, res) => {
     try {
@@ -32,6 +33,9 @@ const agregar = async (req, res) => {
             imagen : req.file.filename,
             publicado
         });
+
+        await MovimientosModels.create({descripcion:'Nuevo diseño agregado'})
+
 
         /// Mensaje de respuesta
         res.json({
@@ -80,6 +84,8 @@ const actualizar = async (req, res) => {
         }
 
         diseno.save();
+        await MovimientosModels.create({descripcion:`Se actualizo el diseño #${id}`})
+
 
         res.json({ message: 'Actualización exitosa' });
     } catch (error) {
@@ -103,6 +109,9 @@ const cambiarEstado = async (req, res) => {
 
         diseno.save();
 
+        await MovimientosModels.create({descripcion:`Se cambio el estado al diseño # ${id}`})
+
+
         res.json({ message: 'Cambio de estado' });
     } catch (error) {
         res.status(500).json({ message: 'No se cambio el estado' });
@@ -122,6 +131,9 @@ const cambiarPublicacion = async (req, res) => {
         diseno.publicado = !estado;
 
         diseno.save();
+
+        await MovimientosModels.create({descripcion:`Se cambio el estado de publicación del diseño #${id}`})
+
 
         res.status(200).json({ message: 'Se cambio el estado de publicación' });
     } catch (error) {

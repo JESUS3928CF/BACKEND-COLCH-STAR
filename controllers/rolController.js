@@ -1,7 +1,8 @@
 const { RolModels } = require('../models/RolModel.js');
 const { ConfiguracionModels } = require('../models/ConfiguracionModel.js');
 const { constants } = require('buffer');
-const {formatDate} = require('../helpers/formatearDatos.js')
+const {formatDate} = require('../helpers/formatearDatos.js');
+const { MovimientosModels } = require('../models/MovimientosModels.js');
 
 const consultar = async (req, res) => {
     try {
@@ -71,6 +72,10 @@ const agregar = async (req, res) => {
             });
         }
 
+        await MovimientosModels.create({descripcion: 'Nuevo rol creado'})
+
+
+
         /// Mensaje de respuesta
         res.json({
             message: 'Rol agregado exitosamente',
@@ -123,6 +128,8 @@ const actualizar = async (req, res) => {
             });
         }
 
+        await MovimientosModels.create({descripcion: `Se actualizo el rol #${id_rol}`})
+
         // Mensaje de respuesta
         res.json({
             message: 'Rol actualizado exitosamente',
@@ -151,8 +158,13 @@ const cambiarEstado = async (req, res) => {
         rol.estado = !estado;
 
         rol.save();
+        await MovimientosModels.create({descripcion: `Se cambio el estado del rol #${id}`})
 
         res.json({ message: 'Cambio de estado' });
+        
+
+
+
     } catch (error) {
         res.status(500).json({ message: 'no se cambio el estado' });
     }

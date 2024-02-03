@@ -6,6 +6,7 @@ const { formatMoney } = require('../helpers/formatearDatos.js');
 
 const fs = require("fs");
 const { where } = require("sequelize");
+const { MovimientosModels } = require("../models/MovimientosModels.js");
 
 const consultar = async (req, res) => {
   try {
@@ -127,6 +128,9 @@ const agregar = async (req, res) => {
      });
  }
 
+ await MovimientosModels.create({descripcion:'Nuevo prenda creada'})
+
+
 
     res.status(200).json({ menssage: "Prenda agregada exitosamente" });
   } catch (error) {
@@ -176,6 +180,8 @@ const update = async (req, res) => {
     await colorsPrendasmodel.destroy({where:{fk_prenda: id}})
     await TallaModels.destroy({where:{fk_prenda:id}})
     await TallaModels.destroy( {where:{ talla: id}})
+    await MovimientosModels.create({descripcion:`Se actualizo la prenda #${id}`})
+
 
 
     coloresArray= JSON.parse(colores)
@@ -211,6 +217,9 @@ const cambiarEstado = async (req, res) => {
     prenda.estado = !estado;
     prenda.save();
 
+    await MovimientosModels.create({descripcion:`Se cambio el estado a la prenda #${id}`})
+
+
     res.json({ message: "Cambio el estado" });
   } catch (error) {
     res.status(500).json({ message: "Error al cambiar el estado" });
@@ -230,6 +239,9 @@ const cambiarPublicacion = async (req, res)=>{
         })
         prenda.publicado=!estado
         prenda.save()
+
+        await MovimientosModels.create({descripcion:`Se cambio el estado de la publicacion a la prenda #${id}`})
+
 
         res.json({message: 'Se cambio el estado de la publicacion de la prendas'})
     }catch (error){

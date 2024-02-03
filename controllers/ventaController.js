@@ -1,4 +1,5 @@
 const { ClienteModels } = require("../models/ClienteModel");
+const { MovimientosModels } = require("../models/MovimientosModels");
 const { VentaModels } = require("../models/VentaModel");
 
 //! Consultar un registro relacionado con Sequelize
@@ -45,6 +46,8 @@ const agregar = async (req, res) => {
             fk_cliente,
         });
 
+        await MovimientosModels.create({descripcion:'Nueva venta agregada'})
+
         /// Respuesta
         res.json({ "message " : "Venta Agregada Exitosamente"})
     } catch (error) {
@@ -82,6 +85,8 @@ const actualizar = async (req, res) => {
         venta.fk_cliente = fk_cliente;
 
         venta.save();
+        await MovimientosModels.create({descripcion:`Se actualizo la venta #${id}`})
+
 
         res.json({ message: 'Actualización exitosa' });
     } catch (error) {
@@ -105,6 +110,9 @@ const cambiarEstado = async (req, res) => {
         // Ahora puedes actualizar el estado de la venta
         venta.estado = !estado;
         await venta.save();
+
+        await MovimientosModels.create({descripcion:`Se cambio el estado de la venta #${id}`})
+
 
         res.status(200).json({
             message: 'Estado de la venta actualizado exitosamente'

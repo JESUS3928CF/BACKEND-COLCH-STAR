@@ -4,6 +4,7 @@ const { OrdenesModels } = require('../models/OrdenesModel.js');
 const { ClienteModels } = require('../models/ClienteModel.js');
 const { ProductoModels } = require('../models/ProductoModel.js');
 const { DetalleOrdenModels } = require('../models/DetalleOrdenModel.js');
+const { MovimientosModels } = require('../models/MovimientosModels.js');
 
 
 const consultar = async (req, res) => {
@@ -118,6 +119,8 @@ const agregar = async (req, res) => {
                 color: value.color || null,
             });
         }
+
+        await MovimientosModels.create({descripcion:'Nueva orden agregada'})
 
         /// Mensaje de respuesta
         res.json({

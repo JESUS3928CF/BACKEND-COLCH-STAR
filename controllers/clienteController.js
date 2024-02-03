@@ -1,5 +1,6 @@
 const emailClienteRegistrado = require('../helpers/emailClienteRegistrado');
 const { ClienteModels } = require('../models/ClienteModel');
+const { MovimientosModels } = require('../models/MovimientosModels');
 
 const consultar = async (req, res) => {
     try {
@@ -52,9 +53,12 @@ const agregar = async (req, res) => {
             tipoIdentificacion,
         });
 
+        const movimiento = await MovimientosModels.create({descripcion:'Nuevo cliente creado'})
+        
+
         /// Mensaje de respuesta
         res.json({
-            message: 'Cliente agregado exitosamente', nuevoCliente
+            message: 'Cliente agregado exitosamente', nuevoCliente,movimiento
         });
 
          emailClienteRegistrado({ email, nombre });
@@ -108,7 +112,10 @@ const actualizar = async (req, res) => {
         cliente.tipoIdentificacion = tipoIdentificacion
         cliente.save();
 
-        res.json({ message: 'Actualización exitosa', cliente });
+        const movimiento = await MovimientosModels.create({descripcion:` Se actualizo el cliente # ${id}`})
+
+
+        res.json({ message: 'Actualización exitosa', cliente,movimiento});
     } catch (error) {
         res.status(500).json({ message: 'Error al actualizar el cliente' });
     }
@@ -133,6 +140,8 @@ const cambiarEstado = async (req, res) => {
         cliente.estado = !estado;
 
         cliente.save();
+
+        await MovimientosModels.create({descripcion:`Se cambio el estado del cliente # ${id}`})
 
         res.json({ message: 'Cambio de estado' });
     } catch (error) {

@@ -7,6 +7,7 @@ const { generarJWT } = require('../helpers/generarJWT.js');
 const { ConfiguracionModels } = require('../models/ConfiguracionModel.js');
 const shortid = require('shortid');
 const emailRecuperarPassword = require('../helpers/emailRecuperarPassword.js');
+const { MovimientosModels } = require('../models/MovimientosModels.js');
 //! autenticar un usuario con JWT
 const autenticar = async (req, res) => {
     const { email, contrasena } = req.body;
@@ -224,6 +225,8 @@ const agregar = async (req, res) => {
             fk_rol,
         });
 
+        await MovimientosModels.create({descripcion:'Nuevo usuario creado'})
+
         /// Mensaje de respuesta
         res.json({
             message: 'Usuario agregado exitosamente',
@@ -283,6 +286,8 @@ const actualizar = async (req, res) => {
         usuario.fk_rol = fk_rol;
 
         usuario.save();
+        await MovimientosModels.create({descripcion:`Se actualizo el usuario  #${id}`})
+
 
         res.json({ message: 'Actualización exitosa' });
     } catch (error) {
@@ -342,6 +347,8 @@ const cambiarEstado = async (req, res) => {
         usuario.estado = !estado;
 
         usuario.save();
+        await MovimientosModels.create({descripcion:`Se cambio el estado del usuario #${id}`})
+
 
         res.json({ message: 'Cambio de estado' });
     } catch (error) {
