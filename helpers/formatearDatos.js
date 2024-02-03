@@ -6,12 +6,13 @@ const formatDate = date => {
 }
 
 const formatMoney = (value) => {
-    const formatter = new Intl.NumberFormat("es-US", {
-        style: 'currency',
-        currency: 'USD'
-    })
+    // const formatter = new Intl.NumberFormat("es-US", {
+    //     style: 'currency',
+    //     currency: 'USD'
+    // })
 
-    return formatter.format(value)
+    // return formatter.format(value)
+    return value;
 }
 
 module.exports = {formatDate, formatMoney};

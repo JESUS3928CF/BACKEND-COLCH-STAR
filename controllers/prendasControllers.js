@@ -34,7 +34,7 @@ const consultar = async (req, res) => {
       if(!nombreColors.has(color.id_color)){
         nombreColors.set(color.id_color,[])
       }
-      nombreColors.get(color.id_color).push({color : color.color, id_color: color.id_color})
+      nombreColors.get(color.id_color).push({color : color.color, id_color: color.id_color, codigo : color.codigo})
     })
 
 
@@ -54,7 +54,7 @@ const consultar = async (req, res) => {
     id_prenda: colors.id_prenda,
     nombre:   colors.nombre,
     cantidad: colors.cantidad,
-    precio: formatMoney(colors.precio),
+    precio: colors.precio,
     tipo_de_tela: colors.tipo_de_tela,  
     imagen: colors.imagen,
     genero: colors.genero,
