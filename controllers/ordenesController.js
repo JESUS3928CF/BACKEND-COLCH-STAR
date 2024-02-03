@@ -6,7 +6,6 @@ const { ProductoModels } = require('../models/ProductoModel.js');
 const { DetalleOrdenModels } = require('../models/DetalleOrdenModel.js');
 const { MovimientosModels } = require('../models/MovimientosModels.js');
 
-
 const consultar = async (req, res) => {
     try {
         /// Consultando todos los registros
@@ -14,7 +13,12 @@ const consultar = async (req, res) => {
             include: [
                 {
                     model: ClienteModels,
-                    attributes: ['nombre', 'apellido', 'identificacion', 'direccion' ],
+                    attributes: [
+                        'nombre',
+                        'apellido',
+                        'identificacion',
+                        'direccion',
+                    ],
                 },
             ],
         });
@@ -28,8 +32,6 @@ const consultar = async (req, res) => {
                 },
             ],
         });
-
-
 
         //* Mapa para almacenar los detalles por ventas
         const detallesPorOrden = new Map();
@@ -45,7 +47,8 @@ const consultar = async (req, res) => {
 
         // Asociar detalles con cordenes
         const ordenesConDetalles = ordenes.map((orden) => {
-            orden.dataValues.detalles = detallesPorOrden.get(orden.id_orden) || [];
+            orden.dataValues.detalles =
+                detallesPorOrden.get(orden.id_orden) || [];
 
             // Validar la fecha antes de formatear
             if (!isNaN(Date.parse(orden.fecha_entrega))) {
@@ -61,18 +64,13 @@ const consultar = async (req, res) => {
             return orden;
         });
 
-
-
         //- Forma de inviar un JSON
         res.status(200).json(ordenesConDetalles);
     } catch (error) {
-        console.log('Error al consultar la tabla compras:', error);
-        res.status(500).json({ error: 'Error al consultar la tabla compras' });
+        console.log('Error al consultar la tabla ordenes:', error);
+        res.status(500).json({ error: 'Error al consultar la tabla ordenes' });
     }
 };
-
-
-
 
 const constOne = async (req, res) => {
     try {
@@ -87,13 +85,17 @@ const constOne = async (req, res) => {
     }
 };
 
-
 // //! Agregar una orden
 
 const agregar = async (req, res) => {
     try {
-        const { fecha_entrega, precio_total, estado_de_orden, fk_cliente, detallesOrdenes } =
-            req.body;
+        const {
+            fecha_entrega,
+            precio_total,
+            estado_de_orden,
+            fk_cliente,
+            detallesOrdenes,
+        } = req.body;
 
         console.log(req.body);
 
@@ -120,7 +122,7 @@ const agregar = async (req, res) => {
             });
         }
 
-        await MovimientosModels.create({descripcion:'Nueva orden agregada'})
+        await MovimientosModels.create({ descripcion: 'Nueva orden agregada' });
 
         /// Mensaje de respuesta
         res.json({
@@ -129,15 +131,14 @@ const agregar = async (req, res) => {
     } catch (error) {
         console.log(error);
         // Envía una respuesta al cliente indicando el error
-        res.status(500).json({ message: 'Error al agregar la compra' });
+        res.status(500).json({ message: 'Error al agregar la orden' });
     }
 };
 
-
 //! Editar la orden
 
-const actualizar = async  (req, res) => {
-    const { fecha_entrega, precio_total, fk_cliente, detallesOrdenes } =
+const actualizar = async (req, res) => {
+    const { fecha_entrega, precio_total, fk_cliente, detalles } =
         req.body;
 
     const id = req.params.id;
@@ -153,13 +154,32 @@ const actualizar = async  (req, res) => {
         orden.precio_total = precio_total;
         orden.save();
 
+        // Elimina los detalles existentes para esta orden
+        await DetalleOrdenModels.destroy({ where: { fk_orden: id } });
+
+        // Inserta los nuevos permisos para el rol
+        for (let value of detalles) {
+            await DetalleOrdenModels.create({
+                fk_orden: id,
+                cantidad: value.cantidad,
+                subtotal: value.subtotal,
+                descripcion: value.descripcion,
+                fk_producto: value.fk_producto,
+                talla: value.talla,
+                color: value.color,
+            });
+        }
+
+        await MovimientosModels.create({
+            descripcion: `Se actualizo la orden #${id}`,
+        });
+
         res.json({ message: 'Orden actualizada con éxito' });
     } catch (error) {
+        console.log(error)
         res.status(500).json({ message: 'Error al actualizar la orden' });
     }
-
-    
-}
+};
 
 // //! Actualizar una compra
 // cambiar el estado de la orden
@@ -181,7 +201,7 @@ const cambiarEstadoOrden = async (req, res) => {
         console.log(compra);
         compra.save();
 
-        res.json({ message: 'Se cambio el estado de la orden'});
+        res.json({ message: 'Se cambio el estado de la orden' });
     } catch (error) {
         res.status(500).json({ message: 'no se cambio el estado' });
     }

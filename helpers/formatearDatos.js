@@ -6,7 +6,7 @@ const formatDate = date => {
 
 const formatMoney = (value) => {
 
-    return formatter.format(value)
+    return (value)
 }
 
 module.exports = {formatDate, formatMoney};
