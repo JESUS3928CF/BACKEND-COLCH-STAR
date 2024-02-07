@@ -97,6 +97,19 @@ const agregar = async (req, res) => {
             return res.json({ message: `Error la imagen del diseño es requerida` });
         }
 
+
+        // Verificar si el nombre ya está ocupado
+        const nombreOcupado = await ProductoModels.findOne({
+            where: { nombre: nombre },
+        });
+
+        if (nombreOcupado) {
+            return res.status(403).json({
+                message: 'Ya existe este Producto',
+                nombreOcupado,
+            });
+        }
+
         //! Obtener el precio de la prenda
         const prenda = await PrendasModels.findByPk(fk_prenda);
         const precioPrenda = parseFloat(prenda.precio);
@@ -156,6 +169,9 @@ const actualizar = async (req, res) => {
         const { nombre, cantidad, fk_prenda, publicado, disenos } = req.body;
         const id = req.params.id;
         console.log(id);
+
+
+        
 
         const producto = await ProductoModels.findOne({
             where: { id_producto: id },
