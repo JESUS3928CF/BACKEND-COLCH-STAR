@@ -10,7 +10,7 @@ const { MovimientosModels } = require("../models/MovimientosModels.js");
 
 const consultar = async (req, res) => {
   try {
-    //Consulatr los registros de las prendas
+    //Consular los registros de las prendas
     const prendas = await PrendasModels.findAll();
     const colors = await colorModels.findAll();
     const colorsPrenda = await colorsPrendasmodel.findAll();
@@ -87,52 +87,64 @@ const consultar = async (req, res) => {
 
 const agregar = async (req, res) => {
   try {
+      const {
+          nombre,
+          cantidad,
+          precio,
+          tipo_de_tela,
+          genero,
+          publicado,
+          colores,
+          tallas,
+      } = req.body;
 
-
-    const { nombre, cantidad, precio, tipo_de_tela, genero, publicado, colores,tallas } = req.body;
-
-    console.log("Datos que se enviaran a la db", req.body);
-    console.log("img", req.file);
-
-    if (!req.file) {
-      return res.json({
-        message: `Error la imagen de la prenda es obligatoria`,
+      // Verificar si el nombre ya está ocupado
+      const nombreOcupado = await PrendasModels.findOne({
+          where: { nombre: nombre },
       });
-    }
 
-    const newPrenda= await PrendasModels.create({
-      nombre,
-      cantidad,
-      precio,
-      tipo_de_tela,
-      imagen: req.file.filename,
-      genero,
-      publicado,
-      
-    });
+      if (nombreOcupado) {
+          return res.status(403).json({
+              message: 'Ya existe esta prenda',
+              nombreOcupado,
+          });
+      }
 
-    coloresArray= JSON.parse(colores)
+      if (!req.file) {
+          return res.json({
+              message: `Error la imagen de la prenda es obligatoria`,
+          });
+      }
 
-
-    for (let value of coloresArray) {
-     await colorsPrendasmodel.create({
-          fk_color: value.id_color,
-          fk_prenda: newPrenda.id_prenda, 
+      const newPrenda = await PrendasModels.create({
+          nombre,
+          cantidad,
+          precio,
+          tipo_de_tela,
+          imagen: req.file.filename,
+          genero,
+          publicado,
       });
-  }
 
-  for (let value of tallas) {
-    await TallaModels.create({
-         talla: value,
-         fk_prenda: newPrenda.id_prenda, 
-     });
- }
+      coloresArray = JSON.parse(colores);
 
- await MovimientosModels.create({descripcion:'Nuevo prenda creada'})
+      for (let value of coloresArray) {
+          await colorsPrendasmodel.create({
+              fk_color: value.id_color,
+              fk_prenda: newPrenda.id_prenda,
+          });
+      }
 
+      for (let value of tallas) {
+          await TallaModels.create({
+              talla: value,
+              fk_prenda: newPrenda.id_prenda,
+          });
+      }
 
+      await MovimientosModels.create({ descripcion: 'Nuevo prenda creada' });
 
-    res.status(200).json({ menssage: "Prenda agregada exitosamente" });
+      res.status(200).json({ menssage: 'Prenda agregada exitosamente' });
   } catch (error) {
     res.status(500).json({ message: "Error al agregar prenda" });
     console.log(error);
@@ -141,68 +153,90 @@ const agregar = async (req, res) => {
 
 const update = async (req, res) => {
   try {
+      const {
+          nombre,
+          cantidad,
+          precio,
+          tipo_de_tela,
+          genero,
+          publicado,
+          colores,
+          tallas,
+      } = req.body;
 
-    const { nombre, cantidad, precio, tipo_de_tela,genero,publicado,colores,tallas} = req.body;
+      const id = req.params.id;
 
-    const id = req.params.id;
-
-    const prenda= await PrendasModels.findOne({
-      where: {id_prenda:id}
-    })
-
-    prenda.nombre=nombre;
-    prenda.cantidad=cantidad;
-    prenda.precio=precio;
-    prenda.tipo_de_tela=tipo_de_tela;
-    prenda.genero=genero;
-    prenda.publicado= publicado;
-
-
-
-    if(req.file){
-        const imagenPath = 'uploads/prenda/'+ prenda.imagen;
-        if(imagenPath && fs.existsSync(imagenPath)){
-            fs.unlink(imagenPath,(error)=>{
-              if(error){
-                console.error('Error al eliminar la imagen',error)
-                return next();
-                
-              }
-            });
-            
-        }
-        prenda.imagen=req.file.filename
-    }
-
-    prenda.save()
-
-    await colorsPrendasmodel.destroy({where:{fk_color: id}});
-    await colorsPrendasmodel.destroy({where:{fk_prenda: id}})
-    await TallaModels.destroy({where:{fk_prenda:id}})
-    await TallaModels.destroy( {where:{ talla: id}})
-    await MovimientosModels.create({descripcion:`Se actualizo la prenda #${id}`})
-
-
-
-    coloresArray= JSON.parse(colores)
-    for (let value of coloresArray) {
-     await colorsPrendasmodel.create({
-          fk_color: value.id_color,
-          fk_prenda: prenda.id_prenda, 
+      // Verificar si el nombre ya está ocupado
+      const nombreOcupado = await PrendasModels.findOne({
+          where: { nombre: nombre },
       });
-  }
 
-   for (let value of tallas) {
-    await TallaModels.create({
-         talla: value,
-         fk_prenda: prenda.id_prenda, 
-     });
- }
+      // Si el nombre ha cambiado, verifica si el nuevo nombre ya está ocupado
+      if (nombre !== nombreOcupado.nombre) {
+          const nombreOcupado = await PrendasModels.findOne({
+              where: { nombre: nombre },
+          });
 
+          if (nombreOcupado) {
+              return res.status(403).json({
+                  message: 'Ya existe esta prenda',
+                  nombreOcupado,
+              });
+          }
+      }
 
-    res.json({
-      message: "Actualizacion exitosa",
-    });
+      const prenda = await PrendasModels.findOne({
+          where: { id_prenda: id },
+      });
+
+      prenda.nombre = nombre;
+      prenda.cantidad = cantidad;
+      prenda.precio = precio;
+      prenda.tipo_de_tela = tipo_de_tela;
+      prenda.genero = genero;
+      prenda.publicado = publicado;
+
+      if (req.file) {
+          const imagenPath = 'uploads/prenda/' + prenda.imagen;
+          if (imagenPath && fs.existsSync(imagenPath)) {
+              fs.unlink(imagenPath, (error) => {
+                  if (error) {
+                      console.error('Error al eliminar la imagen', error);
+                      return next();
+                  }
+              });
+          }
+          prenda.imagen = req.file.filename;
+      }
+
+      prenda.save();
+
+      await colorsPrendasmodel.destroy({ where: { fk_color: id } });
+      await colorsPrendasmodel.destroy({ where: { fk_prenda: id } });
+      await TallaModels.destroy({ where: { fk_prenda: id } });
+      await TallaModels.destroy({ where: { talla: id } });
+      await MovimientosModels.create({
+          descripcion: `Se actualizo la prenda #${id}`,
+      });
+
+      coloresArray = JSON.parse(colores);
+      for (let value of coloresArray) {
+          await colorsPrendasmodel.create({
+              fk_color: value.id_color,
+              fk_prenda: prenda.id_prenda,
+          });
+      }
+
+      for (let value of tallas) {
+          await TallaModels.create({
+              talla: value,
+              fk_prenda: prenda.id_prenda,
+          });
+      }
+
+      res.json({
+          message: 'Actualizacion exitosa',
+      });
   } catch (error) {
     res.status(500).json({ massge: "Error al actualizar la prendas" });
     console.log(error);
