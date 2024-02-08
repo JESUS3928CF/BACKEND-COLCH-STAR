@@ -10,7 +10,6 @@ const PrendasModels = db.define(
             primaryKey:true,
             autoIncrement:true,
         },
-
         nombre: {
             type:Sequelize.STRING,
         },
