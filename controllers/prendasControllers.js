@@ -164,15 +164,18 @@ const update = async (req, res) => {
           tallas,
       } = req.body;
 
+      console.log(nombre);
+
       const id = req.params.id;
 
-      // Verificar si el nombre ya está ocupado
-      const nombreOcupado = await PrendasModels.findOne({
-          where: { nombre: nombre },
+    
+      
+      const prenda = await PrendasModels.findOne({
+          where: { id_prenda: id },
       });
 
       // Si el nombre ha cambiado, verifica si el nuevo nombre ya está ocupado
-      if (nombre !== nombreOcupado.nombre) {
+      if (nombre !== prenda.nombre) {
           const nombreOcupado = await PrendasModels.findOne({
               where: { nombre: nombre },
           });
@@ -184,10 +187,6 @@ const update = async (req, res) => {
               });
           }
       }
-
-      const prenda = await PrendasModels.findOne({
-          where: { id_prenda: id },
-      });
 
       prenda.nombre = nombre;
       prenda.cantidad = cantidad;
@@ -235,7 +234,7 @@ const update = async (req, res) => {
       }
 
       res.json({
-          message: 'Actualizacion exitosa',
+          message: 'Actualización exitosa',
       });
   } catch (error) {
     res.status(500).json({ massge: "Error al actualizar la prendas" });
@@ -274,12 +273,12 @@ const cambiarPublicacion = async (req, res)=>{
         prenda.publicado=!estado
         prenda.save()
 
-        await MovimientosModels.create({descripcion:`Se cambio el estado de la publicacion a la prenda #${id}`})
+        await MovimientosModels.create({descripcion:`Se cambio el estado de la publicación a la prenda #${id}`})
 
 
-        res.json({message: 'Se cambio el estado de la publicacion de la prendas'})
+        res.json({message: 'Se cambio el estado de la publicación de la prendas'})
     }catch (error){
-        res.status(500).json({message: 'No se cambio el estado de la publicacion'})
+        res.status(500).json({message: 'No se cambio el estado de la publicación'})
     }
 }
 
