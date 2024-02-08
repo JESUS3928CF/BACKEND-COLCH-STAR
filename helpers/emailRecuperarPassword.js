@@ -19,10 +19,23 @@ const emailRecuperarPassword = async (data) => {
             to: email, //* A quien se le envía
             subject: 'Restablece tu contraseña', //* Objetivo del email
             text: 'Restablece tu contraseña', //* Una versión sin html del objetivo
-            html: `<p> 👋 Hola ${nombre}, Has solicitado restablecer tu contraseña en la aplicación de Colch Star</p>
-            <p>Sigue el siguiente enlace para generar una nueva contraseña</p>
-	         <a href="${process.env.FRONTEND_URL_WEB}/recuperar-password/:${token}"> Ir a Restablecer Contraseña <a>
-             <p>Si tu no solicitases esta acción, puedes ignorar este mensaje</p>
+            html: `
+            <div style="background-color: #14131b; padding: 13px; border-radius: 4px; ">
+
+            <div style="text-align: center;">
+                <h1 style="color: white; font-size: 30px;">Colch Star</h1>
+            </div>
+        </div>
+        
+        <div style="background-color: white; padding: 20px; border-radius: 4px; margin-top: 20px; text-align: center;">
+
+            <p style = "font-size: 17px;">👋 Hola  <strong>${nombre}</strong>, Has solicitado restablecer tu contraseña en la aplicación de <strong>Colch Star</strong></p>
+            <p   style = "font-size: 15px;"> Sigue el siguiente enlace para generar una nueva contraseña</p>
+            <a href="${process.env.FRONTEND_URL_WEB}/recuperar-password/:${token}" style="display: inline-block; background-color: #14131b;; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px;"> Restablecer Contraseña</a>
+            <p style = "font-size: 15px;" >Si tú no solicitaste esta acción, puedes ignorar este mensaje.</p>
+
+        </div>
+
 	        `,
         });
         console.log('Mensaje enviado: %s', info.messageId);
