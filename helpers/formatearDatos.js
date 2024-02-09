@@ -9,4 +9,13 @@ const formatMoney = (value) => {
     return (value)
 }
 
-module.exports = {formatDate, formatMoney};
+const capitalizarPrimeraLetras = (cadena) => {
+      return cadena
+          .toLowerCase()
+          .split(' ')
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+}
+
+
+module.exports = {formatDate, formatMoney, capitalizarPrimeraLetras};
