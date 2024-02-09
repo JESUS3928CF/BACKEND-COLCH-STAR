@@ -1,4 +1,5 @@
-const {formatDate, formatMoney} = require('../helpers/formatearDatos.js');
+const { where } = require('sequelize');
+const { formatDate, formatMoney } = require('../helpers/formatearDatos.js');
 
 const { CompraModels } = require('../models/CompraModel');
 const { MovimientosModels } = require('../models/MovimientosModels.js');
@@ -98,10 +99,21 @@ const agregar = async (req, res) => {
                 precio: value.precio,
                 fk_prenda: value.fk_prenda || null,
             });
+
+            if (value.fk_prenda) {
+                const prenda = await PrendasModels.findOne({
+                    where: { id_prenda: value.fk_prenda },
+                });
+
+                prenda.cantidad =
+                    Number(prenda.cantidad) + Number(value.cantidad);
+                prenda.save();
+            }
         }
 
-         await MovimientosModels.create({descripcion:'Nueva  compra registrada'})
-
+        await MovimientosModels.create({
+            descripcion: 'Nueva  compra registrada',
+        });
 
         /// Mensaje de respuesta
         res.json({
@@ -154,11 +166,9 @@ const actualizar = async (req, res) => {
 
                 // Guarda los cambios en la base de datos
                 await detalleCompraExistente.save();
-                await MovimientosModels.create({descripcion: `Se modifico la compra # ${id_compra}`})
-
-
-
-
+                await MovimientosModels.create({
+                    descripcion: `Se modifico la compra # ${id_compra}`,
+                });
             } else {
                 // Si no tiene un ID, crea un nuevo detalle de compra
                 await DetalleCompraModels.create({
@@ -169,8 +179,9 @@ const actualizar = async (req, res) => {
                     fk_prenda: value.fk_prenda,
                 });
 
-                await MovimientosModels.create({descripcion:`Nuevo detalle de compra para el id: # ${id_compra}`})
-
+                await MovimientosModels.create({
+                    descripcion: `Nuevo detalle de compra para el id: # ${id_compra}`,
+                });
             }
         }
 
@@ -190,22 +201,53 @@ const actualizar = async (req, res) => {
 const cambiarEstado = async (req, res) => {
     try {
         console.log('Se hizo una estado');
-        const { estado } = req.body;
+        const { estado, detalle } = req.body;
 
-        console.log('actualizar esto');
+        console.log(detalle);
         const id = req.params.id;
         console.log(id);
 
         const compra = await CompraModels.findOne({
             where: { id_compra: id },
         });
+
+        let stockInsuficiente = false
+
+        for (let value of detalle) {
+            if (value.fk_prenda) {
+                const prenda = await PrendasModels.findOne({
+                    where: { id_prenda: value.fk_prenda },
+                });
+
+                if( Number(prenda.cantidad) - Number(value.cantidad) < 0){
+                    stockInsuficiente = true;
+                    break;
+                }
+            }
+        }
+
+        if(stockInsuficiente) return res.status(403).json({ message: 'los productos de esta compra han sido utilizados, no se puede cancelar' });
+
+        for (let value of detalle) {
+            if (value.fk_prenda) {
+                const prenda = await PrendasModels.findOne({
+                    where: { id_prenda: value.fk_prenda },
+                });
+
+                prenda.cantidad =
+                    Number(prenda.cantidad) - Number(value.cantidad);
+                prenda.save();
+            }
+        }
+
         // Actualizar los valores del registro
         compra.estado = !estado;
 
         compra.save();
 
-        await MovimientosModels.create({descripcion:`Se cambio el estado al la compra# ${id}`})
-
+        await MovimientosModels.create({
+            descripcion: `Se cambio el estado al la compra# ${id}`,
+        });
 
         res.json({ message: 'Cambio de estado' });
     } catch (error) {

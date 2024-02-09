@@ -10,7 +10,7 @@ const DetalleCompraModels = db.define('detalle_compra', {
             autoIncrement:true,
     },
     cantidad: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.FLOAT,
     },
     precio: {
         type: Sequelize.FLOAT,
