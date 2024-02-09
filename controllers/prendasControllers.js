@@ -2,7 +2,7 @@ const { PrendasModels } = require("../models/PrendasModel.js");
 const {colorModels}=require('../models/colorModel.js')
 const {colorsPrendasmodel} = require('../models/ColorsPrendasModels.js')
 const {TallaModels}= require('../models/TallaModel.js')
-const { formatMoney } = require('../helpers/formatearDatos.js');
+const { formatMoney, capitalizarPrimeraLetras } = require('../helpers/formatearDatos.js');
 
 const fs = require("fs");
 const { where } = require("sequelize");
@@ -117,10 +117,10 @@ const agregar = async (req, res) => {
       }
 
       const newPrenda = await PrendasModels.create({
-          nombre,
+          nombre: capitalizarPrimeraLetras(nombre),
           cantidad,
           precio,
-          tipo_de_tela,
+          tipo_de_tela: capitalizarPrimeraLetras(tipo_de_tela),
           imagen: req.file.filename,
           genero,
           publicado,
@@ -188,10 +188,10 @@ const update = async (req, res) => {
           }
       }
 
-      prenda.nombre = nombre;
+      prenda.nombre = capitalizarPrimeraLetras(nombre);
       prenda.cantidad = cantidad;
       prenda.precio = precio;
-      prenda.tipo_de_tela = tipo_de_tela;
+      prenda.tipo_de_tela = capitalizarPrimeraLetras(tipo_de_tela);
       prenda.genero = genero;
       prenda.publicado = publicado;
 
