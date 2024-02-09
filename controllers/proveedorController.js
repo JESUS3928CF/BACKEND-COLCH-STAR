@@ -1,5 +1,6 @@
 const { MovimientosModels } = require("../models/MovimientosModels");
 const { ProveedorModels } = require("../models/ProveedorModel");
+const { formatMoney, capitalizarPrimeraLetras } = require('../helpers/formatearDatos.js');
 
 
 const consultar = async (req, res) => {
@@ -50,9 +51,9 @@ const agregar = async (req, res) => {
 
         //!  Insertar un nuevo cliente en la base de datos
          const nuevoProveedor = await ProveedorModels.create({
-            nombre,
+            nombre:  capitalizarPrimeraLetras(nombre),
             telefono,
-            direccion,
+            direccion: capitalizarPrimeraLetras(direccion),
             identificador,
             tipoIdentificacion
 
@@ -107,9 +108,9 @@ const actualizar = async (req, res) => {
 
 
         // Actualizar los valores del registro
-        proveedor.nombre = nombre;
+        proveedor.nombre = capitalizarPrimeraLetras(nombre);
         proveedor.telefono = telefono;
-        proveedor.direccion = direccion;
+        proveedor.direccion = capitalizarPrimeraLetras(direccion);
         proveedor.identificador = identificador
         proveedor.tipoIdentificacion = tipoIdentificacion
 
