@@ -28,7 +28,7 @@ const consultar = async (req, res) => {
             include: [
                 {
                     model: ProductoModels, //modelo de productos
-                    attributes: ['nombre', 'imagen'], // Selecciona los atributos que necesitas, en este caso, solo el nombre y la imagen
+                    attributes: ['nombre', 'imagen','precio'], // Selecciona los atributos que necesitas, en este caso, solo el nombre y la imagen
                 },
             ],
         });
