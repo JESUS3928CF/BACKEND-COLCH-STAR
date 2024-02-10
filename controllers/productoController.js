@@ -3,7 +3,7 @@ const { DisenoModels } = require("../models/DisenoModel");
 const { PrecioDisenoModels } = require("../models/PrecioDisenoModel");
 const { PrendasModels } = require("../models/PrendasModel");
 const { ProductoModels } = require("../models/ProductoModel");
-const { formatMoney } = require('../helpers/formatearDatos.js');
+const { formatMoney , capitalizarPrimeraLetras} = require('../helpers/formatearDatos.js');
 const fs = require('fs');
 const { MovimientosModels } = require("../models/MovimientosModels.js");
 
@@ -128,7 +128,7 @@ const agregar = async (req, res) => {
 
         //! Insertar un nuevo producto en la base de datos con el precio total calculado
         const nuevoProducto = await ProductoModels.create({
-            nombre,
+            nombre: capitalizarPrimeraLetras(nombre),
             cantidad,
             precio: precioTotal, // Utilizar el precio total calculado
             imagen: req.file.filename,
@@ -192,7 +192,7 @@ const actualizar = async (req, res) => {
         const precioTotal = preciosDiseños.reduce((total, precio) => total + precio, precioPrenda);
 
         // Actualizar los valores del registro
-        producto.nombre = nombre;
+        producto.nombre = capitalizarPrimeraLetras(nombre);
         producto.cantidad = cantidad;
         producto.precio = precioTotal; // Utilizar el precio total calculado
         producto.fk_prenda = fk_prenda;

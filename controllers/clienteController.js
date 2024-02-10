@@ -1,4 +1,5 @@
 const emailClienteRegistrado = require('../helpers/emailClienteRegistrado');
+const { capitalizarPrimeraLetras } = require('../helpers/formatearDatos');
 const { ClienteModels } = require('../models/ClienteModel');
 const { MovimientosModels } = require('../models/MovimientosModels');
 
@@ -44,8 +45,8 @@ const agregar = async (req, res) => {
 
         //!  Insertar un nuevo cliente en la base de datos
         const nuevoCliente = await ClienteModels.create({
-            nombre,
-            apellido,
+            nombre: capitalizarPrimeraLetras(nombre),
+            apellido: capitalizarPrimeraLetras(apellido),
             telefono,
             email,
             direccion,
@@ -103,8 +104,8 @@ const actualizar = async (req, res) => {
     
 
         // Actualizar los valores del registro
-        cliente.nombre = nombre;
-        cliente.apellido = apellido;
+        cliente.nombre = capitalizarPrimeraLetras(nombre),
+        cliente.apellido = capitalizarPrimeraLetras(apellido),
         cliente.telefono = telefono;
         cliente.email = email;
         cliente.direccion = direccion

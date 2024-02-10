@@ -1,7 +1,7 @@
 const { RolModels } = require('../models/RolModel.js');
 const { ConfiguracionModels } = require('../models/ConfiguracionModel.js');
 const { constants } = require('buffer');
-const {formatDate} = require('../helpers/formatearDatos.js');
+const {formatDate, capitalizarPrimeraLetras} = require('../helpers/formatearDatos.js');
 const { MovimientosModels } = require('../models/MovimientosModels.js');
 
 const consultar = async (req, res) => {
@@ -61,7 +61,7 @@ const agregar = async (req, res) => {
 
         //!  Insertar un nuevo rol en la base de datos
         const nuevoRol = await RolModels.create({
-            nombre,
+            nombre: capitalizarPrimeraLetras(nombre),
         });
 
         /// Inserta los permisos de ese rol
@@ -113,7 +113,7 @@ const actualizar = async (req, res) => {
 
         // Actualiza el rol en la base de datos
         const rolActualizado = await RolModels.update(
-            { nombre },
+            { nombre: capitalizarPrimeraLetras(nombre), },
             { where: { id_rol: id_rol } }
         );
 

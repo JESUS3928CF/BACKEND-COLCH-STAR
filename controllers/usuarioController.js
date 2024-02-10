@@ -8,6 +8,7 @@ const { ConfiguracionModels } = require('../models/ConfiguracionModel.js');
 const shortid = require('shortid');
 const emailRecuperarPassword = require('../helpers/emailRecuperarPassword.js');
 const { MovimientosModels } = require('../models/MovimientosModels.js');
+const { capitalizarPrimeraLetras } = require('../helpers/formatearDatos.js');
 //! autenticar un usuario con JWT
 const autenticar = async (req, res) => {
     const { email, contrasena } = req.body;
@@ -110,9 +111,9 @@ const passwordPerdida = async (req, res) => {
         //* Enviar email con las instrucciones
         emailRecuperarPassword({
             email,
-            nombre : usuario.nombre,
-            token: usuario.token
-        }) 
+            nombre: usuario.nombre,
+            token: usuario.token,
+        });
 
         res.json({
             message:
@@ -133,7 +134,7 @@ const checkToken = async (req, res) => {
 
     if (tokenValido) return res.json({ message: 'El Token es valido' });
 
-    console.log(tokenValido)
+    console.log(tokenValido);
     res.status(403).json({ message: 'El Token no es valido' });
 };
 
@@ -145,22 +146,21 @@ const newPassword = async (req, res) => {
         where: { token: token },
     });
 
-    if(!usuario) {
+    if (!usuario) {
         const error = new Error('Hubo un error');
         return res.status(403).json({ message: error.message });
     }
-    
+
     try {
         usuario.token = null;
         usuario.contrasena = await bcrypt.hash(contrasena, 10);
         usuario.save();
-        
-        res.json({ message : "Contraseña modificada correctamente"})
+
+        res.json({ message: 'Contraseña modificada correctamente' });
     } catch (error) {
         console.log(error);
     }
 };
-
 
 const consultar = async (req, res) => {
     try {
@@ -217,15 +217,15 @@ const agregar = async (req, res) => {
         }
 
         await UsuarioModels.create({
-            nombre,
-            apellido,
+            nombre: capitalizarPrimeraLetras(nombre),
+            apellido: capitalizarPrimeraLetras(apellido),
             telefono,
             email: email.toLowerCase(),
             contrasena: hashedContrasena, /// Guarda la contraseña cifrada en la base de datos
             fk_rol,
         });
 
-        await MovimientosModels.create({descripcion:'Nuevo usuario creado'})
+        await MovimientosModels.create({ descripcion: 'Nuevo usuario creado' });
 
         /// Mensaje de respuesta
         res.json({
@@ -279,15 +279,16 @@ const actualizar = async (req, res) => {
         if (usuario == null)
             return res.json({ message: 'Usuario no encontrado' });
         // Actualizar los valores del registro
-        usuario.nombre = nombre;
-        usuario.apellido = apellido;
-        usuario.telefono = telefono;
+        (usuario.nombre = capitalizarPrimeraLetras(nombre)),
+            (usuario.apellido = capitalizarPrimeraLetras(apellido)),
+            (usuario.telefono = telefono);
         usuario.email = email;
         usuario.fk_rol = fk_rol;
 
         usuario.save();
-        await MovimientosModels.create({descripcion:`Se actualizo el usuario  #${id}`})
-
+        await MovimientosModels.create({
+            descripcion: `Se actualizo el usuario  #${id}`,
+        });
 
         res.json({ message: 'Actualización exitosa' });
     } catch (error) {
@@ -347,8 +348,9 @@ const cambiarEstado = async (req, res) => {
         usuario.estado = !estado;
 
         usuario.save();
-        await MovimientosModels.create({descripcion:`Se cambio el estado del usuario #${id}`})
-
+        await MovimientosModels.create({
+            descripcion: `Se cambio el estado del usuario #${id}`,
+        });
 
         res.json({ message: 'Cambio de estado' });
     } catch (error) {
