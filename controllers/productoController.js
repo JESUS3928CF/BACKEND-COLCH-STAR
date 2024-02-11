@@ -173,6 +173,20 @@ const actualizar = async (req, res) => {
             where: { id_producto: id },
         });
 
+        // Si el nombre ha cambiado, verifica si el nuevo nombre ya está ocupado
+        if (nombre !== producto.nombre) {
+            const nombreOcupado = await ProductoModels.findOne({
+                where: { nombre: capitalizarPrimeraLetras(nombre) },
+            });
+
+            if (nombreOcupado) {
+                return res.status(403).json({
+                    message: 'Ya existe este Producto',
+                    nombreOcupado,
+                });
+            }
+        }
+
         // Obtener el precio de la prenda seleccionada
         const prenda = await PrendasModels.findByPk(fk_prenda);
         const precioPrenda = parseFloat(prenda.precio);
@@ -180,12 +194,17 @@ const actualizar = async (req, res) => {
         // Calcular el precio total sumando el precio de la prenda y los precios de los diseños
         const disenosArray = JSON.parse(disenos);
         const promises = disenosArray.map(async (value) => {
-            const precioDiseno = await PrecioDisenoModels.findByPk(value.id_precio_diseno);
+            const precioDiseno = await PrecioDisenoModels.findByPk(
+                value.id_precio_diseno
+            );
             return parseFloat(precioDiseno.precio);
         });
 
         const preciosDiseños = await Promise.all(promises);
-        const precioTotal = preciosDiseños.reduce((total, precio) => total + precio, precioPrenda);
+        const precioTotal = preciosDiseños.reduce(
+            (total, precio) => total + precio,
+            precioPrenda
+        );
 
         // Actualizar los valores del registro
         producto.nombre = capitalizarPrimeraLetras(nombre);
@@ -201,7 +220,10 @@ const actualizar = async (req, res) => {
             if (imagenPath && fs.existsSync(imagenPath)) {
                 fs.unlink(imagenPath, (error) => {
                     if (error) {
-                        console.error('Error al eliminar el archivo de imagen:', error);
+                        console.error(
+                            'Error al eliminar el archivo de imagen:',
+                            error
+                        );
                         return next();
                     }
                 });
@@ -211,15 +233,16 @@ const actualizar = async (req, res) => {
         }
 
         producto.save();
-        
-        // estas líneas se encargan de eliminar los registros existentes en la tabla DetalleDiseñoModels 
-        // asociados al producto identificado por el id antes de que se añadan nuevos registros Esto asegura que los detalles de los diseños 
+
+        // estas líneas se encargan de eliminar los registros existentes en la tabla DetalleDiseñoModels
+        // asociados al producto identificado por el id antes de que se añadan nuevos registros Esto asegura que los detalles de los diseños
         // (DetalleDiseñoModels) asociados al producto se actualicen según la nueva información proporcionada en la solicitud.
         await DetalleDiseñoModels.destroy({ where: { fk_diseno: id } });
         await DetalleDiseñoModels.destroy({ where: { fk_precio_diseno: id } });
         await DetalleDiseñoModels.destroy({ where: { fk_producto: id } });
-        await MovimientosModels.create({descripcion:`Se actualizo el producto #${id}`})
-
+        await MovimientosModels.create({
+            descripcion: `Se actualizo el producto #${id}`,
+        });
 
         for (let value of disenosArray) {
             await DetalleDiseñoModels.create({
@@ -229,7 +252,7 @@ const actualizar = async (req, res) => {
             });
         }
 
-        res.json({ message: 'Actualización exitosa',producto });
+        res.json({ message: 'Actualización exitosa', producto });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Error al actualizar el producto ' });
