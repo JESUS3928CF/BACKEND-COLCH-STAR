@@ -80,21 +80,22 @@ const consultar = async (req, res) => {
 //Agregar una prenda
 
 const agregar = async (req, res) => {
-  try {
-      const {
-          nombre,
-          precio,
-          tipo_de_tela,
-          genero,
-          publicado,
-          colores,
-          tallas,
-      } = req.body;
+    try {
+        const {
+            nombre,
+            cantidad,
+            precio,
+            tipo_de_tela,
+            genero,
+            publicado,
+            colores,
+            tallas,
+        } = req.body;
 
-      // Verificar si el nombre ya está ocupado
-      const nombreOcupado = await PrendasModels.findOne({
-          where: { nombre: capitalizarPrimeraLetras(nombre) },
-      });
+        // Verificar si el nombre ya está ocupado
+        const nombreOcupado = await PrendasModels.findOne({
+            where: { nombre: nombre },
+        });
 
         if (nombreOcupado) {
             return res.status(403).json({
@@ -111,14 +112,15 @@ const agregar = async (req, res) => {
 
         const newPrenda = await PrendasModels.create({
             nombre: capitalizarPrimeraLetras(nombre),
-              precio,
+            cantidad,
+            precio,
             tipo_de_tela: capitalizarPrimeraLetras(tipo_de_tela),
             imagen: req.file.filename,
             genero,
             publicado,
         });
 
-        const coloresArray = JSON.parse(colores);
+        coloresArray = JSON.parse(colores);
 
         for (let value of coloresArray) {
             await colorsPrendasmodel.create({
@@ -134,7 +136,7 @@ const agregar = async (req, res) => {
             });
         }
 
-      await MovimientosModels.create({ descripcion: `El usuario: ${req.usuario.nombre} registro una nueva prenda `});
+        await MovimientosModels.create({ descripcion: 'Nuevo prenda creada' });
 
         res.status(200).json({ menssage: 'Prenda agregada exitosamente' });
     } catch (error) {
@@ -144,16 +146,16 @@ const agregar = async (req, res) => {
 };
 
 const update = async (req, res) => {
-  try {
-      const {
-          nombre,
-          precio,
-          tipo_de_tela,
-          genero,
-          publicado,
-          colores,
-          tallas,
-      } = req.body;
+    try {
+        const {
+            nombre,
+            precio,
+            tipo_de_tela,
+            genero,
+            publicado,
+            colores,
+            tallas,
+        } = req.body;
 
         console.log(nombre);
 
@@ -163,11 +165,11 @@ const update = async (req, res) => {
             where: { id_prenda: id },
         });
 
-      // Si el nombre ha cambiado, verifica si el nuevo nombre ya está ocupado
-      if (nombre !== prenda.nombre) {
-          const nombreOcupado = await PrendasModels.findOne({
-              where: { nombre: capitalizarPrimeraLetras(nombre) },
-          });
+        // Si el nombre ha cambiado, verifica si el nuevo nombre ya está ocupado
+        if (nombre !== prenda.nombre) {
+            const nombreOcupado = await PrendasModels.findOne({
+                where: { nombre: nombre },
+            });
 
             if (nombreOcupado) {
                 return res.status(403).json({
@@ -177,34 +179,32 @@ const update = async (req, res) => {
             }
         }
 
-      prenda.nombre = capitalizarPrimeraLetras(nombre);
-      prenda.precio = precio;
-      prenda.tipo_de_tela = capitalizarPrimeraLetras(tipo_de_tela);
-      prenda.genero = genero;
-      prenda.publicado = publicado;
+        prenda.nombre = capitalizarPrimeraLetras(nombre);
+        prenda.precio = precio;
+        prenda.tipo_de_tela = capitalizarPrimeraLetras(tipo_de_tela);
+        prenda.genero = genero;
+        prenda.publicado = publicado;
 
-      if (req.file) {
-          const imagenPath = 'uploads/prenda/' + prenda.imagen;
-          if (imagenPath && fs.existsSync(imagenPath)) {
-              fs.unlink(imagenPath, (error) => {
-                  if (error) {
-                      console.error('Error al eliminar la imagen', error);
-                      return next();
-                  }
-              });
-          }
-          prenda.imagen = req.file.filename;
-      }
+        if (req.file) {
+            const imagenPath = 'uploads/prenda/' + prenda.imagen;
+            if (imagenPath && fs.existsSync(imagenPath)) {
+                fs.unlink(imagenPath, (error) => {
+                    if (error) {
+                        console.error('Error al eliminar la imagen', error);
+                        return next();
+                    }
+                });
+            }
+            prenda.imagen = req.file.filename;
+        }
 
-      prenda.save();
-
-      await colorsPrendasmodel.destroy({ where: { fk_color: id } });
-      await colorsPrendasmodel.destroy({ where: { fk_prenda: id } });
-      await TallaModels.destroy({ where: { fk_prenda: id } });
-      await TallaModels.destroy({ where: { talla: id } });
-      await MovimientosModels.create({
-          descripcion: `El usuario: ${req.usuario.nombre} actualizo la prenda #${id}`,
-      });
+        await colorsPrendasmodel.destroy({ where: { fk_color: id } });
+        await colorsPrendasmodel.destroy({ where: { fk_prenda: id } });
+        await TallaModels.destroy({ where: { fk_prenda: id } });
+        await TallaModels.destroy({ where: { talla: id } });
+        await MovimientosModels.create({
+            descripcion: `Se actualizo la prenda #${id}`,
+        });
 
         coloresArray = JSON.parse(colores);
         for (let value of coloresArray) {
@@ -243,7 +243,7 @@ const cambiarEstado = async (req, res) => {
         prenda.save();
 
         await MovimientosModels.create({
-            descripcion: `El usuario: ${req.usuario.nombre} cambio el estado a la prenda #${id}`,
+            descripcion: `Se cambio el estado a la prenda #${id}`,
         });
 
         res.json({ message: 'Cambio el estado' });
@@ -264,7 +264,7 @@ const cambiarPublicacion = async (req, res) => {
         prenda.save();
 
         await MovimientosModels.create({
-            descripcion: `El usuario: ${req.usuario.nombre} cambio la publicación a la prenda #${id}`,
+            descripcion: `Se cambio el estado de la publicación a la prenda #${id}`,
         });
 
         res.json({

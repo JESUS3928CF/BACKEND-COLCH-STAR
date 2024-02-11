@@ -1,12 +1,20 @@
-const { DetalleDiseñoModels } = require("../models/DetalleDiseñoModel");
-const { DisenoModels } = require("../models/DisenoModel");
-const { PrecioDisenoModels } = require("../models/PrecioDisenoModel");
-const { PrendasModels } = require("../models/PrendasModel");
-const { ProductoModels } = require("../models/ProductoModel");
-const { formatMoney , capitalizarPrimeraLetras} = require('../helpers/formatearDatos.js');
+const { DetalleDiseñoModels } = require('../models/DetalleDiseñoModel');
+const { DisenoModels } = require('../models/DisenoModel');
+const { PrecioDisenoModels } = require('../models/PrecioDisenoModel');
+const { PrendasModels } = require('../models/PrendasModel');
+const { ProductoModels } = require('../models/ProductoModel');
+const {
+    formatMoney,
+    capitalizarPrimeraLetras,
+} = require('../helpers/formatearDatos.js');
 const fs = require('fs');
-const { MovimientosModels } = require("../models/MovimientosModels.js");
-
+const { MovimientosModels } = require('../models/MovimientosModels.js');
+const {
+    consultar: consultarPrendas,
+} = require('../controllers/prendasControllers');
+const { TallaModels } = require('../models/TallaModel.js');
+const { colorModels } = require('../models/colorModel.js');
+const { colorsPrendasmodel } = require('../models/ColorsPrendasModels.js');
 
 const consultar = async (req, res) => {
     try {
@@ -26,25 +34,57 @@ const consultar = async (req, res) => {
             ],
         });
 
+        const Tallas = await TallaModels.findAll();
+        const colors = await colorModels.findAll();
+        const colorsPrenda = await colorsPrendasmodel.findAll();
+
+
+        const TablaIntermedia = new Map();
+        const tallas = new Map();
+        const nombreColors = new Map();
+
+        Tallas.forEach((talla) => {
+            if (!tallas.has(talla.fk_prenda)) {
+                tallas.set(talla.fk_prenda, []);
+            }
+            tallas.get(talla.fk_prenda).push(talla.talla);
+        });
+
+        colors.forEach((color) => {
+            if (!nombreColors.has(color.id_color)) {
+                nombreColors.set(color.id_color, []);
+            }
+            nombreColors.get(color.id_color).push({
+                color: color.color,
+                id_color: color.id_color,
+                codigo: color.codigo,
+            });
+        });
+
+        colorsPrenda.forEach((fk_color) => {
+            if (!TablaIntermedia.has(fk_color.fk_prenda)) {
+                TablaIntermedia.set(fk_color.fk_prenda, []);
+            }
+            TablaIntermedia.get(fk_color.fk_prenda).push(fk_color.fk_color);
+        });
+
         /// Consultando los diseños
         const detalle_diseno = await DetalleDiseñoModels.findAll({
             include: [
                 {
                     model: DisenoModels, // Modelo de Prendas
-                    attributes: ['id_diseno','imagen', 'nombre' ], // Selecciona los atributos que necesitas, en este caso, solo la imagen
+                    attributes: ['id_diseno', 'imagen', 'nombre'], // Selecciona los atributos que necesitas, en este caso, solo la imagen
                 },
                 {
                     model: PrecioDisenoModels, // Modelo de Prendas
-                    attributes: [ 'id_precio_diseno','tamano','precio' ], // Selecciona los atributos que necesitas, en este caso, solo la imagen
+                    attributes: ['id_precio_diseno', 'tamano', 'precio'], // Selecciona los atributos que necesitas, en este caso, solo la imagen
                 },
-            
             ],
         });
 
         const productosConDisenos = new Map();
 
         detalle_diseno.forEach((diseno) => {
-
             // console.log(diseno);
             if (!productosConDisenos.has(diseno.fk_producto)) {
                 productosConDisenos.set(diseno.fk_producto, []);
@@ -64,7 +104,6 @@ const consultar = async (req, res) => {
 
         //  console.log(productosConDisenos);
 
-
         //- Forma de inviar un JSON-
         // res.status(200).json(productos);
         const productoConDisenos = productos.map((producto) => ({
@@ -78,6 +117,15 @@ const consultar = async (req, res) => {
             fk_prenda: producto.fk_prenda,
             prenda: producto.prenda,
             disenos: productosConDisenos.get(producto.id_producto) || [],
+            tallas: tallas.get(producto.fk_prenda) || [],
+            colores: (() => {
+                const result = [];
+                TablaIntermedia.get(producto.fk_prenda).forEach((fk_color) => {
+                    // Use spread (...) operator to merge arrays
+                    result.push(...(nombreColors.get(fk_color) || []));
+                });
+                return result || [];
+            })(),
         }));
 
         res.status(200).json(productoConDisenos);
@@ -92,11 +140,12 @@ const consultar = async (req, res) => {
 const agregar = async (req, res) => {
     try {
         const { nombre, cantidad, fk_prenda, publicado, disenos } = req.body;
-        console.log(req.file)
+        console.log(req.file);
         if (!req.file) {
-            return res.json({ message: `Error la imagen del diseño es requerida` });
+            return res.json({
+                message: `Error la imagen del diseño es requerida`,
+            });
         }
-
 
         // Verificar si el nombre ya está ocupado
         const nombreOcupado = await ProductoModels.findOne({
@@ -119,12 +168,17 @@ const agregar = async (req, res) => {
 
         const promises = disenosArray.map(async (value) => {
             // Obtener el precio de cada diseño
-            const precioDiseno = await PrecioDisenoModels.findByPk(value.id_precio_diseno);
+            const precioDiseno = await PrecioDisenoModels.findByPk(
+                value.id_precio_diseno
+            );
             return parseFloat(precioDiseno.precio);
         });
 
         const preciosDiseños = await Promise.all(promises);
-        const precioTotal = preciosDiseños.reduce((total, precio) => total + precio, precioPrenda);
+        const precioTotal = preciosDiseños.reduce(
+            (total, precio) => total + precio,
+            precioPrenda
+        );
 
         //! Insertar un nuevo producto en la base de datos con el precio total calculado
         const nuevoProducto = await ProductoModels.create({
@@ -146,12 +200,14 @@ const agregar = async (req, res) => {
             });
         }
 
-        await MovimientosModels.create({descripcion:`El usuario: ${req.usuario.nombre} registro un nuevo producto`})
-
+        await MovimientosModels.create({
+            descripcion: `El usuario: ${req.usuario.nombre} registro un nuevo producto`,
+        });
 
         /// Mensaje de respuesta
         res.json({
-            message: 'Producto agregado exitosamente', nuevoProducto
+            message: 'Producto agregado exitosamente',
+            nuevoProducto,
         });
     } catch (error) {
         console.log(error);
@@ -159,8 +215,6 @@ const agregar = async (req, res) => {
         res.status(500).json({ message: 'Error al agregar el Producto' });
     }
 };
-
-
 
 // ! Actualizar un proveedor
 
@@ -240,8 +294,9 @@ const actualizar = async (req, res) => {
         await DetalleDiseñoModels.destroy({ where: { fk_diseno: id } });
         await DetalleDiseñoModels.destroy({ where: { fk_precio_diseno: id } });
         await DetalleDiseñoModels.destroy({ where: { fk_producto: id } });
-        await MovimientosModels.create({descripcion: `El usuario: ${req.usuario.nombre} actualizo el producto #${id}`})
-
+        await MovimientosModels.create({
+            descripcion: `El usuario: ${req.usuario.nombre} actualizo el producto #${id}`,
+        });
 
         for (let value of disenosArray) {
             await DetalleDiseñoModels.create({
@@ -260,7 +315,6 @@ const actualizar = async (req, res) => {
 
 const cambiarEstado = async (req, res) => {
     try {
-
         const { estado } = req.body;
 
         // console.log('actualizar esto');
@@ -275,39 +329,44 @@ const cambiarEstado = async (req, res) => {
 
         producto.save();
 
-        await MovimientosModels.create({descripcion:`El usuario: ${req.usuario.nombre} cambio el estado al producto #${id}`})
-
+        await MovimientosModels.create({
+            descripcion: `El usuario: ${req.usuario.nombre} cambio el estado al producto #${id}`,
+        });
 
         res.json({ message: 'Cambio de estado' });
     } catch (error) {
         res.status(500).json({ message: 'no se cambio el estado' });
     }
-}
+};
 
-const cambiarPublicacion = async (req, res)=>{
-    try{
-        const {estado}=req.body;
-        const id = req.params.id
+const cambiarPublicacion = async (req, res) => {
+    try {
+        const { estado } = req.body;
+        const id = req.params.id;
 
-        const producto =await ProductoModels.findOne({
+        const producto = await ProductoModels.findOne({
+            where: { id_producto: id },
+        });
+        // Actualizar el estado contrario al que se le envía
+        producto.publicado = !estado;
 
-            where: {id_producto: id},
-
-        })
-        // Actualizar el estado contrario al que se le envía 
-        producto.publicado=!estado
-
-        producto.save()
-        await MovimientosModels.create({descripcion:`El usuario: ${req.usuario.nombre} actualizo la publicacion al producto #${id}`})
-
+        producto.save();
+        await MovimientosModels.create({
+            descripcion: `El usuario: ${req.usuario.nombre} actualizo la publicacion al producto #${id}`,
+        });
 
         res.status(200).json({ message: 'Se cambio el estado de publicación' });
-
-    }catch (error){
-        res.status(500).json({message: 'No se cambio el estado de la publicación'})
+    } catch (error) {
+        res.status(500).json({
+            message: 'No se cambio el estado de la publicación',
+        });
     }
-}
+};
 
-
-module.exports = { consultar, agregar, actualizar, cambiarEstado, cambiarPublicacion };
-
+module.exports = {
+    consultar,
+    agregar,
+    actualizar,
+    cambiarEstado,
+    cambiarPublicacion,
+};
