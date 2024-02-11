@@ -118,7 +118,7 @@ const agregar = async (req, res) => {
             publicado,
         });
 
-        coloresArray = JSON.parse(colores);
+        const coloresArray = JSON.parse(colores);
 
         for (let value of coloresArray) {
             await colorsPrendasmodel.create({
@@ -178,7 +178,6 @@ const update = async (req, res) => {
         }
 
       prenda.nombre = capitalizarPrimeraLetras(nombre);
-      prenda.cantidad = cantidad;
       prenda.precio = precio;
       prenda.tipo_de_tela = capitalizarPrimeraLetras(tipo_de_tela);
       prenda.genero = genero;
