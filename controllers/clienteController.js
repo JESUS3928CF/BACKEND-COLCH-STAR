@@ -25,6 +25,7 @@ const agregar = async (req, res) => {
 
     try {
         const { nombre, apellido, telefono, email, direccion, identificacion, tipoIdentificacion} = req.body;
+        console.log(req.usuario)
 
 
         const identificacionRepetido = await ClienteModels.findOne({
@@ -54,7 +55,7 @@ const agregar = async (req, res) => {
             tipoIdentificacion,
         });
 
-        const movimiento = await MovimientosModels.create({descripcion:'Nuevo cliente creado'})
+        const movimiento = await MovimientosModels.create({descripcion:`El usuario: ${req.usuario.nombre} registro un nuevo cliente`})
         
 
         /// Mensaje de respuesta
@@ -113,7 +114,7 @@ const actualizar = async (req, res) => {
         cliente.tipoIdentificacion = tipoIdentificacion
         cliente.save();
 
-        const movimiento = await MovimientosModels.create({descripcion:` Se actualizo el cliente # ${id}`})
+        const movimiento = await MovimientosModels.create({descripcion:`El usuario: ${req.usuario.nombre} actualizo el cliente # ${id}`})
 
 
         res.json({ message: 'Actualización exitosa', cliente,movimiento});
@@ -142,7 +143,7 @@ const cambiarEstado = async (req, res) => {
 
         cliente.save();
 
-        await MovimientosModels.create({descripcion:`Se cambio el estado del cliente # ${id}`})
+        await MovimientosModels.create({descripcion:`El usuario: ${req.usuario.nombre} cambio el estado del cliente # ${id}`})
 
         res.json({ message: 'Cambio de estado' });
     } catch (error) {

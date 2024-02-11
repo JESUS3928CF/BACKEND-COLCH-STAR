@@ -122,7 +122,7 @@ const agregar = async (req, res) => {
             });
         }
 
-        await MovimientosModels.create({ descripcion: 'Nueva orden agregada' });
+        await MovimientosModels.create({ descripcion: `El usuario: ${req.usuario.nombre} Registro una nueva orden` });
 
         /// Mensaje de respuesta
         res.json({
@@ -171,7 +171,7 @@ const actualizar = async (req, res) => {
         }
 
         await MovimientosModels.create({
-            descripcion: `Se actualizo la orden #${id}`,
+            descripcion: `El usuario: ${req.usuario.nombre}  actualizo la orden #${id}`,
         });
 
         res.json({ message: 'Orden actualizada con éxito' });
@@ -200,6 +200,9 @@ const cambiarEstadoOrden = async (req, res) => {
 
         console.log(compra);
         compra.save();
+        await MovimientosModels.create({
+            descripcion: `El usuario: ${req.usuario.nombre}  actualizo el estado de la orden #${id}`,
+        });
 
         res.json({ message: 'Se cambio el estado de la orden' });
     } catch (error) {

@@ -5,6 +5,8 @@ const {
     cambiarEstadoOrden,
     actualizar,
 } = require('../controllers/ordenesController');
+const { checkAut } = require("../middleware/authMidlleware");
+
 const router = express.Router();
 
 
@@ -12,14 +14,14 @@ const router = express.Router();
 router.get("/", consultar );
 
 //* Insert One
-router.post("/", agregar );
+router.post("/",checkAut, agregar );
 
 //* Update One State
-router.patch('/:id', actualizar );
+router.patch('/:id',checkAut, actualizar );
 
 
 //* Update One State
-router.patch('/estado/:id', cambiarEstadoOrden );
+router.patch('/estado/:id',checkAut, cambiarEstadoOrden );
 
 
 module.exports = router;

@@ -34,7 +34,7 @@ const agregar = async (req, res) => {
             publicado
         });
 
-        await MovimientosModels.create({descripcion:'Nuevo diseño agregado'})
+        await MovimientosModels.create({descripcion: `El usuario: ${req.usuario.nombre} registro un nuevo diseño`})
 
 
         /// Mensaje de respuesta
@@ -84,7 +84,7 @@ const actualizar = async (req, res) => {
         }
 
         diseno.save();
-        await MovimientosModels.create({descripcion:`Se actualizo el diseño #${id}`})
+        await MovimientosModels.create({descripcion: `El usuario: ${req.usuario.nombre} actualizo el diseño #${id}`})
 
 
         res.json({ message: 'Actualización exitosa' });
@@ -109,7 +109,7 @@ const cambiarEstado = async (req, res) => {
 
         diseno.save();
 
-        await MovimientosModels.create({descripcion:`Se cambio el estado al diseño # ${id}`})
+        await MovimientosModels.create({descripcion:`El usuario: ${req.usuario.nombre} cambio el estado al diseño # ${id}`})
 
 
         res.json({ message: 'Cambio de estado' });
@@ -132,7 +132,7 @@ const cambiarPublicacion = async (req, res) => {
 
         diseno.save();
 
-        await MovimientosModels.create({descripcion:`Se cambio el estado de publicación del diseño #${id}`})
+        await MovimientosModels.create({descripcion:`El usuario: ${req.usuario.nombre} cambio el estado de publicación del diseño #${id}`})
 
 
         res.status(200).json({ message: 'Se cambio el estado de publicación' });
