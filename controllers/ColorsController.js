@@ -42,7 +42,7 @@ const addColors = async(req,res)=>{
             codigo
         });
 
-        await MovimientosModels.create({descripcion:`Nuevo color creado`})
+        await MovimientosModels.create({descripcion:`El usuario: ${req.usuario.nombre} registro un nuevo color`})
 
 
 
@@ -67,7 +67,7 @@ const updateColors = async(req,res)=>{
         colorsUpdate.codigo=codigo
     
         colorsUpdate.save()
-        await MovimientosModels.create({descripcion: `Se actualizo el color # ${id}`})
+        await MovimientosModels.create({descripcion: `El usuario: ${req.usuario.nombre} actualizo el color # ${id}`})
 
     
         res.status(200).json({message: 'Actualizacion de color exitosa'})

@@ -46,7 +46,7 @@ const agregar = async (req, res) => {
             fk_cliente,
         });
 
-        await MovimientosModels.create({descripcion:'Nueva venta agregada'})
+        await MovimientosModels.create({descripcion:`El usuario: ${req.usuario.nombre} registro una nueva venta`})
 
         /// Respuesta
         res.json({ "message " : "Venta Agregada Exitosamente"})
@@ -85,7 +85,7 @@ const actualizar = async (req, res) => {
         venta.fk_cliente = fk_cliente;
 
         venta.save();
-        await MovimientosModels.create({descripcion:`Se actualizo la venta #${id}`})
+        await MovimientosModels.create({descripcion:`El usuario: ${req.usuario.nombre} actualizo la venta #${id}`})
 
 
         res.json({ message: 'Actualización exitosa' });
@@ -111,7 +111,7 @@ const cambiarEstado = async (req, res) => {
         venta.estado = !estado;
         await venta.save();
 
-        await MovimientosModels.create({descripcion:`Se cambio el estado de la venta #${id}`})
+        await MovimientosModels.create({descripcion:`El usuario: ${req.usuario.nombre} cambio el estado de la venta #${id}`})
 
 
         res.status(200).json({

@@ -59,7 +59,7 @@ const agregar = async (req, res) => {
 
         });
 
-        await MovimientosModels.create({descripcion: 'Nuevo proveedor agregado'})
+        await MovimientosModels.create({descripcion: `El usuario: ${req.usuario.nombre} registro un nuevo proveedor`})
 
 
         /// Mensaje de respuesta
@@ -116,7 +116,7 @@ const actualizar = async (req, res) => {
 
         proveedor.save();
 
-        await MovimientosModels.create({descripcion:`Se actualizo el proveedor #${id}`})
+        await MovimientosModels.create({descripcion:`El usuario: ${req.usuario.nombre} actualizo el proveedor #${id}`})
 
 
 
@@ -144,7 +144,7 @@ const cambiarEstado = async (req, res) => {
         proveedor.estado = !estado;
 
         proveedor.save();
-        await MovimientosModels.create({descripcion:`Se cambio el estado del proveedor #${id}`})
+        await MovimientosModels.create({descripcion:`El usuario: ${req.usuario.nombre} cambio el estado del proveedor #${id}`})
 
 
         res.json({ message: 'Cambio de estado' });

@@ -9,12 +9,12 @@ const router = express.Router();
 router.get('/' , consultar);
 
 //* Insert One
-router.post('/', agregar);
+router.post('/',checkAut, agregar);
 
 //* Update
-router.patch('/:id', actualizar);
+router.patch('/:id', checkAut, actualizar);
 
 //* Cambiar estado
-router.patch('/estado/:id', cambiarEstado);
+router.patch('/estado/:id',checkAut, cambiarEstado);
 
 module.exports = router;

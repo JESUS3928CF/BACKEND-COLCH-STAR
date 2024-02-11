@@ -72,7 +72,7 @@ const agregar = async (req, res) => {
             });
         }
 
-        await MovimientosModels.create({descripcion: 'Nuevo rol creado'})
+        await MovimientosModels.create({descripcion: `El usuario: ${req.usuario.nombre} registro un nuevo rol`})
 
 
 
@@ -129,7 +129,7 @@ const actualizar = async (req, res) => {
             });
         }
 
-        await MovimientosModels.create({descripcion: `Se actualizo el rol #${id_rol}`})
+        await MovimientosModels.create({descripcion: `El usuario: ${req.usuario.nombre} actualizo el rol #${id_rol}`})
 
         // Mensaje de respuesta
         res.json({
@@ -159,7 +159,7 @@ const cambiarEstado = async (req, res) => {
         rol.estado = !estado;
 
         rol.save();
-        await MovimientosModels.create({descripcion: `Se cambio el estado del rol #${id}`})
+        await MovimientosModels.create({descripcion: `El usuario: ${req.usuario.nombre} cambio el estado del rol #${id}`})
 
         res.json({ message: 'Cambio de estado' });
 

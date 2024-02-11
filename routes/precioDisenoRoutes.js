@@ -3,6 +3,7 @@ const {
     consultar,
     actualizar,
 } = require('../controllers/precioDisenoController');
+const { checkAut } = require("../middleware/authMidlleware");
 const router = express.Router();
 
 /// peticiones para diseños
@@ -11,6 +12,6 @@ const router = express.Router();
 router.get('/', consultar);
 
 //* Update parcial element
-router.put('/:id', actualizar);
+router.put('/:id',checkAut, actualizar);
 
 module.exports = router;

@@ -112,7 +112,7 @@ const agregar = async (req, res) => {
         }
 
         await MovimientosModels.create({
-            descripcion: 'Nueva  compra registrada',
+            descripcion: `El usuario: ${req.usuario.nombre} registro una compra`,
         });
 
         /// Mensaje de respuesta
@@ -167,7 +167,7 @@ const actualizar = async (req, res) => {
                 // Guarda los cambios en la base de datos
                 await detalleCompraExistente.save();
                 await MovimientosModels.create({
-                    descripcion: `Se modifico la compra # ${id_compra}`,
+                    descripcion: `El usuario: ${req.usuario.nombre}  modifico la compra # ${id_compra}`,
                 });
             } else {
                 // Si no tiene un ID, crea un nuevo detalle de compra
@@ -180,7 +180,7 @@ const actualizar = async (req, res) => {
                 });
 
                 await MovimientosModels.create({
-                    descripcion: `Nuevo detalle de compra para el id: # ${id_compra}`,
+                    descripcion: `El usuario: ${req.usuario.nombre} registro un detalle de compra para el id: # ${id_compra}`,
                 });
             }
         }
@@ -246,7 +246,7 @@ const cambiarEstado = async (req, res) => {
         compra.save();
 
         await MovimientosModels.create({
-            descripcion: `Se cambio el estado al la compra# ${id}`,
+            descripcion: `El usuario: ${req.usuario.nombre} cambio el estado a la compra# ${id}`,
         });
 
         res.json({ message: 'Cambio de estado' });

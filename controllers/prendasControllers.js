@@ -140,7 +140,7 @@ const agregar = async (req, res) => {
           });
       }
 
-      await MovimientosModels.create({ descripcion: 'Nuevo prenda creada' });
+      await MovimientosModels.create({ descripcion: `El usuario: ${req.usuario.nombre} registro una nueva prenda `});
 
       res.status(200).json({ menssage: 'Prenda agregada exitosamente' });
   } catch (error) {
@@ -211,7 +211,7 @@ const update = async (req, res) => {
       await TallaModels.destroy({ where: { fk_prenda: id } });
       await TallaModels.destroy({ where: { talla: id } });
       await MovimientosModels.create({
-          descripcion: `Se actualizo la prenda #${id}`,
+          descripcion: `El usuario: ${req.usuario.nombre} actualizo la prenda #${id}`,
       });
 
       coloresArray = JSON.parse(colores);
@@ -246,7 +246,7 @@ const cambiarEstado = async (req, res) => {
     prenda.estado = !estado;
     prenda.save();
 
-    await MovimientosModels.create({descripcion:`Se cambio el estado a la prenda #${id}`})
+    await MovimientosModels.create({descripcion:`El usuario: ${req.usuario.nombre} cambio el estado a la prenda #${id}`})
 
 
     res.json({ message: "Cambio el estado" });
@@ -269,7 +269,7 @@ const cambiarPublicacion = async (req, res)=>{
         prenda.publicado=!estado
         prenda.save()
 
-        await MovimientosModels.create({descripcion:`Se cambio el estado de la publicación a la prenda #${id}`})
+        await MovimientosModels.create({descripcion:`El usuario: ${req.usuario.nombre} cambio la publicación a la prenda #${id}`})
 
 
         res.json({message: 'Se cambio el estado de la publicación de la prendas'})

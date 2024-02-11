@@ -225,7 +225,7 @@ const agregar = async (req, res) => {
             fk_rol,
         });
 
-        await MovimientosModels.create({ descripcion: 'Nuevo usuario creado' });
+        await MovimientosModels.create({ descripcion: `El usuario: ${req.usuario.nombre} registro un nuevo usuario` });
 
         /// Mensaje de respuesta
         res.json({
@@ -287,7 +287,7 @@ const actualizar = async (req, res) => {
 
         usuario.save();
         await MovimientosModels.create({
-            descripcion: `Se actualizo el usuario  #${id}`,
+            descripcion: `El usuario: ${req.usuario.nombre} actualizo el usuario  #${id}`,
         });
 
         res.json({ message: 'Actualización exitosa' });
@@ -349,7 +349,7 @@ const cambiarEstado = async (req, res) => {
 
         usuario.save();
         await MovimientosModels.create({
-            descripcion: `Se cambio el estado del usuario #${id}`,
+            descripcion: `El usuario: ${req.usuario.nombre} cambio el estado del usuario #${id}`,
         });
 
         res.json({ message: 'Cambio de estado' });

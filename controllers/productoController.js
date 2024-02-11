@@ -146,7 +146,7 @@ const agregar = async (req, res) => {
             });
         }
 
-        await MovimientosModels.create({descripcion:'Nuevo producto creado'})
+        await MovimientosModels.create({descripcion:`El usuario: ${req.usuario.nombre} registro un nuevo producto`})
 
 
         /// Mensaje de respuesta
@@ -240,9 +240,8 @@ const actualizar = async (req, res) => {
         await DetalleDiseñoModels.destroy({ where: { fk_diseno: id } });
         await DetalleDiseñoModels.destroy({ where: { fk_precio_diseno: id } });
         await DetalleDiseñoModels.destroy({ where: { fk_producto: id } });
-        await MovimientosModels.create({
-            descripcion: `Se actualizo el producto #${id}`,
-        });
+        await MovimientosModels.create({descripcion: `El usuario: ${req.usuario.nombre} actualizo el producto #${id}`})
+
 
         for (let value of disenosArray) {
             await DetalleDiseñoModels.create({
@@ -276,7 +275,7 @@ const cambiarEstado = async (req, res) => {
 
         producto.save();
 
-        await MovimientosModels.create({descripcion:`Se cambio el estado al producto #${id}`})
+        await MovimientosModels.create({descripcion:`El usuario: ${req.usuario.nombre} cambio el estado al producto #${id}`})
 
 
         res.json({ message: 'Cambio de estado' });
@@ -299,7 +298,7 @@ const cambiarPublicacion = async (req, res)=>{
         producto.publicado=!estado
 
         producto.save()
-        await MovimientosModels.create({descripcion:`Se cambio el estado de la publicacion al producto #${id}`})
+        await MovimientosModels.create({descripcion:`El usuario: ${req.usuario.nombre} actualizo la publicacion al producto #${id}`})
 
 
         res.status(200).json({ message: 'Se cambio el estado de publicación' });
