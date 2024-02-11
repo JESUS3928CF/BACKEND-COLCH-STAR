@@ -1,6 +1,7 @@
 const {DisenoModels} = require('../models/DisenoModel.js');
 const fs = require('fs');
 const { MovimientosModels } = require('../models/MovimientosModels.js');
+const { capitalizarPrimeraLetras } = require('../helpers/formatearDatos.js');
 
 const consultar = async (req, res) => {
     try {
@@ -29,7 +30,7 @@ const agregar = async (req, res) => {
 
         //!  Insertar un nuevo diseño en la base de datos
         const nuevoDiseno = await DisenoModels.create({
-            nombre,
+            nombre: capitalizarPrimeraLetras(nombre),
             imagen : req.file.filename,
             publicado
         });
@@ -60,7 +61,8 @@ const actualizar = async (req, res) => {
             where: { id_diseno: id },
         });
         /// Actualizar los valores del registro
-        diseno.nombre = nombre;
+        diseno.nombre = capitalizarPrimeraLetras(nombre);
+        
         diseno.publicado = publicado;
 
         /// Verificar si se subió una imagen nueva
