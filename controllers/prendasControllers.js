@@ -89,7 +89,6 @@ const agregar = async (req, res) => {
   try {
       const {
           nombre,
-          cantidad,
           precio,
           tipo_de_tela,
           genero,
@@ -100,7 +99,7 @@ const agregar = async (req, res) => {
 
       // Verificar si el nombre ya está ocupado
       const nombreOcupado = await PrendasModels.findOne({
-          where: { nombre: nombre },
+          where: { nombre: capitalizarPrimeraLetras(nombre) },
       });
 
       if (nombreOcupado) {
@@ -118,7 +117,6 @@ const agregar = async (req, res) => {
 
       const newPrenda = await PrendasModels.create({
           nombre: capitalizarPrimeraLetras(nombre),
-          cantidad,
           precio,
           tipo_de_tela: capitalizarPrimeraLetras(tipo_de_tela),
           imagen: req.file.filename,
@@ -155,7 +153,6 @@ const update = async (req, res) => {
   try {
       const {
           nombre,
-          cantidad,
           precio,
           tipo_de_tela,
           genero,
@@ -177,7 +174,7 @@ const update = async (req, res) => {
       // Si el nombre ha cambiado, verifica si el nuevo nombre ya está ocupado
       if (nombre !== prenda.nombre) {
           const nombreOcupado = await PrendasModels.findOne({
-              where: { nombre: nombre },
+              where: { nombre: capitalizarPrimeraLetras(nombre) },
           });
 
           if (nombreOcupado) {
@@ -189,7 +186,6 @@ const update = async (req, res) => {
       }
 
       prenda.nombre = capitalizarPrimeraLetras(nombre);
-      prenda.cantidad = cantidad;
       prenda.precio = precio;
       prenda.tipo_de_tela = capitalizarPrimeraLetras(tipo_de_tela);
       prenda.genero = genero;

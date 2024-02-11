@@ -100,7 +100,7 @@ const agregar = async (req, res) => {
 
         // Verificar si el nombre ya está ocupado
         const nombreOcupado = await ProductoModels.findOne({
-            where: { nombre: nombre },
+            where: { nombre: capitalizarPrimeraLetras(nombre) },
         });
 
         if (nombreOcupado) {
@@ -168,10 +168,6 @@ const actualizar = async (req, res) => {
     try {
         const { nombre, cantidad, fk_prenda, publicado, disenos } = req.body;
         const id = req.params.id;
-        console.log(id);
-
-
-        
 
         const producto = await ProductoModels.findOne({
             where: { id_producto: id },

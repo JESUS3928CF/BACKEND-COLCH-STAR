@@ -47,7 +47,7 @@ const agregar = async (req, res) => {
 
         // Verificar si el nombre ya está ocupado
         const nombreOcupado = await RolModels.findOne({
-            where: { nombre: nombre },
+            where: { nombre: capitalizarPrimeraLetras(nombre) },
         });
 
         if (nombreOcupado) {
@@ -83,6 +83,7 @@ const agregar = async (req, res) => {
     } catch (error) {
         // Envía una respuesta al cliente indicando el error
         res.status(500).json({ message: 'Error al agregar el rol' });
+        console.log(error)
     }
 };
 
@@ -100,7 +101,7 @@ const actualizar = async (req, res) => {
         // Si el nombre ha cambiado, verifica si el nuevo nombre ya está ocupado
         if (nombre !== rol.nombre) {
             const nombreOcupado = await RolModels.findOne({
-                where: { nombre: nombre },
+                where: { nombre: capitalizarPrimeraLetras(nombre) },
             });
 
             if (nombreOcupado) {
@@ -112,7 +113,7 @@ const actualizar = async (req, res) => {
         }
 
         // Actualiza el rol en la base de datos
-        const rolActualizado = await RolModels.update(
+        await RolModels.update(
             { nombre: capitalizarPrimeraLetras(nombre), },
             { where: { id_rol: id_rol } }
         );
@@ -161,9 +162,6 @@ const cambiarEstado = async (req, res) => {
         await MovimientosModels.create({descripcion: `Se cambio el estado del rol #${id}`})
 
         res.json({ message: 'Cambio de estado' });
-        
-
-
 
     } catch (error) {
         res.status(500).json({ message: 'no se cambio el estado' });

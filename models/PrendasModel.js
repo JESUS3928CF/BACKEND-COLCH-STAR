@@ -15,6 +15,7 @@ const PrendasModels = db.define(
         },
         cantidad:{
             type: Sequelize.INTEGER,
+            defaultValue: 0
         },
         precio:{
             type: Sequelize.FLOAT,
