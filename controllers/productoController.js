@@ -270,12 +270,44 @@ const actualizar = async (req, res) => {
             precioPrenda
         );
 
+
+        if (fk_prenda) {
+            const prenda = await PrendasModels.findOne({
+                where: { id_prenda: fk_prenda },
+            });
+        
+            if (producto.cantidad < cantidad) {
+
+                
+
+                // Calculamos la cantidad restante después de la transacción
+                const cantidadRestante = cantidad - producto.cantidad;
+        
+                // Restamos la cantidad vendida de la prenda
+                prenda.cantidad = Number(prenda.cantidad) - Number(cantidadRestante);
+                await prenda.save();
+        
+            } else {
+
+
+                const cantidadRestante =  producto.cantidad - cantidad 
+                // Sumamos la cantidad al inventario de la prenda
+                prenda.cantidad = Number(prenda.cantidad) + Number(cantidadRestante);
+                await prenda.save();
+        
+                // No necesitamos modificar 'cantidad' en este caso, ya que no hay cantidad sobrante
+            }
+        }
+
         // Actualizar los valores del registro
         producto.nombre = capitalizarPrimeraLetras(nombre);
         producto.cantidad = cantidad;
         producto.precio = precioTotal; // Utilizar el precio total calculado
         producto.fk_prenda = fk_prenda;
         producto.publicado = publicado;
+
+
+       
 
         /// Verificar si se subió una imagen nueva
         if (req.file) {
