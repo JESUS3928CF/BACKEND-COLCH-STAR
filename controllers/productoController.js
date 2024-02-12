@@ -200,6 +200,16 @@ const agregar = async (req, res) => {
             });
         }
 
+        if (fk_prenda) {
+            const prenda = await PrendasModels.findOne({
+                where: { id_prenda: fk_prenda },
+            });
+
+            prenda.cantidad =
+                Number(prenda.cantidad) - Number(cantidad);
+            prenda.save();
+        }
+
         await MovimientosModels.create({
             descripcion: `El usuario: ${req.usuario.nombre} registro un nuevo producto`,
         });
