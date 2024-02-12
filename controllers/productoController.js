@@ -205,10 +205,18 @@ const agregar = async (req, res) => {
                 where: { id_prenda: fk_prenda },
             });
 
+            const resultado =
             prenda.cantidad =
                 Number(prenda.cantidad) - Number(cantidad);
             prenda.save();
+
+
         }
+
+        
+
+
+
 
         await MovimientosModels.create({
             descripcion: `El usuario: ${req.usuario.nombre} registro un nuevo producto`,
@@ -271,27 +279,30 @@ const actualizar = async (req, res) => {
         );
 
 
+            //condicional para calcular la cantidad de prendas dependiento  del producto
         if (fk_prenda) {
             const prenda = await PrendasModels.findOne({
                 where: { id_prenda: fk_prenda },
             });
-        
+            
+            //si la cantidad de producto anterior es menor a la actualizada del producto
             if (producto.cantidad < cantidad) {
 
                 
 
-                // Calculamos la cantidad restante después de la transacción
+                //la cantidad actualizada se le resta la cantidad vieja y el resultado
                 const cantidadRestante = cantidad - producto.cantidad;
         
-                // Restamos la cantidad vendida de la prenda
+                //el resultado de la cantidad actualiza y la cantidad vieja se le resta a prenda
                 prenda.cantidad = Number(prenda.cantidad) - Number(cantidadRestante);
                 await prenda.save();
-        
+
+                //en el caso cotrario se le suma
             } else {
 
 
                 const cantidadRestante =  producto.cantidad - cantidad 
-                // Sumamos la cantidad al inventario de la prenda
+                
                 prenda.cantidad = Number(prenda.cantidad) + Number(cantidadRestante);
                 await prenda.save();
         
