@@ -180,7 +180,30 @@ const agregar = async (req, res) => {
             precioPrenda
         );
 
-        //! Insertar un nuevo producto en la base de datos con el precio total calculado
+        //CONDICIONAL PARA VALIDAR LAS UNIDADES EN STOCK SI HAY LAS SUFICIENTES LO DEJA GUARDAR SI NO MANDA ELMMESJAE
+        if (fk_prenda) {
+            const prenda = await PrendasModels.findOne({
+                where: { id_prenda: fk_prenda },
+            });
+
+            const resultado = Number(prenda.cantidad) - Number(cantidad);
+
+            // Verificar si la cantidad resultante es menor que cero
+            if (resultado < 0) {
+                return res.status(404).json({
+                    message: 'No hay suficientes unidades en stock',
+                    resultado,
+                });
+            }
+
+            prenda.cantidad = resultado;
+            prenda.save();
+
+
+        }
+
+
+        //! Insertar un nuevo producto en la base de datos 
         const nuevoProducto = await ProductoModels.create({
             nombre: capitalizarPrimeraLetras(nombre),
             cantidad,
@@ -200,21 +223,6 @@ const agregar = async (req, res) => {
             });
         }
 
-        if (fk_prenda) {
-            const prenda = await PrendasModels.findOne({
-                where: { id_prenda: fk_prenda },
-            });
-
-            const resultado =
-            prenda.cantidad =
-                Number(prenda.cantidad) - Number(cantidad);
-            prenda.save();
-
-
-        }
-
-        
-
 
 
 
@@ -227,6 +235,7 @@ const agregar = async (req, res) => {
             message: 'Producto agregado exitosamente',
             nuevoProducto,
         });
+
     } catch (error) {
         console.log(error);
         // Envía una respuesta al cliente indicando el error
@@ -279,33 +288,45 @@ const actualizar = async (req, res) => {
         );
 
 
-            //condicional para calcular la cantidad de prendas dependiento  del producto
+        //condicional para calcular la cantidad de prendas dependiento  del producto
         if (fk_prenda) {
             const prenda = await PrendasModels.findOne({
                 where: { id_prenda: fk_prenda },
             });
-            
+
             //si la cantidad de producto anterior es menor a la actualizada del producto
             if (producto.cantidad < cantidad) {
 
-                
+
 
                 //la cantidad actualizada se le resta la cantidad vieja y el resultado
                 const cantidadRestante = cantidad - producto.cantidad;
-        
+
+
                 //el resultado de la cantidad actualiza y la cantidad vieja se le resta a prenda
-                prenda.cantidad = Number(prenda.cantidad) - Number(cantidadRestante);
+                const resultado = Number(prenda.cantidad) - Number(cantidadRestante);
+
+                // Verificar si la cantidad resultante es menor que cero
+                if (resultado < 0) {
+                    return res.status(404).json({
+                        message: 'No hay suficientes unidades en stock',
+                        resultado,
+                    });
+                }
+
+
+                prenda.cantidad = resultado
                 await prenda.save();
 
                 //en el caso cotrario se le suma
             } else {
 
 
-                const cantidadRestante =  producto.cantidad - cantidad 
-                
+                const cantidadRestante = producto.cantidad - cantidad
+
                 prenda.cantidad = Number(prenda.cantidad) + Number(cantidadRestante);
                 await prenda.save();
-        
+
                 // No necesitamos modificar 'cantidad' en este caso, ya que no hay cantidad sobrante
             }
         }
@@ -318,7 +339,7 @@ const actualizar = async (req, res) => {
         producto.publicado = publicado;
 
 
-       
+
 
         /// Verificar si se subió una imagen nueva
         if (req.file) {
