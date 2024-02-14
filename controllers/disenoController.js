@@ -23,6 +23,18 @@ const agregar = async (req, res) => {
 
         console.log(req.body);
 
+        // Verificar si el nombre ya está ocupado
+        const nombreOcupado = await DisenoModels.findOne({
+            where: { nombre: nombre },
+        });
+
+        if (nombreOcupado) {
+            return res.status(403).json({
+                message: 'Ya existe este Diseño',
+                nombreOcupado,
+            });
+        }
+
         //* Validar que se haya cargado el archivo
         if(!req.file) {
             return res.json({ message: `Error la imagen del diseño es requerida` });
@@ -60,6 +72,21 @@ const actualizar = async (req, res) => {
         const diseno = await DisenoModels.findOne({
             where: { id_diseno: id },
         });
+
+        // Si el nombre ha cambiado, verifica si el nuevo nombre ya está ocupado
+        if (nombre !== diseno.nombre) {
+            const nombreOcupado = await DisenoModels.findOne({
+                where: { nombre: nombre },
+            });
+
+            if (nombreOcupado) {
+                return res.status(403).json({
+                    message: 'Ya existe este Diseño',
+                    nombreOcupado,
+                });
+            }
+        }
+
         /// Actualizar los valores del registro
         diseno.nombre = capitalizarPrimeraLetras(nombre);
         

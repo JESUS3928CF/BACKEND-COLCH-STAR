@@ -50,6 +50,16 @@ const consultar = async (req, res) => {
             orden.dataValues.detalles =
                 detallesPorOrden.get(orden.id_orden) || [];
 
+
+            // Validar la fecha antes de formatear
+            if (!isNaN(Date.parse(orden.fecha_creacion))) {
+                orden.fecha_creacion = formatDate(orden.fecha_creacion);
+            } else {
+                // Manejar el caso de una fecha no válida
+                console.error('Fecha no válida:', orden.fecha_creacion);
+                // Puedes asignar una fecha por defecto o manejarlo de otra manera
+            }
+
             // Validar la fecha antes de formatear
             if (!isNaN(Date.parse(orden.fecha_entrega))) {
                 orden.fecha_entrega = formatDate(orden.fecha_entrega);

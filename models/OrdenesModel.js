@@ -14,6 +14,13 @@ const OrdenesModels = db.define(
         fecha_entrega: {
             type: Sequelize.STRING,
         },
+        fecha_creacion: {
+            type: Sequelize.DATE,
+            allowNull: false,
+            defaultValue: Sequelize.literal(
+                "CONVERT_TZ(NOW(), '+00:00', '-05:00')"
+            ),
+        },
         precio_total: {
             type: Sequelize.FLOAT,
         },
