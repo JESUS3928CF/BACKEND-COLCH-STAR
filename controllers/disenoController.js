@@ -25,7 +25,7 @@ const agregar = async (req, res) => {
 
         // Verificar si el nombre ya está ocupado
         const nombreOcupado = await DisenoModels.findOne({
-            where: { nombre: nombre },
+            where: { nombre: capitalizarPrimeraLetras(nombre) },
         });
 
         if (nombreOcupado) {
@@ -76,7 +76,7 @@ const actualizar = async (req, res) => {
         // Si el nombre ha cambiado, verifica si el nuevo nombre ya está ocupado
         if (nombre !== diseno.nombre) {
             const nombreOcupado = await DisenoModels.findOne({
-                where: { nombre: nombre },
+                where: { nombre: capitalizarPrimeraLetras(nombre) },
             });
 
             if (nombreOcupado) {

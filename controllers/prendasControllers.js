@@ -94,7 +94,7 @@ const agregar = async (req, res) => {
 
         // Verificar si el nombre ya está ocupado
         const nombreOcupado = await PrendasModels.findOne({
-            where: { nombre: nombre },
+            where: { nombre: capitalizarPrimeraLetras(nombre) },
         });
 
         if (nombreOcupado) {
@@ -168,7 +168,7 @@ const update = async (req, res) => {
         // Si el nombre ha cambiado, verifica si el nuevo nombre ya está ocupado
         if (nombre !== prenda.nombre) {
             const nombreOcupado = await PrendasModels.findOne({
-                where: { nombre: nombre },
+                where: { nombre: capitalizarPrimeraLetras(nombre) },
             });
 
             if (nombreOcupado) {

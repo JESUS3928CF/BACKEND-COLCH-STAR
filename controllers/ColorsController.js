@@ -1,7 +1,7 @@
 const{colorModels}= require('../models/colorModel')
-const {colorsPrendasmodel} = require('../models/ColorsPrendasModels.js');
 const { MovimientosModels } = require('../models/MovimientosModels.js');
-const { PrendasModels } = require("../models/PrendasModel.js");
+
+const { capitalizarPrimeraLetras } = require('../helpers/formatearDatos.js');
 
 
 
@@ -26,8 +26,7 @@ const addColors = async(req,res)=>{
     try{
         const {color,codigo}=req.body
         const  repeatedColors = await colorModels.findOne({
-            where: {color:color,codigo:codigo}
-
+            where: {color: capitalizarPrimeraLetras(color)}
         })
 
         if(repeatedColors){
@@ -37,8 +36,19 @@ const addColors = async(req,res)=>{
             })
         }
 
+        const  repeatedColorsCode = await colorModels.findOne({
+            where: {codigo:codigo}
+        })
+
+        if(repeatedColorsCode){
+            return res.status(403).json({
+                message:'Ya existe el codigo del color',
+                repeatedColorsCode
+            })
+        }
+
          await colorModels.create({
-            color,
+            color : capitalizarPrimeraLetras(color),
             codigo
         });
 
