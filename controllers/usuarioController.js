@@ -117,7 +117,7 @@ const passwordPerdida = async (req, res) => {
 
         res.json({
             message:
-                'Se ha enviado un email con las instrucciones para restablecer la contraseña, si no encuentras el mensaje recuerda revisas la bandeja de span',
+                'Se ha enviado un correo electrónico con las instrucciones para reestablecer la contraseña, si no encuentras el mensaje recuerda revisar en la bandeja de spam.',
         });
     } catch (error) {
         console.log(error);
