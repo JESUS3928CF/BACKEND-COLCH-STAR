@@ -2,13 +2,10 @@ const { PrendasModels } = require('../models/PrendasModel.js');
 const { colorModels } = require('../models/colorModel.js');
 const { colorsPrendasmodel } = require('../models/ColorsPrendasModels.js');
 const { TallaModels } = require('../models/TallaModel.js');
-const {
-    formatMoney,
-    capitalizarPrimeraLetras,
-} = require('../helpers/formatearDatos.js');
+const { DetallePrendaModels } = require('../models/DetallePrendaModel.js');
+const { capitalizarPrimeraLetras } = require('../helpers/formatearDatos.js');
 
 const fs = require('fs');
-const { where } = require('sequelize');
 const { MovimientosModels } = require('../models/MovimientosModels.js');
 
 const consultar = async (req, res) => {
@@ -19,9 +16,27 @@ const consultar = async (req, res) => {
         const colorsPrenda = await colorsPrendasmodel.findAll();
         const Tallas = await TallaModels.findAll();
 
+        //* Cantidades
+        const cantidades = await DetallePrendaModels.findAll();
+
+        // Mappers de tablas relacionadas
+        const cantidadesPrenda = new Map();
         const TablaIntermedia = new Map();
         const nombreColors = new Map();
         const tallas = new Map();
+
+        cantidades.forEach((cantidad) => {
+
+            const colorDB = colors.find((color) => cantidad.color == color.id_color)
+            if (!cantidadesPrenda.has(cantidad.fk_prenda)) {
+                cantidadesPrenda.set(cantidad.fk_prenda, []);
+            }
+            cantidadesPrenda.get(cantidad.fk_prenda).push({
+                color: colorDB.color ,
+                talla: cantidad.talla,
+                cantidad: cantidad.cantidad,
+            });
+        });
 
         Tallas.forEach((talla) => {
             if (!tallas.has(talla.fk_prenda)) {
@@ -48,26 +63,27 @@ const consultar = async (req, res) => {
             TablaIntermedia.get(fk_color.fk_prenda).push(fk_color.fk_color);
         });
 
-        const ColoresDelaPrenda = prendas.map((colors) => ({
-            id_prenda: colors.id_prenda,
-            nombre: colors.nombre,
-            cantidad: colors.cantidad,
-            precio: colors.precio,
-            tipo_de_tela: colors.tipo_de_tela,
-            imagen: colors.imagen,
-            genero: colors.genero,
-            publicado: colors.publicado,
-            estado: colors.estado,
+        const ColoresDelaPrenda = prendas.map((prenda) => ({
+            id_prenda: prenda.id_prenda,
+            nombre: prenda.nombre,
+            cantidad: prenda.cantidad,
+            precio: prenda.precio,
+            tipo_de_tela: prenda.tipo_de_tela,
+            imagen: prenda.imagen,
+            genero: prenda.genero,
+            publicado: prenda.publicado,
+            estado: prenda.estado,
             color: (() => {
                 const result = [];
-                TablaIntermedia.get(colors.id_prenda).forEach((fk_color) => {
+                TablaIntermedia.get(prenda.id_prenda).forEach((fk_color) => {
                     // Use spread (...) operator to merge arrays
                     result.push(...(nombreColors.get(fk_color) || []));
                 });
                 return result || [];
             })(),
 
-            Talla: tallas.get(colors.id_prenda) || [],
+            Talla: tallas.get(prenda.id_prenda) || [],
+            cantidades: cantidadesPrenda.get(prenda.id_prenda) || [],
         }));
 
         res.status(200).json(ColoresDelaPrenda);
