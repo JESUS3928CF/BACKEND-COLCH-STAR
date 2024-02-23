@@ -14,9 +14,9 @@ const ProductoModels = db.define(
         nombre: {
             type: Sequelize.STRING,
         },
-        cantidad: {
-            type: Sequelize.INTEGER,
-        },
+        // cantidad: {
+        //     type: Sequelize.INTEGER,
+        // },
         precio: {
             type: Sequelize.FLOAT,
         },

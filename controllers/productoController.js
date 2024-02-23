@@ -109,7 +109,7 @@ const consultar = async (req, res) => {
         const productoConDisenos = productos.map((producto) => ({
             id_producto: producto.id_producto,
             nombre: producto.nombre,
-            cantidad: producto.cantidad,
+            // cantidad: producto.cantidad,
             precio: formatMoney(producto.precio),
             estado: producto.estado,
             imagen: producto.imagen,
@@ -139,7 +139,8 @@ const consultar = async (req, res) => {
 
 const agregar = async (req, res) => {
     try {
-        const { nombre, cantidad, fk_prenda, publicado, disenos } = req.body;
+        // cantidad
+        const { nombre,  fk_prenda, publicado, disenos } = req.body;
         console.log(req.file);
         if (!req.file) {
             return res.json({
@@ -180,40 +181,39 @@ const agregar = async (req, res) => {
             precioPrenda
         );
 
-        //CONDICIONAL PARA VALIDAR LAS UNIDADES EN STOCK SI HAY LAS SUFICIENTES LO DEJA GUARDAR SI NO MANDA ELMMESJAE
-        if (fk_prenda) {
-            const prenda = await PrendasModels.findOne({
-                where: { id_prenda: fk_prenda },
-            });
+        // //CONDICIONAL PARA VALIDAR LAS UNIDADES EN STOCK SI HAY LAS SUFICIENTES LO DEJA GUARDAR SI NO MANDA ELMMESJAE
+        // if (fk_prenda) {
+        //     const prenda = await PrendasModels.findOne({
+        //         where: { id_prenda: fk_prenda },
+        //     });
 
-            const resultado = Number(prenda.cantidad) - Number(cantidad);
+        //     const resultado = Number(prenda.cantidad) - Number(cantidad);
 
-            // Verificar si la cantidad resultante es menor que cero
-            if (resultado < 0) {
-                return res.status(404).json({
-                    message: 'No hay suficientes unidades en stock',
-                    resultado,
-                });
-            }
+        //     // Verificar si la cantidad resultante es menor que cero
+        //     if (resultado < 0) {
+        //         return res.status(404).json({
+        //             message: 'No hay suficientes unidades en stock',
+        //             resultado,
+        //         });
+        //     }
 
-            prenda.cantidad = resultado;
-            prenda.save();
+        //     prenda.cantidad = resultado;
+        //     prenda.save();
 
 
-        }
+        // }
 
 
         //! Insertar un nuevo producto en la base de datos 
         const nuevoProducto = await ProductoModels.create({
             nombre: capitalizarPrimeraLetras(nombre),
-            cantidad,
+            // cantidad,
             precio: precioTotal, // Utilizar el precio total calculado
             imagen: req.file.filename,
             fk_prenda,
             publicado,
         });
 
-        // console.log(imagen)
 
         for (let value of disenosArray) {
             await DetalleDiseñoModels.create({
@@ -247,7 +247,8 @@ const agregar = async (req, res) => {
 
 const actualizar = async (req, res) => {
     try {
-        const { nombre, cantidad, fk_prenda, publicado, disenos } = req.body;
+        // cantidad,
+        const { nombre,  fk_prenda, publicado, disenos } = req.body;
         const id = req.params.id;
 
         const producto = await ProductoModels.findOne({
@@ -289,51 +290,51 @@ const actualizar = async (req, res) => {
 
 
         //condicional para calcular la cantidad de prendas dependiento  del producto
-        if (fk_prenda) {
-            const prenda = await PrendasModels.findOne({
-                where: { id_prenda: fk_prenda },
-            });
+        // if (fk_prenda) {
+        //     const prenda = await PrendasModels.findOne({
+        //         where: { id_prenda: fk_prenda },
+        //     });
 
-            //si la cantidad de producto anterior es menor a la actualizada del producto
-            if (producto.cantidad < cantidad) {
-
-
-
-                //la cantidad actualizada se le resta la cantidad vieja y el resultado
-                const cantidadRestante = cantidad - producto.cantidad;
+        //     //si la cantidad de producto anterior es menor a la actualizada del producto
+        //     if (producto.cantidad < cantidad) {
 
 
-                //el resultado de la cantidad actualiza y la cantidad vieja se le resta a prenda
-                const resultado = Number(prenda.cantidad) - Number(cantidadRestante);
 
-                // Verificar si la cantidad resultante es menor que cero
-                if (resultado < 0) {
-                    return res.status(404).json({
-                        message: 'No hay suficientes unidades en stock',
-                        resultado,
-                    });
-                }
+        //         //la cantidad actualizada se le resta la cantidad vieja y el resultado
+        //         const cantidadRestante = cantidad - producto.cantidad;
 
 
-                prenda.cantidad = resultado
-                await prenda.save();
+        //         //el resultado de la cantidad actualiza y la cantidad vieja se le resta a prenda
+        //         const resultado = Number(prenda.cantidad) - Number(cantidadRestante);
 
-                //en el caso cotrario se le suma
-            } else {
+        //         // Verificar si la cantidad resultante es menor que cero
+        //         if (resultado < 0) {
+        //             return res.status(404).json({
+        //                 message: 'No hay suficientes unidades en stock',
+        //                 resultado,
+        //             });
+        //         }
 
 
-                const cantidadRestante = producto.cantidad - cantidad
+        //         prenda.cantidad = resultado
+        //         await prenda.save();
 
-                prenda.cantidad = Number(prenda.cantidad) + Number(cantidadRestante);
-                await prenda.save();
+        //         //en el caso cotrario se le suma
+        //     } else {
 
-                // No necesitamos modificar 'cantidad' en este caso, ya que no hay cantidad sobrante
-            }
-        }
+
+        //         const cantidadRestante = producto.cantidad - cantidad
+
+        //         prenda.cantidad = Number(prenda.cantidad) + Number(cantidadRestante);
+        //         await prenda.save();
+
+        //         // No necesitamos modificar 'cantidad' en este caso, ya que no hay cantidad sobrante
+        //     }
+        // }
 
         // Actualizar los valores del registro
         producto.nombre = capitalizarPrimeraLetras(nombre);
-        producto.cantidad = cantidad;
+        // producto.cantidad = cantidad;
         producto.precio = precioTotal; // Utilizar el precio total calculado
         producto.fk_prenda = fk_prenda;
         producto.publicado = publicado;
