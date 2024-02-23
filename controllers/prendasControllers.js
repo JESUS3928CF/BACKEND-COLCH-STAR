@@ -201,7 +201,6 @@ const update = async (req, res) => {
             },
         });
 
-        console.log(cantidades, " cantidades")
 
         //* Validar que no se pueda quitar la talla si se esta usando en cantidades
         let tallasDisponibles = [];
@@ -220,30 +219,42 @@ const update = async (req, res) => {
 
         //* Validar que no se pueda quitar el color si se esta usando en cantidades
 
-        // const coloresDB = await colorModels.findAll();
+        const coloresDB = await colorModels.findAll();
 
-        // // Los colores de las cantidades
-        // const coloresUsadosId = cantidades.map((cantidad) => cantidad.color);
+        // Los colores de las cantidades
+        const coloresUsadosId = cantidades.map((cantidad) => cantidad.color);
 
-        // console.log(coloresUsadosId, ' del back');
 
-        // // Filtrar los colores de la base de datos usando los IDs de colores usados
-        // const coloresUsados = coloresDB.filter((color) =>
-        //     coloresUsadosId.includes(color.id)
-        // );
+        // Filtrar los colores de la base de datos usando los IDs de colores usados
+        const coloresUsados = coloresDB.filter((color) =>
+            coloresUsadosId.includes(color.id_color)
+        );
 
-        // console.log(coloresUsados, ' del from');
 
-        // // Verificar si se encontró alguna talla no válida
-        // let todosLosColoresPresentes = coloresUsados.every((color) =>
-        //     coloresNombres.includes(color)
-        // );
+        let coloresNombresCantidad = coloresUsados.filter(
+            (color) => color.color
+        );
 
-        // if (!todosLosColoresPresentes) {
-        //     return res.status(403).json({
-        //         message: `Hay cantidades en stock de prendas con estos colores ${coloresUsados} así que no los puedes retirar`,
-        //     });
-        // }
+        coloresNombresCantidad = coloresNombresCantidad.map( color => color.color)
+
+        console.log(coloresNombresCantidad, " colores cantidad")
+
+        let coloresNombresFrom = colores.filter((color) => color.color);
+
+        coloresNombresFrom = coloresNombresFrom.map((color) => color.color);
+
+        console.log(coloresNombresFrom, " color del from");
+
+        // Verificar si se encontró alguna talla no válida
+        let todosLosColoresPresentes = coloresNombresCantidad.every((color) =>
+            coloresNombresFrom.includes(color)
+        );
+
+        if (!todosLosColoresPresentes) {
+            return res.status(403).json({
+                message: `Hay cantidades en stock de prendas con estos colores ${coloresNombresCantidad} así que no los puedes retirar`,
+            });
+        }
 
         prenda.nombre = capitalizarPrimeraLetras(nombre);
         prenda.precio = precio;
