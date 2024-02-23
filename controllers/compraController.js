@@ -81,6 +81,8 @@ const agregar = async (req, res) => {
         const { total_de_compra, fecha, fk_proveedor, DetallesCompras } =
             req.body;
 
+        console.log(DetallesCompras);
+
         const compras = await CompraModels.create({
             total_de_compra,
             fecha,
@@ -96,7 +98,7 @@ const agregar = async (req, res) => {
                 fk_compra: compras.id_compra,
                 cantidad: value.cantidad,
                 precio: value.precio,
-                color_id: value.color_id,
+                color_id: value.color,
                 talla: value.talla,
                 fk_prenda: value.fk_prenda || null,
             });
@@ -106,19 +108,19 @@ const agregar = async (req, res) => {
                 const cantidad = await DetallePrendaModels.findOne({
                     where: {
                         fk_prenda: value.fk_prenda,
-                        color: value.color_id,
+                        color: value.color,
                         talla: value.talla,
                     },
                 });
 
                 if (cantidad) {
-                    cantidad.cantidad = cantidad.cantidad + value.cantidad
+                    cantidad.cantidad = Number(cantidad.cantidad) + Number(value.cantidad)
                     await cantidad.save();
                 } else {
-                    const cantidadNueva = await DetallePrendaModels.create({
-                        cantidad : value.cantidad,
+                    await DetallePrendaModels.create({
+                        cantidad : Number(value.cantidad),
                         talla : value.talla,
-                        color : value.color_id,
+                        color : value.color,
                         fk_prenda : value.fk_prenda
                     })
                 }
