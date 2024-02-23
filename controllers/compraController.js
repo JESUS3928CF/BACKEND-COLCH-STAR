@@ -230,46 +230,66 @@ const cambiarEstado = async (req, res) => {
         console.log('Se hizo una estado');
         const { estado, detalle } = req.body;
 
-        console.log(detalle);
         const id = req.params.id;
-        console.log(id);
 
-        const compra = await CompraModels.findOne({
-            where: { id_compra: id },
-        });
 
         let stockInsuficiente = false;
 
+
         for (let value of detalle) {
             if (value.fk_prenda) {
-                const prenda = await PrendasModels.findOne({
-                    where: { id_prenda: value.fk_prenda },
+                const cantidad = await DetallePrendaModels.findOne({
+                    where: { fk_prenda: value.fk_prenda, talla : value.talla, color : value.color_id },
                 });
 
-                if (Number(prenda.cantidad) - Number(value.cantidad) < 0) {
+
+                if (Number(cantidad.cantidad) - Number(value.cantidad) < 0) {
                     stockInsuficiente = true;
                     break;
+                }
+
+                
+
+
+
+            }
+        }
+
+
+        if (stockInsuficiente){
+            return res.status(403).json({
+                message:
+                    'Algunas de las prendas de esta compra han sido utilizados, no se puede cancelar',
+            })}
+
+        console.log("Llega aqui")
+
+
+        for (let value of detalle) {
+            if (value.fk_prenda) {
+                const cantidad = await DetallePrendaModels.findOne({
+                    where: { fk_prenda: value.fk_prenda, talla : value.talla, color : value.color_id },
+                });
+
+                console.log(cantidad, "  cantidad")
+
+                if (Number(cantidad.cantidad) - Number(value.cantidad) == 0) {
+                    cantidad.destroy()
+                    break;
+                }else {
+                    cantidad.cantidad = Number(cantidad.cantidad) - Number(value.cantidad);
+                    cantidad.save();
                 }
             }
         }
 
-        if (stockInsuficiente)
-            return res.status(403).json({
-                message:
-                    'los productos de esta compra han sido utilizados, no se puede cancelar',
-            });
 
-        for (let value of detalle) {
-            if (value.fk_prenda) {
-                const prenda = await PrendasModels.findOne({
-                    where: { id_prenda: value.fk_prenda },
-                });
 
-                prenda.cantidad =
-                    Number(prenda.cantidad) - Number(value.cantidad);
-                prenda.save();
+        const compra = await CompraModels.findOne({
+            where : {
+                id_compra : id
             }
-        }
+        })
 
         // Actualizar los valores del registro
         compra.estado = !estado;
@@ -283,6 +303,7 @@ const cambiarEstado = async (req, res) => {
         res.json({ message: 'Cambio de estado' });
     } catch (error) {
         res.status(500).json({ message: 'no se cambio el estado' });
+        console.log(error)
     }
 };
 
