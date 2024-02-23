@@ -6,6 +6,7 @@ const { MovimientosModels } = require('../models/MovimientosModels.js');
 const { PrendasModels } = require('../models/PrendasModel.js');
 const { ProveedorModels } = require('../models/ProveedorModel');
 const { DetalleCompraModels } = require('../models/compraDetallesModel.js');
+const { DetallePrendaModels } = require('../models/DetallePrendaModel.js');
 
 const consultar = async (req, res) => {
     try {
@@ -80,26 +81,50 @@ const agregar = async (req, res) => {
         const { total_de_compra, fecha, fk_proveedor, DetallesCompras } =
             req.body;
 
-        console.log(req.body);
-
         const compras = await CompraModels.create({
             total_de_compra,
             fecha,
             fk_proveedor,
         });
 
-        console.log(DetallesCompras);
-
         let detallesComprasArray = DetallesCompras;
+
+        // Actualizar las cantidades de las prendas compradas
 
         for (let value of detallesComprasArray) {
             await DetalleCompraModels.create({
                 fk_compra: compras.id_compra,
                 cantidad: value.cantidad,
                 precio: value.precio,
+                color_id: value.color_id,
+                talla: value.talla,
                 fk_prenda: value.fk_prenda || null,
             });
 
+            // Encontrar la cantidad que se va a actualizar y si no existe se crea esa nueva cantidad
+            if (value.fk_prenda) {
+                const cantidad = await DetallePrendaModels.findOne({
+                    where: {
+                        fk_prenda: value.fk_prenda,
+                        color: value.color_id,
+                        talla: value.talla,
+                    },
+                });
+
+                if (cantidad) {
+                    cantidad.cantidad = cantidad.cantidad + value.cantidad
+                    await cantidad.save();
+                } else {
+                    const cantidadNueva = await DetallePrendaModels.create({
+                        cantidad : value.cantidad,
+                        talla : value.talla,
+                        color : value.color_id,
+                        fk_prenda : value.fk_prenda
+                    })
+                }
+            }
+
+            //todo: Quitar cuando se implementes los nuevos cambio y ya no de error
             if (value.fk_prenda) {
                 const prenda = await PrendasModels.findOne({
                     where: { id_prenda: value.fk_prenda },
@@ -211,7 +236,7 @@ const cambiarEstado = async (req, res) => {
             where: { id_compra: id },
         });
 
-        let stockInsuficiente = false
+        let stockInsuficiente = false;
 
         for (let value of detalle) {
             if (value.fk_prenda) {
@@ -219,14 +244,18 @@ const cambiarEstado = async (req, res) => {
                     where: { id_prenda: value.fk_prenda },
                 });
 
-                if( Number(prenda.cantidad) - Number(value.cantidad) < 0){
+                if (Number(prenda.cantidad) - Number(value.cantidad) < 0) {
                     stockInsuficiente = true;
                     break;
                 }
             }
         }
 
-        if(stockInsuficiente) return res.status(403).json({ message: 'los productos de esta compra han sido utilizados, no se puede cancelar' });
+        if (stockInsuficiente)
+            return res.status(403).json({
+                message:
+                    'los productos de esta compra han sido utilizados, no se puede cancelar',
+            });
 
         for (let value of detalle) {
             if (value.fk_prenda) {
