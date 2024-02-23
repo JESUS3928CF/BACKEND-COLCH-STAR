@@ -201,9 +201,9 @@ const update = async (req, res) => {
             },
         });
 
-        //* Validar que no se pueda quitar la talla si se esta usando en cantidades
+        console.log(cantidades, " cantidades")
 
-        console.log(cantidades);
+        //* Validar que no se pueda quitar la talla si se esta usando en cantidades
         let tallasDisponibles = [];
 
         tallasDisponibles = cantidades.map((cantidad) => cantidad.talla);
@@ -274,7 +274,7 @@ const update = async (req, res) => {
 
         prenda.save();
 
-        coloresArray = JSON.parse(colores);
+        coloresArray = colores;
         for (let value of coloresArray) {
             await colorsPrendasmodel.create({
                 fk_color: value.id_color,
