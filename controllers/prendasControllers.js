@@ -26,13 +26,14 @@ const consultar = async (req, res) => {
         const tallas = new Map();
 
         cantidades.forEach((cantidad) => {
-
-            const colorDB = colors.find((color) => cantidad.color == color.id_color)
+            const colorDB = colors.find(
+                (color) => cantidad.color == color.id_color
+            );
             if (!cantidadesPrenda.has(cantidad.fk_prenda)) {
                 cantidadesPrenda.set(cantidad.fk_prenda, []);
             }
             cantidadesPrenda.get(cantidad.fk_prenda).push({
-                color: colorDB.color ,
+                color: colorDB.color,
                 talla: cantidad.talla,
                 cantidad: cantidad.cantidad,
             });
@@ -163,17 +164,15 @@ const agregar = async (req, res) => {
 
 const update = async (req, res) => {
     try {
-        const {
-            nombre,
-            precio,
-            tipo_de_tela,
-            genero,
-            publicado,
-            colores,
-            tallas,
-        } = req.body;
+        const { nombre, precio, tipo_de_tela, genero, publicado, tallas } =
+            req.body;
 
-        console.log(nombre);
+        let { colores } = req.body;
+
+        // Verificar si colores es un string y parsearlo si es necesario
+        if (typeof colores === 'string') {
+            colores = JSON.parse(colores);
+        }
 
         const id = req.params.id;
 
@@ -194,6 +193,57 @@ const update = async (req, res) => {
                 });
             }
         }
+
+        //* Validar las cantidades
+        const cantidades = await DetallePrendaModels.findAll({
+            where: {
+                fk_prenda: id,
+            },
+        });
+
+        //* Validar que no se pueda quitar la talla si se esta usando en cantidades
+
+        console.log(cantidades);
+        let tallasDisponibles = [];
+
+        tallasDisponibles = cantidades.map((cantidad) => cantidad.talla);
+        // Verificar si se encontró alguna talla no válida
+        const todasPresentes = tallasDisponibles.every((talla) =>
+            tallas.includes(talla)
+        );
+
+        if (!todasPresentes) {
+            return res.status(403).json({
+                message: `Hay cantidades en stock de prendas con tallas ${tallasDisponibles} así que no las puedes retirar`,
+            });
+        }
+
+        //* Validar que no se pueda quitar el color si se esta usando en cantidades
+
+        // const coloresDB = await colorModels.findAll();
+
+        // // Los colores de las cantidades
+        // const coloresUsadosId = cantidades.map((cantidad) => cantidad.color);
+
+        // console.log(coloresUsadosId, ' del back');
+
+        // // Filtrar los colores de la base de datos usando los IDs de colores usados
+        // const coloresUsados = coloresDB.filter((color) =>
+        //     coloresUsadosId.includes(color.id)
+        // );
+
+        // console.log(coloresUsados, ' del from');
+
+        // // Verificar si se encontró alguna talla no válida
+        // let todosLosColoresPresentes = coloresUsados.every((color) =>
+        //     coloresNombres.includes(color)
+        // );
+
+        // if (!todosLosColoresPresentes) {
+        //     return res.status(403).json({
+        //         message: `Hay cantidades en stock de prendas con estos colores ${coloresUsados} así que no los puedes retirar`,
+        //     });
+        // }
 
         prenda.nombre = capitalizarPrimeraLetras(nombre);
         prenda.precio = precio;
@@ -222,6 +272,8 @@ const update = async (req, res) => {
             descripcion: `Se actualizo la prenda #${id}`,
         });
 
+        prenda.save();
+
         coloresArray = JSON.parse(colores);
         for (let value of coloresArray) {
             await colorsPrendasmodel.create({
@@ -237,13 +289,11 @@ const update = async (req, res) => {
             });
         }
 
-        prenda.save();
-
         res.json({
             message: 'Actualización exitosa',
         });
     } catch (error) {
-        res.status(500).json({ massge: 'Error al actualizar la prendas' });
+        res.status(500).json({ message: 'Error al actualizar la prendas' });
         console.log(error);
     }
 };
