@@ -81,7 +81,6 @@ const agregar = async (req, res) => {
         const { total_de_compra, fecha, fk_proveedor, DetallesCompras } =
             req.body;
 
-        console.log(DetallesCompras);
 
         const compras = await CompraModels.create({
             total_de_compra,
@@ -262,10 +261,8 @@ const cambiarEstado = async (req, res) => {
                 });
 
                 if (Number(cantidad.cantidad) - Number(value.cantidad) == 0) {
-                    console.log("Es igual a 0");
                     cantidad.destroy();
                 }else {
-                    console.log('Solo actualizar');
                     cantidad.cantidad = Number(cantidad.cantidad) - Number(value.cantidad);
                     cantidad.save();
                 }
