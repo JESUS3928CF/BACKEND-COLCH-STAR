@@ -239,7 +239,7 @@ const cambiarEstado = async (req, res) => {
                     where: { fk_prenda: value.fk_prenda, talla : value.talla, color : value.color_id },
                 });
 
-                if (Number(cantidad.cantidad) - Number(value.cantidad) < 0) {
+                if (!cantidad || Number(cantidad.cantidad) - Number(value.cantidad) < 0) {
                     stockInsuficiente = true;
                     break;
                 }
