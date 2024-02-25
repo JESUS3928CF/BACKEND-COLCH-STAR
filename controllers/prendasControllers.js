@@ -67,7 +67,12 @@ const consultar = async (req, res) => {
         const ColoresDelaPrenda = prendas.map((prenda) => ({
             id_prenda: prenda.id_prenda,
             nombre: prenda.nombre,
-            cantidad: prenda.cantidad,
+            cantidad: cantidadesPrenda.has(prenda.id_prenda)
+                ? cantidadesPrenda
+                      .get(prenda.id_prenda)
+                      .reduce((total, cantidad) => total + cantidad.cantidad, 0)
+                : 0,
+            // cantidad: prenda.cantidad,
             precio: prenda.precio,
             tipo_de_tela: prenda.tipo_de_tela,
             imagen: prenda.imagen,
@@ -100,7 +105,6 @@ const agregar = async (req, res) => {
     try {
         const {
             nombre,
-            cantidad,
             precio,
             tipo_de_tela,
             genero,
@@ -129,7 +133,6 @@ const agregar = async (req, res) => {
 
         const newPrenda = await PrendasModels.create({
             nombre: capitalizarPrimeraLetras(nombre),
-            cantidad,
             precio,
             tipo_de_tela: capitalizarPrimeraLetras(tipo_de_tela),
             imagen: req.file.filename,
@@ -201,7 +204,6 @@ const update = async (req, res) => {
             },
         });
 
-
         //* Validar que no se pueda quitar la talla si se esta usando en cantidades
         let tallasDisponibles = [];
 
@@ -224,26 +226,26 @@ const update = async (req, res) => {
         // Los colores de las cantidades
         const coloresUsadosId = cantidades.map((cantidad) => cantidad.color);
 
-
         // Filtrar los colores de la base de datos usando los IDs de colores usados
         const coloresUsados = coloresDB.filter((color) =>
             coloresUsadosId.includes(color.id_color)
         );
 
-
         let coloresNombresCantidad = coloresUsados.filter(
             (color) => color.color
         );
 
-        coloresNombresCantidad = coloresNombresCantidad.map( color => color.color)
+        coloresNombresCantidad = coloresNombresCantidad.map(
+            (color) => color.color
+        );
 
-        console.log(coloresNombresCantidad, " colores cantidad")
+        console.log(coloresNombresCantidad, ' colores cantidad');
 
         let coloresNombresFrom = colores.filter((color) => color.color);
 
         coloresNombresFrom = coloresNombresFrom.map((color) => color.color);
 
-        console.log(coloresNombresFrom, " color del from");
+        console.log(coloresNombresFrom, ' color del from');
 
         // Verificar si se encontró alguna talla no válida
         let todosLosColoresPresentes = coloresNombresCantidad.every((color) =>
