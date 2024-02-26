@@ -10,7 +10,7 @@ const { DetallePrendaModels } = require('../models/DetallePrendaModel.js');
 
 
 
-        
+
 
 
 const consultar = async (req, res) => {
@@ -35,7 +35,7 @@ const consultar = async (req, res) => {
             include: [
                 {
                     model: ProductoModels, //modelo de productos
-                    attributes: ['nombre', 'imagen','precio'], // Selecciona los atributos que necesitas, en este caso, solo el nombre y la imagen
+                    attributes: ['nombre', 'imagen', 'precio'], // Selecciona los atributos que necesitas, en este caso, solo el nombre y la imagen
                 },
             ],
         });
@@ -58,7 +58,7 @@ const consultar = async (req, res) => {
                 detallesPorOrden.get(orden.id_orden) || [];
 
 
-           
+
 
             // Validar la fecha antes de formatear
             if (!isNaN(Date.parse(orden.fecha_entrega))) {
@@ -73,8 +73,8 @@ const consultar = async (req, res) => {
 
             return orden;
         });
-        
-       
+
+
 
 
         //- Forma de inviar un JSON
@@ -121,18 +121,47 @@ const agregar = async (req, res) => {
 
         console.log(detallesOrdenes);
 
+        let detallesOrdenesArray = detallesOrdenes;
+
+        for (let value of detallesOrdenesArray) {
+            await DetalleOrdenModels.create({
+                fk_orden: ordenes.id_orden,
+                cantidad: value.cantidad,
+                subtotal: value.subtotal,
+                descripcion: value.descripcion,
+                fk_producto: value.fk_producto,
+                talla: value.talla,
+                color: value.color || null,
+
+            });
+
+
+
+        }
+
+
+
+
         let prenditaId;
 
         // Iterar sobre los detalles de la orden para encontrar el ID de la prenda asociada al producto
         for (let value of detallesOrdenes) {
-            const productoNombre = value.producto.nombre;
-            
-            // Buscar la prenda que coincide con el nombre del producto
-            const prenda = await PrendasModels.findOne({ where: { nombre: productoNombre } });
+            const productId = value.fk_producto;
+            const producto = await ProductoModels.findByPk(productId);
 
-            if (prenda) {
-                prenditaId = prenda.id; // Guardar el ID de la prenda
-                break; // Salir del bucle una vez que se encuentre la prenda
+            if (producto) {
+                const productoNombre = producto.nombre;
+                console.log(productoNombre);
+
+                // Buscar la prenda que coincide con el nombre del producto
+                const prenda = await PrendasModels.findOne({ where: { nombre: productoNombre } });
+
+                if (prenda) {
+                    prenditaId = prenda.id; // Guardar el ID de la prenda
+                    break; // Salir del bucle una vez que se encuentre la prenda
+                }
+            } else {
+                console.log(`No se encontró el producto con ID ${productId}`);
             }
         }
 
@@ -141,36 +170,46 @@ const agregar = async (req, res) => {
             for (let value of detallesOrdenes) {
                 const cantidad = await DetallePrendaModels.findOne({
                     where: {
-                        fk_prenda: prenditaId, // Utilizar prenditaId en lugar de value.prenditaId
+                        fk_prenda: prenditaId,
                         color: value.color,
                         talla: value.talla,
                     },
                 });
 
                 if (cantidad) {
-                    cantidad.cantidad = Number(cantidad.cantidad) + Number(value.cantidad)
+                    cantidad.cantidad = Number(cantidad.cantidad) + Number(value.cantidad);
                     await cantidad.save();
                 } else {
                     await DetallePrendaModels.create({
-                        cantidad : Number(value.cantidad),
-                        talla : value.talla,
-                        color : value.color,
-                        fk_prenda : prenditaId // Utilizar prenditaId en lugar de value.prenditaId
-                    })
+                        cantidad: Number(value.cantidad),
+                        talla: value.talla,
+                        color: value.color,
+                        fk_prenda: prenditaId
+                    });
                 }
+            }
 
-                // Actualizar la cantidad en la prenda
-                const prenda = await PrendasModels.findByPk(prenditaId);
-                if (prenda) {
+            const prenda = await PrendasModels.findOne({
+                where: { id_prenda: prenditaId },
+            });
+
+            if (prenda) {
+                for (let value of detallesOrdenes) {
                     prenda.cantidad = Number(prenda.cantidad) + Number(value.cantidad);
-                    await prenda.save();
                 }
+                await prenda.save();
+            } else {
+                console.log(`No se encontró la prenda con ID ${prenditaId}`);
             }
         }
 
+
+
+
+
         await MovimientosModels.create({ descripcion: `El usuario: ${req.usuario.nombre} Registro una nueva orden` });
 
-        // Mensaje de respuesta
+        /// Mensaje de respuesta
         res.json({
             message: 'Orden agregada exitosamente',
         });
@@ -180,7 +219,6 @@ const agregar = async (req, res) => {
         res.status(500).json({ message: 'Error al agregar la orden' });
     }
 };
-
 
 //! Editar la orden
 
