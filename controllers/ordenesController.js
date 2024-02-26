@@ -5,6 +5,13 @@ const { ClienteModels } = require('../models/ClienteModel.js');
 const { ProductoModels } = require('../models/ProductoModel.js');
 const { DetalleOrdenModels } = require('../models/DetalleOrdenModel.js');
 const { MovimientosModels } = require('../models/MovimientosModels.js');
+const { PrendasModels } = require('../models/PrendasModel.js');
+const { DetallePrendaModels } = require('../models/DetallePrendaModel.js');
+
+
+
+        
+
 
 const consultar = async (req, res) => {
     try {
@@ -66,6 +73,9 @@ const consultar = async (req, res) => {
 
             return orden;
         });
+        
+       
+
 
         //- Forma de inviar un JSON
         res.status(200).json(ordenesConDetalles);
@@ -111,23 +121,56 @@ const agregar = async (req, res) => {
 
         console.log(detallesOrdenes);
 
-        let detallesOrdenesArray = detallesOrdenes;
+        let prenditaId;
 
-        for (let value of detallesOrdenesArray) {
-            await DetalleOrdenModels.create({
-                fk_orden: ordenes.id_orden,
-                cantidad: value.cantidad,
-                subtotal: value.subtotal,
-                descripcion: value.descripcion,
-                fk_producto: value.fk_producto,
-                talla: value.talla,
-                color: value.color || null,
-            });
+        // Iterar sobre los detalles de la orden para encontrar el ID de la prenda asociada al producto
+        for (let value of detallesOrdenes) {
+            const productoNombre = value.producto.nombre;
+            
+            // Buscar la prenda que coincide con el nombre del producto
+            const prenda = await PrendasModels.findOne({ where: { nombre: productoNombre } });
+
+            if (prenda) {
+                prenditaId = prenda.id; // Guardar el ID de la prenda
+                break; // Salir del bucle una vez que se encuentre la prenda
+            }
+        }
+
+        // Encontrar la cantidad que se va a actualizar y si no existe se crea esa nueva cantidad
+        if (prenditaId) {
+            for (let value of detallesOrdenes) {
+                const cantidad = await DetallePrendaModels.findOne({
+                    where: {
+                        fk_prenda: prenditaId, // Utilizar prenditaId en lugar de value.prenditaId
+                        color: value.color,
+                        talla: value.talla,
+                    },
+                });
+
+                if (cantidad) {
+                    cantidad.cantidad = Number(cantidad.cantidad) + Number(value.cantidad)
+                    await cantidad.save();
+                } else {
+                    await DetallePrendaModels.create({
+                        cantidad : Number(value.cantidad),
+                        talla : value.talla,
+                        color : value.color,
+                        fk_prenda : prenditaId // Utilizar prenditaId en lugar de value.prenditaId
+                    })
+                }
+
+                // Actualizar la cantidad en la prenda
+                const prenda = await PrendasModels.findByPk(prenditaId);
+                if (prenda) {
+                    prenda.cantidad = Number(prenda.cantidad) + Number(value.cantidad);
+                    await prenda.save();
+                }
+            }
         }
 
         await MovimientosModels.create({ descripcion: `El usuario: ${req.usuario.nombre} Registro una nueva orden` });
 
-        /// Mensaje de respuesta
+        // Mensaje de respuesta
         res.json({
             message: 'Orden agregada exitosamente',
         });
@@ -137,6 +180,7 @@ const agregar = async (req, res) => {
         res.status(500).json({ message: 'Error al agregar la orden' });
     }
 };
+
 
 //! Editar la orden
 
