@@ -105,11 +105,12 @@ const agregar = async (req, res) => {
             // Encontrar la cantidad que se va a actualizar y si no existe se crea esa nueva cantidad
             if (value.fk_prenda) {
 
-                // const prendaPrecio = await PrendasModels.findOne({
-                //     where : { 
-                //         id_prenda : value.fk_prenda
-                //     }
-                // })
+                const prendaPrecio = await PrendasModels.findOne({
+                    where : { 
+                        id_prenda : value.fk_prenda
+                    }
+                })
+
                 const cantidad = await DetallePrendaModels.findOne({
                     where: {
                         fk_prenda: value.fk_prenda,
@@ -119,10 +120,10 @@ const agregar = async (req, res) => {
                 });
 
                 // actulizar el precio base de la prenda
-                // if(prendaPrecio.precio < value.precio) {
-                //     prendaPrecio.precio = value.precio
-                //     prendaPrecio.save()
-                // }
+                if(prendaPrecio.precio < value.precio) {
+                    prendaPrecio.precio = value.precio
+                    prendaPrecio.save()
+                }
 
                 if (cantidad) {
                     cantidad.cantidad = Number(cantidad.cantidad) + Number(value.cantidad)
