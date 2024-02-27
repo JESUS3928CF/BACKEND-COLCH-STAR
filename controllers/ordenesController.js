@@ -5,6 +5,15 @@ const { ClienteModels } = require('../models/ClienteModel.js');
 const { ProductoModels } = require('../models/ProductoModel.js');
 const { DetalleOrdenModels } = require('../models/DetalleOrdenModel.js');
 const { MovimientosModels } = require('../models/MovimientosModels.js');
+const { PrendasModels } = require('../models/PrendasModel.js');
+const { DetallePrendaModels } = require('../models/DetallePrendaModel.js');
+const { colorsPrendasmodel } = require('../models/ColorsPrendasModels.js');
+const { colorModels } = require('../models/colorModel.js');
+
+
+
+
+
 
 const consultar = async (req, res) => {
     try {
@@ -28,7 +37,7 @@ const consultar = async (req, res) => {
             include: [
                 {
                     model: ProductoModels, //modelo de productos
-                    attributes: ['nombre', 'imagen','precio'], // Selecciona los atributos que necesitas, en este caso, solo el nombre y la imagen
+                    attributes: ['nombre', 'imagen', 'precio'], // Selecciona los atributos que necesitas, en este caso, solo el nombre y la imagen
                 },
             ],
         });
@@ -51,7 +60,7 @@ const consultar = async (req, res) => {
                 detallesPorOrden.get(orden.id_orden) || [];
 
 
-           
+
 
             // Validar la fecha antes de formatear
             if (!isNaN(Date.parse(orden.fecha_entrega))) {
@@ -66,6 +75,9 @@ const consultar = async (req, res) => {
 
             return orden;
         });
+
+
+
 
         //- Forma de inviar un JSON
         res.status(200).json(ordenesConDetalles);
@@ -122,8 +134,13 @@ const agregar = async (req, res) => {
                 fk_producto: value.fk_producto,
                 talla: value.talla,
                 color: value.color || null,
+
             });
+
+
+
         }
+
 
         await MovimientosModels.create({ descripcion: `El usuario: ${req.usuario.nombre} Registro una nueva orden` });
 
@@ -200,6 +217,57 @@ const cambiarEstadoOrden = async (req, res) => {
         });
         // Actualizar los valores del registro
         compra.estado_de_orden = estado;
+
+        // aca que busque las cantidades y las reste
+
+        const detallesOrdenes = await DetalleOrdenModels.findAll({
+            where : {
+                fk_orden : id
+            }
+        })
+
+        if(estado == "Entregada"){
+            // Iterar sobre los detalles de la orden para encontrar el ID de la prenda asociada al producto
+        for (let value of detallesOrdenes) {
+            const productId = value.fk_producto;
+            const producto = await ProductoModels.findByPk(productId);
+
+            
+
+            if (producto) {
+                const fk_prenda = producto.fk_prenda;
+                console.log(fk_prenda, " prenda ");
+
+                // Buscar la prenda que coincide con el nombre del producto
+                // const prenda = await PrendasModels.findOne({ where: { id_prenda: fk_prenda } });
+
+                console.log(value, " informacion de la canitdad a restar")
+
+                const id_color = await colorModels.findOne( { where : {
+                    color : value.color
+                }})
+
+                console.log(id_color, " el color")
+
+                const cantidad = await DetallePrendaModels.findOne({
+                    where: {
+                        fk_prenda: fk_prenda,
+                        color: id_color.id_color,
+                        talla: value.talla,
+                    },
+                });
+
+                console.log(cantidad, " cantidad a restar")
+
+                if (cantidad) {
+                    cantidad.cantidad = Number(cantidad.cantidad) - Number(value.cantidad);
+                    await cantidad.save();
+                }
+            } else {
+                console.log(`No se encontró el producto con ID ${productId}`);
+            }
+        }
+        }
 
         console.log(compra);
         compra.save();

@@ -53,14 +53,14 @@ const autenticar = async (req, res) => {
 
         /// Verificar que este habilitado
         if (!usuario.estado) {
-            const error = new Error('Tu cuenta se encuentra deshabilitada');
+            const error = new Error('Tu cuenta se encuentra inhabilitada');
             return res.status(403).json({ message: error.message });
         }
 
         /// Verificar que el rol este habilitado
         if (!usuario.rol.estado) {
             const error = new Error(
-                `El rol de ${usuario.rol.nombre} se encuentra deshabilitado`
+                `El rol de ${usuario.rol.nombre} se encuentra inhabilitado`
             );
             return res.status(403).json({ message: error.message });
         }
@@ -211,7 +211,7 @@ const agregar = async (req, res) => {
 
         if (correoOcupado) {
             return res.status(403).json({
-                message: 'Ya existe este Email',
+                message: 'Ya existe este correo electrónico',
                 correoOcupado,
             });
         }
@@ -257,7 +257,7 @@ const actualizar = async (req, res) => {
             });
             if (telOcupado) {
                 return res.status(403).json({
-                    message: 'Ya Existe este Teléfono',
+                    message: 'Ya existe este teléfono',
                     telOcupado,
                 });
             }
@@ -270,7 +270,7 @@ const actualizar = async (req, res) => {
 
             if (correoOcupado) {
                 return res.status(403).json({
-                    message: 'Ya Existe este Email',
+                    message: 'Ya existe este correo electrónico',
                     correoOcupado,
                 });
             }
