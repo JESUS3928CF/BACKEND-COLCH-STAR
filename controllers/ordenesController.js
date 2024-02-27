@@ -226,7 +226,7 @@ const cambiarEstadoOrden = async (req, res) => {
             }
         })
 
-        if(estado == "Entregada"){
+        if(estado == "Finalizada"){
             // Iterar sobre los detalles de la orden para encontrar el ID de la prenda asociada al producto
         for (let value of detallesOrdenes) {
             const productId = value.fk_producto;
