@@ -212,11 +212,15 @@ const cambiarEstadoOrden = async (req, res) => {
         const id = req.params.id;
         console.log(id);
 
-        const compra = await OrdenesModels.findOne({
+        const orden = await OrdenesModels.findOne({
             where: { id_orden: id },
         });
+
+        if( orden.estado_de_orden == "Creada"){
+            console.log("Realizar validación")
+        }
         // Actualizar los valores del registro
-        compra.estado_de_orden = estado;
+        orden.estado_de_orden = estado;
 
         // aca que busque las cantidades y las reste
 
@@ -225,6 +229,9 @@ const cambiarEstadoOrden = async (req, res) => {
                 fk_orden : id
             }
         })
+
+
+        
 
         if(estado == "Finalizada"){
             // Iterar sobre los detalles de la orden para encontrar el ID de la prenda asociada al producto
@@ -274,8 +281,8 @@ const cambiarEstadoOrden = async (req, res) => {
         }
         }
 
-        console.log(compra);
-        compra.save();
+        console.log(orden);
+        orden.save();
         await MovimientosModels.create({
             descripcion: `El usuario: ${req.usuario.nombre}  actualizo el estado de la orden #${id}`,
         });
