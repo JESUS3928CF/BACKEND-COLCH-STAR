@@ -38,7 +38,6 @@ const consultar = async (req, res) => {
         const colors = await colorModels.findAll();
         const colorsPrenda = await colorsPrendasmodel.findAll();
 
-
         const TablaIntermedia = new Map();
         const tallas = new Map();
         const nombreColors = new Map();
@@ -68,6 +67,8 @@ const consultar = async (req, res) => {
             TablaIntermedia.get(fk_color.fk_prenda).push(fk_color.fk_color);
         });
 
+        console.log(TablaIntermedia, ' map tabla');
+
         /// Consultando los diseños
         const detalle_diseno = await DetalleDiseñoModels.findAll({
             include: [
@@ -85,24 +86,19 @@ const consultar = async (req, res) => {
         const productosConDisenos = new Map();
 
         detalle_diseno.forEach((diseno) => {
-            // console.log(diseno);
             if (!productosConDisenos.has(diseno.fk_producto)) {
                 productosConDisenos.set(diseno.fk_producto, []);
             }
-            console.log(diseno);
-            console.log(
-                productosConDisenos.get(diseno.fk_producto).push({
-                    id_diseno: diseno.diseno.id_diseno,
-                    nombre: diseno.diseno.nombre,
-                    imagen: diseno.diseno.imagen,
-                    id_precio_diseno: diseno.precio_diseno.id_precio_diseno,
-                    precio: diseno.precio_diseno.precio,
-                    tamano: diseno.precio_diseno.tamano,
-                })
-            );
-        });
 
-        //  console.log(productosConDisenos);
+            productosConDisenos.get(diseno.fk_producto).push({
+                id_diseno: diseno.diseno.id_diseno,
+                nombre: diseno.diseno.nombre,
+                imagen: diseno.diseno.imagen,
+                id_precio_diseno: diseno.precio_diseno.id_precio_diseno,
+                precio: diseno.precio_diseno.precio,
+                tamano: diseno.precio_diseno.tamano,
+            });
+        });
 
         //- Forma de inviar un JSON-
         // res.status(200).json(productos);
@@ -120,10 +116,18 @@ const consultar = async (req, res) => {
             tallas: tallas.get(producto.fk_prenda) || [],
             colores: (() => {
                 const result = [];
-                TablaIntermedia.get(producto.fk_prenda).forEach((fk_color) => {
-                    // Use spread (...) operator to merge arrays
-                    result.push(...(nombreColors.get(fk_color) || []));
-                });
+                const tablaIntermediaData = TablaIntermedia.get(
+                    producto.fk_prenda
+                );
+                if (tablaIntermediaData) {
+                    tablaIntermediaData.forEach((fk_color) => {
+                        result.push(...(nombreColors.get(fk_color) || []));
+                    });
+                } else {
+                    console.log(
+                        'La tabla intermedia no contiene datos para el producto'
+                    );
+                }
                 return result || [];
             })(),
         }));
@@ -140,7 +144,7 @@ const consultar = async (req, res) => {
 const agregar = async (req, res) => {
     try {
         // cantidad
-        const { nombre,  fk_prenda, publicado, disenos } = req.body;
+        const { nombre, fk_prenda, publicado, disenos } = req.body;
         console.log(req.file);
         if (!req.file) {
             return res.json({
@@ -200,11 +204,9 @@ const agregar = async (req, res) => {
         //     prenda.cantidad = resultado;
         //     prenda.save();
 
-
         // }
 
-
-        //! Insertar un nuevo producto en la base de datos 
+        //! Insertar un nuevo producto en la base de datos
         const nuevoProducto = await ProductoModels.create({
             nombre: capitalizarPrimeraLetras(nombre),
             // cantidad,
@@ -214,7 +216,6 @@ const agregar = async (req, res) => {
             publicado,
         });
 
-
         for (let value of disenosArray) {
             await DetalleDiseñoModels.create({
                 fk_producto: nuevoProducto.id_producto,
@@ -222,9 +223,6 @@ const agregar = async (req, res) => {
                 fk_precio_diseno: value.id_precio_diseno,
             });
         }
-
-
-
 
         await MovimientosModels.create({
             descripcion: `El usuario: ${req.usuario.nombre} registro un nuevo producto`,
@@ -235,7 +233,6 @@ const agregar = async (req, res) => {
             message: 'Producto agregado exitosamente',
             nuevoProducto,
         });
-
     } catch (error) {
         console.log(error);
         // Envía una respuesta al cliente indicando el error
@@ -248,7 +245,7 @@ const agregar = async (req, res) => {
 const actualizar = async (req, res) => {
     try {
         // cantidad,
-        const { nombre,  fk_prenda, publicado, disenos } = req.body;
+        const { nombre, fk_prenda, publicado, disenos } = req.body;
         const id = req.params.id;
 
         const producto = await ProductoModels.findOne({
@@ -288,7 +285,6 @@ const actualizar = async (req, res) => {
             precioPrenda
         );
 
-
         //condicional para calcular la cantidad de prendas dependiento  del producto
         // if (fk_prenda) {
         //     const prenda = await PrendasModels.findOne({
@@ -298,11 +294,8 @@ const actualizar = async (req, res) => {
         //     //si la cantidad de producto anterior es menor a la actualizada del producto
         //     if (producto.cantidad < cantidad) {
 
-
-
         //         //la cantidad actualizada se le resta la cantidad vieja y el resultado
         //         const cantidadRestante = cantidad - producto.cantidad;
-
 
         //         //el resultado de la cantidad actualiza y la cantidad vieja se le resta a prenda
         //         const resultado = Number(prenda.cantidad) - Number(cantidadRestante);
@@ -315,13 +308,11 @@ const actualizar = async (req, res) => {
         //             });
         //         }
 
-
         //         prenda.cantidad = resultado
         //         await prenda.save();
 
         //         //en el caso cotrario se le suma
         //     } else {
-
 
         //         const cantidadRestante = producto.cantidad - cantidad
 
@@ -338,9 +329,6 @@ const actualizar = async (req, res) => {
         producto.precio = precioTotal; // Utilizar el precio total calculado
         producto.fk_prenda = fk_prenda;
         producto.publicado = publicado;
-
-
-
 
         /// Verificar si se subió una imagen nueva
         if (req.file) {
