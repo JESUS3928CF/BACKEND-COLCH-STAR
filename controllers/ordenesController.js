@@ -268,7 +268,12 @@ const cambiarEstadoOrden = async (req, res) => {
 
                 if (cantidad) {
                     cantidad.cantidad = Number(cantidad.cantidad) - Number(value.cantidad);
-                    await cantidad.save();
+
+                    if(cantidad.cantidad == 0) {
+                        cantidad.destroy()
+                    } else {
+                        cantidad.save();
+                    }
                 }
             } else {
                 console.log(`No se encontró el producto con ID ${productId}`);
