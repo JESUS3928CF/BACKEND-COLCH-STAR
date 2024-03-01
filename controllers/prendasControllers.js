@@ -64,6 +64,7 @@ const consultar = async (req, res) => {
             TablaIntermedia.get(fk_color.fk_prenda).push(fk_color.fk_color);
         });
 
+
         const ColoresDelaPrenda = prendas.map((prenda) => ({
             id_prenda: prenda.id_prenda,
             nombre: prenda.nombre,
@@ -81,10 +82,15 @@ const consultar = async (req, res) => {
             estado: prenda.estado,
             color: (() => {
                 const result = [];
-                TablaIntermedia.get(prenda.id_prenda).forEach((fk_color) => {
-                    // Use spread (...) operator to merge arrays
-                    result.push(...(nombreColors.get(fk_color) || []));
-                });
+                const tablaIntermediaData = TablaIntermedia.get(
+                    prenda.id_prenda
+                );
+                if (tablaIntermediaData) {
+                    tablaIntermediaData.forEach((fk_color) => {
+                        // Use spread (...) operator to merge arrays
+                        result.push(...(nombreColors.get(fk_color) || []));
+                    });
+                }
                 return result || [];
             })(),
 
@@ -140,7 +146,7 @@ const agregar = async (req, res) => {
             publicado,
         });
 
-        coloresArray = JSON.parse(colores);
+        let coloresArray = JSON.parse(colores);
 
         for (let value of coloresArray) {
             await colorsPrendasmodel.create({
@@ -239,13 +245,11 @@ const update = async (req, res) => {
             (color) => color.color
         );
 
-        console.log(coloresNombresCantidad, ' colores cantidad');
 
         let coloresNombresFrom = colores.filter((color) => color.color);
 
         coloresNombresFrom = coloresNombresFrom.map((color) => color.color);
 
-        console.log(coloresNombresFrom, ' color del from');
 
         // Verificar si se encontró alguna talla no válida
         let todosLosColoresPresentes = coloresNombresCantidad.every((color) =>
@@ -277,17 +281,16 @@ const update = async (req, res) => {
             prenda.imagen = req.file.filename;
         }
 
-        await colorsPrendasmodel.destroy({ where: { fk_color: id } });
         await colorsPrendasmodel.destroy({ where: { fk_prenda: id } });
         await TallaModels.destroy({ where: { fk_prenda: id } });
-        await TallaModels.destroy({ where: { talla: id } });
+
         await MovimientosModels.create({
             descripcion: `Se actualizo la prenda #${id}`,
         });
 
         prenda.save();
 
-        coloresArray = colores;
+        let coloresArray = colores;
         for (let value of coloresArray) {
             await colorsPrendasmodel.create({
                 fk_color: value.id_color,
