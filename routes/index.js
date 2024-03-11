@@ -42,7 +42,7 @@ function routerApi(app){
     router.use('/compras', checkAut , routerCompra)
     router.use('/compraDetalles',routerCompraDetalles)
     router.use('/DetalleOrden',routerDetalleOrden)
-    router.use('/ordenes',routerOrdenes)
+    router.use('/ordenes', checkAut ,routerOrdenes)
     router.use('/movimientos',routerMovimientos)
 }
 
