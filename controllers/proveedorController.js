@@ -28,10 +28,6 @@ const agregar = async (req, res) => {
 
 
         // findOne se utiliza para buscar un solo registro en la base de datos que cumpla con ciertos criterios.
-
-        // // si la busqueda anterior, se encuntra un  registro que cumple con la condicion de busqueda,
-        // // se ejecuta el bloque de codigo  dentro del if
-
         // que establece las condiciones de búsqueda. En este caso, se está buscando un registro en la base de datos donde la propiedad 
         // identificador sea igual al valor de la variable identificador
         const identificadorRepetido = await ProveedorModels.findOne({

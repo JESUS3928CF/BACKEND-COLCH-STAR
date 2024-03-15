@@ -67,8 +67,6 @@ const consultar = async (req, res) => {
             TablaIntermedia.get(fk_color.fk_prenda).push(fk_color.fk_color);
         });
 
-        console.log(TablaIntermedia, ' map tabla');
-
         /// Consultando los diseños
         const detalle_diseno = await DetalleDiseñoModels.findAll({
             include: [
@@ -185,27 +183,6 @@ const agregar = async (req, res) => {
             precioPrenda
         );
 
-        // //CONDICIONAL PARA VALIDAR LAS UNIDADES EN STOCK SI HAY LAS SUFICIENTES LO DEJA GUARDAR SI NO MANDA ELMMESJAE
-        // if (fk_prenda) {
-        //     const prenda = await PrendasModels.findOne({
-        //         where: { id_prenda: fk_prenda },
-        //     });
-
-        //     const resultado = Number(prenda.cantidad) - Number(cantidad);
-
-        //     // Verificar si la cantidad resultante es menor que cero
-        //     if (resultado < 0) {
-        //         return res.status(404).json({
-        //             message: 'No hay suficientes unidades en stock',
-        //             resultado,
-        //         });
-        //     }
-
-        //     prenda.cantidad = resultado;
-        //     prenda.save();
-
-        // }
-
         //! Insertar un nuevo producto en la base de datos
         const nuevoProducto = await ProductoModels.create({
             nombre: capitalizarPrimeraLetras(nombre),
@@ -285,44 +262,6 @@ const actualizar = async (req, res) => {
             precioPrenda
         );
 
-        //condicional para calcular la cantidad de prendas dependiento  del producto
-        // if (fk_prenda) {
-        //     const prenda = await PrendasModels.findOne({
-        //         where: { id_prenda: fk_prenda },
-        //     });
-
-        //     //si la cantidad de producto anterior es menor a la actualizada del producto
-        //     if (producto.cantidad < cantidad) {
-
-        //         //la cantidad actualizada se le resta la cantidad vieja y el resultado
-        //         const cantidadRestante = cantidad - producto.cantidad;
-
-        //         //el resultado de la cantidad actualiza y la cantidad vieja se le resta a prenda
-        //         const resultado = Number(prenda.cantidad) - Number(cantidadRestante);
-
-        //         // Verificar si la cantidad resultante es menor que cero
-        //         if (resultado < 0) {
-        //             return res.status(404).json({
-        //                 message: 'No hay suficientes unidades en stock',
-        //                 resultado,
-        //             });
-        //         }
-
-        //         prenda.cantidad = resultado
-        //         await prenda.save();
-
-        //         //en el caso cotrario se le suma
-        //     } else {
-
-        //         const cantidadRestante = producto.cantidad - cantidad
-
-        //         prenda.cantidad = Number(prenda.cantidad) + Number(cantidadRestante);
-        //         await prenda.save();
-
-        //         // No necesitamos modificar 'cantidad' en este caso, ya que no hay cantidad sobrante
-        //     }
-        // }
-
         // Actualizar los valores del registro
         producto.nombre = capitalizarPrimeraLetras(nombre);
         // producto.cantidad = cantidad;
@@ -354,8 +293,6 @@ const actualizar = async (req, res) => {
         // estas líneas se encargan de eliminar los registros existentes en la tabla DetalleDiseñoModels
         // asociados al producto identificado por el id antes de que se añadan nuevos registros Esto asegura que los detalles de los diseños
         // (DetalleDiseñoModels) asociados al producto se actualicen según la nueva información proporcionada en la solicitud.
-        await DetalleDiseñoModels.destroy({ where: { fk_diseno: id } });
-        await DetalleDiseñoModels.destroy({ where: { fk_precio_diseno: id } });
         await DetalleDiseñoModels.destroy({ where: { fk_producto: id } });
         await MovimientosModels.create({
             descripcion: `El usuario: ${req.usuario.nombre} actualizo el producto #${id}`,
@@ -415,7 +352,7 @@ const cambiarPublicacion = async (req, res) => {
 
         producto.save();
         await MovimientosModels.create({
-            descripcion: `El usuario: ${req.usuario.nombre} actualizo la publicacion al producto #${id}`,
+            descripcion: `El usuario: ${req.usuario.nombre} actualizo la publicación al producto #${id}`,
         });
 
         res.status(200).json({ message: 'Se cambio el estado de publicación' });

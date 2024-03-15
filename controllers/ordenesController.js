@@ -243,12 +243,10 @@ const cambiarEstadoOrden = async (req, res) => {
 
             if (producto) {
                 const fk_prenda = producto.fk_prenda;
-                console.log(fk_prenda, " prenda ");
 
                 // Buscar la prenda que coincide con el nombre del producto
                 // const prenda = await PrendasModels.findOne({ where: { id_prenda: fk_prenda } });
 
-                console.log(value, " informacion de la canitdad a restar")
 
                 const id_color = await colorModels.findOne( { where : {
                     color : value.color
@@ -289,7 +287,7 @@ const cambiarEstadoOrden = async (req, res) => {
 
         res.json({ message: 'Se cambio el estado de la orden' });
     } catch (error) {
-        res.status(500).json({ message: 'no se cambio el estado' });
+        res.status(500).json({ message: 'no se cambio el estado de orden' });
     }
 };
 
