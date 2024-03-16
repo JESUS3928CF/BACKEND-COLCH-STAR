@@ -287,6 +287,7 @@ const cambiarEstadoOrden = async (req, res) => {
 
         res.json({ message: 'Se cambio el estado de la orden' });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ message: 'no se cambio el estado de orden' });
     }
 };

@@ -147,6 +147,7 @@ const cambiarEstado = async (req, res) => {
 
         res.json({ message: 'Cambio de estado' });
     } catch (error) {
+        console.log(error)
         res.status(500).json({ message: 'no se cambio el estado' });
     }
 }
